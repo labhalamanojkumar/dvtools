@@ -14,9 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Upload,
   Download,
@@ -25,9 +23,6 @@ import {
   Settings,
   FileImage,
   Shrink,
-  Palette,
-  RotateCcw,
-  Copy,
   Trash2,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toaster";
@@ -80,11 +75,23 @@ export default function ImageOptimizerConverterClient() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const [batchProgress, setBatchProgress] = useState(0);
+  const [useServer, setUseServer] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  }, []);
+
   const handleFileSelect = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
       const files = Array.from(event.target.files || []);
 
       if (files.length === 0) return;
@@ -104,30 +111,88 @@ export default function ImageOptimizerConverterClient() {
 
       if (validFiles.length === 0) return;
 
-      // Process each file
-      validFiles.forEach(async (file) => {
-        const preview = URL.createObjectURL(file);
+      // Process each file sequentially to avoid race conditions
+      for (const file of validFiles) {
+        try {
+          const preview = URL.createObjectURL(file);
 
-        // Get image dimensions
-        const img = new Image();
-        img.onload = () => {
+          // Get image dimensions
+          const dimensions = await getImageDimensions(file);
+
           const newImage: ImageFile = {
             file,
             preview,
             originalSize: file.size,
             format: file.type.split("/")[1].toUpperCase(),
-            dimensions: { width: img.width, height: img.height },
+            dimensions,
             status: "pending",
           };
 
           setImages((prev) => [...prev, newImage]);
-          URL.revokeObjectURL(preview);
-        };
-        img.src = preview;
-      });
+        } catch (error) {
+          toast({
+            title: "Error loading image",
+            description: `Failed to load ${file.name}`,
+            variant: "destructive",
+          });
+        }
+      }
 
       // Reset input
       event.target.value = "";
+    },
+    [toast],
+  );
+
+  const handleDrop = useCallback(
+    async (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+
+      const files = Array.from(e.dataTransfer.files);
+      if (files.length === 0) return;
+
+      // Process files directly instead of creating synthetic event
+      const validFiles = files.filter((file) => {
+        const isValidType = file.type.startsWith("image/");
+        if (!isValidType) {
+          toast({
+            title: "Invalid file type",
+            description: `${file.name} is not a supported image format`,
+            variant: "destructive",
+          });
+        }
+        return isValidType;
+      });
+
+      if (validFiles.length === 0) return;
+
+      // Process each file sequentially to avoid race conditions
+      for (const file of validFiles) {
+        try {
+          const preview = URL.createObjectURL(file);
+
+          // Get image dimensions
+          const dimensions = await getImageDimensions(file);
+
+          const newImage: ImageFile = {
+            file,
+            preview,
+            originalSize: file.size,
+            format: file.type.split("/")[1].toUpperCase(),
+            dimensions,
+            status: "pending",
+          };
+
+          setImages((prev) => [...prev, newImage]);
+        } catch (error) {
+          toast({
+            title: "Error loading image",
+            description: `Failed to load ${file.name}`,
+            variant: "destructive",
+          });
+        }
+      }
     },
     [toast],
   );
@@ -136,20 +201,19 @@ export default function ImageOptimizerConverterClient() {
     setImages((prev) => {
       const newImages = [...prev];
       URL.revokeObjectURL(newImages[index].preview);
-      if (newImages[index].optimized) {
-        URL.revokeObjectURL(URL.createObjectURL(newImages[index].optimized!));
-      }
+      // We don't keep a persistent object URL for the optimized blob
+      // (we create and revoke it on download). So don't create/revoke
+      // a new temporary URL here — it is unnecessary.
       newImages.splice(index, 1);
       return newImages;
     });
   };
 
-  const getImageDimensions = (
-    file: File,
-  ): Promise<{ width: number; height: number }> => {
-    return new Promise((resolve) => {
+  const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve({ width: img.width, height: img.height });
+      img.onerror = () => reject(new Error("Failed to load image"));
       img.src = URL.createObjectURL(file);
     });
   };
@@ -168,37 +232,78 @@ export default function ImageOptimizerConverterClient() {
 
       const img = new Image();
       img.onload = () => {
-        // Calculate new dimensions
-        let { width, height } = img;
+        try {
+          // Calculate new dimensions
+          let { width, height } = img;
 
-        if (settings.maxWidth && width > settings.maxWidth) {
-          height = (height * settings.maxWidth) / width;
-          width = settings.maxWidth;
-        }
+          if (settings.maxWidth && width > settings.maxWidth) {
+            height = (height * settings.maxWidth) / width;
+            width = settings.maxWidth;
+          }
 
-        if (settings.maxHeight && height > settings.maxHeight) {
-          width = (width * settings.maxHeight) / height;
-          height = settings.maxHeight;
-        }
+          if (settings.maxHeight && height > settings.maxHeight) {
+            width = (width * settings.maxHeight) / height;
+            height = settings.maxHeight;
+          }
 
-        // Set canvas size
-        canvas.width = width;
-        canvas.height = height;
+          // Set canvas size
+          canvas.width = width;
+          canvas.height = height;
 
-        // Draw and compress
-        ctx.drawImage(img, 0, 0, width, height);
+          // Draw and compress
+          ctx.drawImage(img, 0, 0, width, height);
 
-        canvas.toBlob(
-          (blob) => {
-            if (blob) {
-              resolve(blob);
-            } else {
-              reject(new Error("Failed to compress image"));
+          // Try to export using the requested format. Some browsers
+          // (or platforms) may not support all MIME types (eg. WebP / AVIF).
+          // If the first attempt yields a null blob, try safe fallbacks.
+          const tryExport = (
+            types: { mime: string; quality?: number }[],
+            idx = 0,
+          ) => {
+            if (idx >= types.length) {
+              reject(new Error("Failed to compress image: unsupported format"));
+              return;
             }
-          },
-          `image/${settings.format}`,
-          settings.quality / 100,
-        );
+
+            const { mime, quality } = types[idx];
+            canvas.toBlob(
+              (blob) => {
+                if (blob && blob.size > 0) {
+                  // If we had to fallback (idx > 0), notify the user once.
+                  if (idx > 0) {
+                    try {
+                      toast?.({
+                        title: "Format fallback",
+                        description: `Requested format not supported in this browser; exported as ${mime.split('/').pop()}`,
+                      });
+                    } catch (e) {
+                      /* ignore toast failures */
+                    }
+                  }
+
+                  resolve(blob);
+                } else {
+                  // try next fallback
+                  tryExport(types, idx + 1);
+                }
+              },
+              mime,
+              quality,
+            );
+          };
+
+          const preferredMime = `image/${settings.format}`;
+          // Fallback order: preferred -> jpeg -> png
+          const mimeAttempts = [
+            { mime: preferredMime, quality: settings.quality / 100 },
+            { mime: "image/jpeg", quality: settings.quality / 100 },
+            { mime: "image/png" },
+          ];
+
+          tryExport(mimeAttempts);
+        } catch (error) {
+          reject(new Error("Failed to process image"));
+        }
       };
 
       img.onerror = () => reject(new Error("Failed to load image"));
@@ -226,13 +331,44 @@ export default function ImageOptimizerConverterClient() {
         updatedImages[i].status = "processing";
         setImages([...updatedImages]);
 
-        const optimized = await optimizeImage(images[i], settings);
-        updatedImages[i] = {
-          ...updatedImages[i],
-          optimized,
-          optimizedSize: optimized.size,
-          status: "completed",
-        };
+        if (useServer) {
+          // Send image to server-side conversion endpoint as data URL
+          try {
+            const dataUrl = await fileToDataUrl(images[i].file);
+            const res = await fetch("/api/tools/image-optimizer", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                image: dataUrl,
+                format: settings.format,
+                quality: settings.quality,
+              }),
+            });
+
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(text || `Server conversion failed: ${res.status}`);
+            }
+
+            const blob = await res.blob();
+            updatedImages[i] = {
+              ...updatedImages[i],
+              optimized: blob,
+              optimizedSize: blob.size,
+              status: "completed",
+            };
+          } catch (err) {
+            throw err;
+          }
+        } else {
+          const optimized = await optimizeImage(images[i], settings);
+          updatedImages[i] = {
+            ...updatedImages[i],
+            optimized,
+            optimizedSize: optimized.size,
+            status: "completed",
+          };
+        }
 
         setImages([...updatedImages]);
       } catch (error) {
@@ -265,12 +401,22 @@ export default function ImageOptimizerConverterClient() {
     const blob = type === "optimized" ? image.optimized : image.file;
     if (!blob) return;
 
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(blob as Blob);
     const link = document.createElement("a");
     link.href = url;
 
-    const extension =
-      type === "optimized" ? settings.format : image.format.toLowerCase();
+    // Derive extension from the blob MIME type when possible to match
+    // the actual exported format (falls back to settings/filename).
+    const mimeType = (blob as Blob).type || "";
+    let extension = "";
+    if (mimeType) {
+      extension = mimeType.split("/").pop() || "bin";
+      // normalize jpeg -> jpg for nicer filenames
+      if (extension === "jpeg") extension = "jpg";
+    } else {
+      extension = type === "optimized" ? settings.format : image.format.toLowerCase();
+    }
+
     link.download = `${image.file.name.replace(/\.[^/.]+$/, "")}_${type}.${extension}`;
 
     document.body.appendChild(link);
@@ -305,6 +451,15 @@ export default function ImageOptimizerConverterClient() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  const fileToDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = () => reject(new Error("Failed to read file"));
+      reader.readAsDataURL(file);
+    });
+  };
+
   const getCompressionRatio = (original: number, optimized: number) => {
     if (!optimized) return 0;
     return ((original - optimized) / original) * 100;
@@ -321,10 +476,19 @@ export default function ImageOptimizerConverterClient() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+          <div
+            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              isDragOver
+                ? "border-primary bg-primary/5"
+                : "border-muted-foreground/25"
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             <FileImage className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-lg font-medium mb-2">
-              Drop images here or click to browse
+              {isDragOver ? "Drop images here" : "Drop images here or click to browse"}
             </p>
             <p className="text-muted-foreground mb-4">
               Supports JPEG, PNG, WebP, and other common image formats
@@ -354,12 +518,22 @@ export default function ImageOptimizerConverterClient() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="col-span-full flex items-center gap-2">
+              <input
+                id="use-server"
+                type="checkbox"
+                checked={useServer}
+                onChange={(e) => setUseServer(e.target.checked)}
+                className="mr-2"
+              />
+              <Label htmlFor="use-server">Use server-side conversion</Label>
+            </div>
             <div>
               <Label htmlFor="format">Output Format</Label>
               <Select
                 value={settings.format}
-                onValueChange={(value) =>
-                  setSettings((prev) => ({ ...prev, format: value as any }))
+                onValueChange={(value: "webp" | "jpeg" | "png" | "avif") =>
+                  setSettings((prev) => ({ ...prev, format: value }))
                 }
               >
                 <SelectTrigger>
@@ -574,15 +748,27 @@ export default function ImageOptimizerConverterClient() {
                           </div>
 
                           {image.status === "completed" && (
-                            <div className="flex gap-1">
+                            <div className="flex gap-2 mt-2">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() =>
                                   downloadImage(image, "optimized")
                                 }
+                                className="flex items-center gap-1"
                               >
                                 <Download className="h-3 w-3" />
+                                Download Optimized
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  downloadImage(image, "original")
+                                }
+                                className="text-xs"
+                              >
+                                Original
                               </Button>
                             </div>
                           )}
@@ -603,50 +789,116 @@ export default function ImageOptimizerConverterClient() {
         </Card>
       )}
 
-      {/* Stats */}
-      {images.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold">{images.length}</div>
-              <p className="text-xs text-muted-foreground">Total Images</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-600">
-                {images.filter((img) => img.status === "completed").length}
+      {/* Download Summary */}
+      {images.some((img) => img.status === "completed") && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Download className="h-5 w-5" />
+              Download Results
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 border rounded-lg">
+                <div className="text-2xl font-bold text-green-600">
+                  {images.filter((img) => img.status === "completed").length}
+                </div>
+                <p className="text-sm text-muted-foreground">Images Optimized</p>
               </div>
-              <p className="text-xs text-muted-foreground">Completed</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-blue-600">
-                {formatBytes(
-                  images.reduce((sum, img) => sum + img.originalSize, 0),
-                )}
+              <div className="text-center p-4 border rounded-lg">
+                <div className="text-2xl font-bold text-blue-600">
+                  {formatBytes(
+                    images.reduce(
+                      (sum, img) => sum + (img.optimizedSize || 0),
+                      0,
+                    ),
+                  )}
+                </div>
+                <p className="text-sm text-muted-foreground">Total Optimized Size</p>
               </div>
-              <p className="text-xs text-muted-foreground">Original Size</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-2xl font-bold text-green-600">
-                {formatBytes(
-                  images.reduce(
-                    (sum, img) => sum + (img.optimizedSize || 0),
-                    0,
-                  ),
-                )}
+              <div className="text-center p-4 border rounded-lg">
+                <div className="text-2xl font-bold text-purple-600">
+                  {images.length > 0
+                    ? Math.round(
+                        images.reduce(
+                          (sum, img) =>
+                            sum +
+                            getCompressionRatio(
+                              img.originalSize,
+                              img.optimizedSize || 0,
+                            ),
+                          0,
+                        ) / images.filter((img) => img.optimizedSize).length,
+                      )
+                    : 0}
+                  %
+                </div>
+                <p className="text-sm text-muted-foreground">Avg. Compression</p>
               </div>
-              <p className="text-xs text-muted-foreground">Optimized Size</p>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button
+                onClick={downloadAll}
+                disabled={!images.some((img) => img.status === "completed")}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Download All Optimized Images
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const completedImages = images.filter(
+                    (img) => img.status === "completed",
+                  );
+                  if (completedImages.length === 0) return;
+
+                  const csvContent = [
+                    ["Filename", "Original Size", "Optimized Size", "Compression %", "Format"],
+                    ...completedImages.map((img) => [
+                      img.file.name,
+                      formatBytes(img.originalSize),
+                      formatBytes(img.optimizedSize || 0),
+                      getCompressionRatio(
+                        img.originalSize,
+                        img.optimizedSize || 0,
+                      ).toFixed(1) + "%",
+                      settings.format.toUpperCase(),
+                    ]),
+                  ]
+                    .map((row) => row.map((cell) => `"${cell}"`).join(","))
+                    .join("\n");
+
+                  const blob = new Blob([csvContent], { type: "text/csv" });
+                  const url = URL.createObjectURL(blob);
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.download = "optimization-report.csv";
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  URL.revokeObjectURL(url);
+
+                  toast({
+                    title: "Report Downloaded",
+                    description: "Optimization report saved as CSV",
+                  });
+                }}
+                disabled={!images.some((img) => img.status === "completed")}
+                className="flex items-center gap-2"
+              >
+                <FileImage className="h-4 w-4" />
+                Download Report (CSV)
+              </Button>
+            </div>
+
+            <div className="text-sm text-muted-foreground text-center">
+              💡 Tip: Individual download buttons are available for each optimized image above
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
