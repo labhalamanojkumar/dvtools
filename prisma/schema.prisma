@@ -1,0 +1,216 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum ToolType {
+  JSON_FORMATTER
+  BASE64_ENCODER
+  CODE_BEAUTIFIER
+  URL_ENCODER
+  JWT_DECODER
+  REGEXP_TESTER
+  COMPONENT_PLAYGROUND
+  CSS_LINTER_OPTIMIZER
+  RESPONSIVE_DESIGN_TESTER
+  IMAGE_OPTIMIZER_CONVERTER
+  ACCESSIBILITY_SCANNER
+  PERFORMANCE_PROFILER
+  STATIC_SITE_EXPORTER
+  THEME_BUILDER
+}
+
+enum AuditAction {
+  USER_LOGIN
+  USER_LOGOUT
+  USER_CREATED
+  USER_UPDATED
+  USER_DELETED
+  USER_SUSPENDED
+  USER_BANNED
+  ROLE_CHANGED
+  TOOL_USED
+  SETTING_CHANGED
+  API_KEY_CREATED
+  API_KEY_REVOKED
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String       @unique
+  name          String?
+  password      String
+  role          Role         @default(USER)
+  status        UserStatus   @default(ACTIVE)
+  emailVerified DateTime?
+  image         String?
+  twoFactorEnabled Boolean   @default(false)
+  twoFactorSecret String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  lastLoginAt   DateTime?
+  lastLoginIp   String?
+  
+  accounts      Account[]
+  sessions      Session[]
+  toolSessions  ToolSession[]
+  apiKeys       ApiKey[]
+  auditLogs     AuditLog[]
+  
+  @@index([email])
+  @@index([role])
+  @@index([status])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model ToolSession {
+  id          String    @id @default(cuid())
+  userId      String?
+  toolType    ToolType
+  inputHash   String?
+  outputHash  String?
+  duration    Int?      // in milliseconds
+  success     Boolean   @default(true)
+  errorMsg    String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime  @default(now())
+  
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([toolType])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  key         String    @unique
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([key])
+  @@index([userId])
+}
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  userId      String?
+  action      AuditAction
+  resource    String?
+  resourceId  String?
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+  
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model SEOReport {
+  id              String   @id @default(cuid())
+  page            String
+  title           String?
+  description     String?
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  ctr             Float    @default(0)
+  avgPosition     Float    @default(0)
+  performanceScore Int?
+  accessibilityScore Int?
+  seoScore        Int?
+  bestPracticesScore Int?
+  reportDate      DateTime @default(now())
+  createdAt       DateTime @default(now())
+  
+  @@index([page])
+  @@index([reportDate])
+}
+
+model PageView {
+  id          String   @id @default(cuid())
+  page        String
+  userId      String?
+  sessionId   String
+  ipAddress   String?
+  userAgent   String?
+  referrer    String?
+  createdAt   DateTime @default(now())
+  
+  @@index([page])
+  @@index([sessionId])
+  @@index([createdAt])
+}
+
+model SystemMetric {
+  id          String   @id @default(cuid())
+  metricName  String
+  metricValue Float
+  timestamp   DateTime @default(now())
+  metadata    Json?
+  
+  @@index([metricName])
+  @@index([timestamp])
+}
