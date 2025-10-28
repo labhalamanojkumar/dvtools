@@ -9,14 +9,14 @@
   (or defaults) and hash the password with bcrypt. It uses the Prisma client.
 */
 
-const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+const { PrismaClient } = require("@prisma/client");
+const bcrypt = require("bcrypt");
 
 async function main() {
   const prisma = new PrismaClient();
 
-  const adminEmail = process.env.ADMIN_EMAIL || 'admin@devtools.com';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@devtools.com";
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123";
 
   try {
     const hashed = await bcrypt.hash(adminPassword, 10);
@@ -25,21 +25,21 @@ async function main() {
       where: { email: adminEmail },
       update: {
         password: hashed,
-        role: 'SUPERADMIN',
-        status: 'ACTIVE',
+        role: "SUPERADMIN",
+        status: "ACTIVE",
       },
       create: {
         email: adminEmail,
-        name: 'Super Admin',
+        name: "Super Admin",
         password: hashed,
-        role: 'SUPERADMIN',
-        status: 'ACTIVE',
+        role: "SUPERADMIN",
+        status: "ACTIVE",
       },
     });
 
-    console.log('Admin user upserted:', user.email);
+    console.log("Admin user upserted:", user.email);
   } catch (err) {
-    console.error('Failed to upsert admin user:', err);
+    console.error("Failed to upsert admin user:", err);
     process.exitCode = 1;
   } finally {
     await prisma.$disconnect();

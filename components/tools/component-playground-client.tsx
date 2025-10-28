@@ -1,16 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Play,
   Code,
@@ -23,61 +29,89 @@ import {
   Palette,
   Type,
   Layout,
-  MousePointer
-} from 'lucide-react';
-import { useToast } from '@/components/ui/toaster';
+  MousePointer,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
 
 // Sample components for playground
 const sampleComponents = {
   Button: {
-    name: 'Button',
+    name: "Button",
     props: {
-      variant: { type: 'select', options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'], default: 'default' },
-      size: { type: 'select', options: ['default', 'sm', 'lg', 'icon'], default: 'default' },
-      disabled: { type: 'boolean', default: false },
-      children: { type: 'text', default: 'Click me' }
+      variant: {
+        type: "select",
+        options: [
+          "default",
+          "destructive",
+          "outline",
+          "secondary",
+          "ghost",
+          "link",
+        ],
+        default: "default",
+      },
+      size: {
+        type: "select",
+        options: ["default", "sm", "lg", "icon"],
+        default: "default",
+      },
+      disabled: { type: "boolean", default: false },
+      children: { type: "text", default: "Click me" },
     },
-    render: (props: any) => `<Button variant="${props.variant}" size="${props.size}"${props.disabled ? ' disabled' : ''}>\n  ${props.children}\n</Button>`
+    render: (props: any) =>
+      `<Button variant="${props.variant}" size="${props.size}"${props.disabled ? " disabled" : ""}>\n  ${props.children}\n</Button>`,
   },
   Card: {
-    name: 'Card',
+    name: "Card",
     props: {
-      title: { type: 'text', default: 'Card Title' },
-      content: { type: 'textarea', default: 'Card content goes here...' },
-      className: { type: 'text', default: '' }
+      title: { type: "text", default: "Card Title" },
+      content: { type: "textarea", default: "Card content goes here..." },
+      className: { type: "text", default: "" },
     },
-    render: (props: any) => `<Card className="${props.className}">\n  <CardHeader>\n    <CardTitle>${props.title}</CardTitle>\n  </CardHeader>\n  <CardContent>\n    <p>${props.content}</p>\n  </CardContent>\n</Card>`
+    render: (props: any) =>
+      `<Card className="${props.className}">\n  <CardHeader>\n    <CardTitle>${props.title}</CardTitle>\n  </CardHeader>\n  <CardContent>\n    <p>${props.content}</p>\n  </CardContent>\n</Card>`,
   },
   Input: {
-    name: 'Input',
+    name: "Input",
     props: {
-      type: { type: 'select', options: ['text', 'email', 'password', 'number'], default: 'text' },
-      placeholder: { type: 'text', default: 'Enter text...' },
-      disabled: { type: 'boolean', default: false },
-      className: { type: 'text', default: '' }
+      type: {
+        type: "select",
+        options: ["text", "email", "password", "number"],
+        default: "text",
+      },
+      placeholder: { type: "text", default: "Enter text..." },
+      disabled: { type: "boolean", default: false },
+      className: { type: "text", default: "" },
     },
-    render: (props: any) => `<Input type="${props.type}" placeholder="${props.placeholder}"${props.disabled ? ' disabled' : ''} className="${props.className}" />`
+    render: (props: any) =>
+      `<Input type="${props.type}" placeholder="${props.placeholder}"${props.disabled ? " disabled" : ""} className="${props.className}" />`,
   },
   Badge: {
-    name: 'Badge',
+    name: "Badge",
     props: {
-      variant: { type: 'select', options: ['default', 'secondary', 'destructive', 'outline'], default: 'default' },
-      children: { type: 'text', default: 'Badge' }
+      variant: {
+        type: "select",
+        options: ["default", "secondary", "destructive", "outline"],
+        default: "default",
+      },
+      children: { type: "text", default: "Badge" },
     },
-    render: (props: any) => `<Badge variant="${props.variant}">${props.children}</Badge>`
-  }
+    render: (props: any) =>
+      `<Badge variant="${props.variant}">${props.children}</Badge>`,
+  },
 };
 
 export default function ComponentPlaygroundClient() {
-  const [selectedComponent, setSelectedComponent] = useState('Button');
+  const [selectedComponent, setSelectedComponent] = useState("Button");
   const [componentProps, setComponentProps] = useState<any>({});
-  const [generatedCode, setGeneratedCode] = useState('');
-  const [previewMode, setPreviewMode] = useState<'preview' | 'code'>('preview');
+  const [generatedCode, setGeneratedCode] = useState("");
+  const [previewMode, setPreviewMode] = useState<"preview" | "code">("preview");
   const { toast } = useToast();
 
   // Initialize component props when component changes
   useEffect(() => {
-    const component = sampleComponents[selectedComponent as keyof typeof sampleComponents];
+    const component =
+      sampleComponents[selectedComponent as keyof typeof sampleComponents];
     if (component) {
       const initialProps: any = {};
       Object.entries(component.props).forEach(([key, config]) => {
@@ -89,7 +123,8 @@ export default function ComponentPlaygroundClient() {
 
   // Generate code when props change
   useEffect(() => {
-    const component = sampleComponents[selectedComponent as keyof typeof sampleComponents];
+    const component =
+      sampleComponents[selectedComponent as keyof typeof sampleComponents];
     if (component) {
       setGeneratedCode(component.render(componentProps));
     }
@@ -98,7 +133,7 @@ export default function ComponentPlaygroundClient() {
   const handlePropChange = (propName: string, value: any) => {
     setComponentProps((prev: any) => ({
       ...prev,
-      [propName]: value
+      [propName]: value,
     }));
   };
 
@@ -106,20 +141,21 @@ export default function ComponentPlaygroundClient() {
     try {
       await navigator.clipboard.writeText(generatedCode);
       toast({
-        title: 'Copied!',
-        description: 'Code copied to clipboard',
+        title: "Copied!",
+        description: "Code copied to clipboard",
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to copy code',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to copy code",
+        variant: "destructive",
       });
     }
   };
 
   const resetProps = () => {
-    const component = sampleComponents[selectedComponent as keyof typeof sampleComponents];
+    const component =
+      sampleComponents[selectedComponent as keyof typeof sampleComponents];
     if (component) {
       const initialProps: any = {};
       Object.entries(component.props).forEach(([key, config]) => {
@@ -130,11 +166,12 @@ export default function ComponentPlaygroundClient() {
   };
 
   const renderComponentPreview = () => {
-    const component = sampleComponents[selectedComponent as keyof typeof sampleComponents];
+    const component =
+      sampleComponents[selectedComponent as keyof typeof sampleComponents];
     if (!component) return null;
 
     switch (selectedComponent) {
-      case 'Button':
+      case "Button":
         return (
           <Button
             variant={componentProps.variant}
@@ -144,7 +181,7 @@ export default function ComponentPlaygroundClient() {
             {componentProps.children}
           </Button>
         );
-      case 'Card':
+      case "Card":
         return (
           <Card className={componentProps.className}>
             <CardHeader>
@@ -155,7 +192,7 @@ export default function ComponentPlaygroundClient() {
             </CardContent>
           </Card>
         );
-      case 'Input':
+      case "Input":
         return (
           <Input
             type={componentProps.type}
@@ -164,7 +201,7 @@ export default function ComponentPlaygroundClient() {
             className={componentProps.className}
           />
         );
-      case 'Badge':
+      case "Badge":
         return (
           <Badge variant={componentProps.variant}>
             {componentProps.children}
@@ -177,7 +214,7 @@ export default function ComponentPlaygroundClient() {
 
   const renderPropControl = (propName: string, config: any) => {
     switch (config.type) {
-      case 'text':
+      case "text":
         return (
           <div key={propName} className="space-y-2">
             <Label htmlFor={propName} className="text-sm font-medium">
@@ -185,13 +222,13 @@ export default function ComponentPlaygroundClient() {
             </Label>
             <Input
               id={propName}
-              value={componentProps[propName] || ''}
+              value={componentProps[propName] || ""}
               onChange={(e) => handlePropChange(propName, e.target.value)}
               placeholder={`Enter ${propName}`}
             />
           </div>
         );
-      case 'textarea':
+      case "textarea":
         return (
           <div key={propName} className="space-y-2">
             <Label htmlFor={propName} className="text-sm font-medium">
@@ -199,14 +236,14 @@ export default function ComponentPlaygroundClient() {
             </Label>
             <Textarea
               id={propName}
-              value={componentProps[propName] || ''}
+              value={componentProps[propName] || ""}
               onChange={(e) => handlePropChange(propName, e.target.value)}
               placeholder={`Enter ${propName}`}
               rows={3}
             />
           </div>
         );
-      case 'select':
+      case "select":
         return (
           <div key={propName} className="space-y-2">
             <Label htmlFor={propName} className="text-sm font-medium">
@@ -229,7 +266,7 @@ export default function ComponentPlaygroundClient() {
             </Select>
           </div>
         );
-      case 'boolean':
+      case "boolean":
         return (
           <div key={propName} className="flex items-center space-x-2">
             <input
@@ -254,7 +291,8 @@ export default function ComponentPlaygroundClient() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Component Playground</h1>
         <p className="text-muted-foreground">
-          Interactive component inspector with live preview, props panel, and code generation
+          Interactive component inspector with live preview, props panel, and
+          code generation
         </p>
       </div>
 
@@ -272,7 +310,10 @@ export default function ComponentPlaygroundClient() {
               {/* Component Selector */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Component</Label>
-                <Select value={selectedComponent} onValueChange={setSelectedComponent}>
+                <Select
+                  value={selectedComponent}
+                  onValueChange={setSelectedComponent}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -291,9 +332,15 @@ export default function ComponentPlaygroundClient() {
               {/* Props Controls */}
               <ScrollArea className="h-96">
                 <div className="space-y-4">
-                  {sampleComponents[selectedComponent as keyof typeof sampleComponents] &&
-                    Object.entries(sampleComponents[selectedComponent as keyof typeof sampleComponents].props).map(([propName, config]) =>
-                      renderPropControl(propName, config)
+                  {sampleComponents[
+                    selectedComponent as keyof typeof sampleComponents
+                  ] &&
+                    Object.entries(
+                      sampleComponents[
+                        selectedComponent as keyof typeof sampleComponents
+                      ].props,
+                    ).map(([propName, config]) =>
+                      renderPropControl(propName, config),
                     )}
                 </div>
               </ScrollArea>
@@ -317,7 +364,7 @@ export default function ComponentPlaygroundClient() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  {previewMode === 'preview' ? (
+                  {previewMode === "preview" ? (
                     <>
                       <Eye className="h-5 w-5" />
                       Live Preview
@@ -331,17 +378,17 @@ export default function ComponentPlaygroundClient() {
                 </CardTitle>
                 <div className="flex gap-2">
                   <Button
-                    variant={previewMode === 'preview' ? 'default' : 'outline'}
+                    variant={previewMode === "preview" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setPreviewMode('preview')}
+                    onClick={() => setPreviewMode("preview")}
                   >
                     <Eye className="h-4 w-4 mr-2" />
                     Preview
                   </Button>
                   <Button
-                    variant={previewMode === 'code' ? 'default' : 'outline'}
+                    variant={previewMode === "code" ? "default" : "outline"}
                     size="sm"
-                    onClick={() => setPreviewMode('code')}
+                    onClick={() => setPreviewMode("code")}
                   >
                     <Code className="h-4 w-4 mr-2" />
                     Code
@@ -354,11 +401,9 @@ export default function ComponentPlaygroundClient() {
               </div>
             </CardHeader>
             <CardContent>
-              {previewMode === 'preview' ? (
+              {previewMode === "preview" ? (
                 <div className="min-h-64 flex items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-8">
-                  <div className="text-center">
-                    {renderComponentPreview()}
-                  </div>
+                  <div className="text-center">{renderComponentPreview()}</div>
                 </div>
               ) : (
                 <div className="relative">
@@ -382,21 +427,34 @@ export default function ComponentPlaygroundClient() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {Object.keys(sampleComponents[selectedComponent as keyof typeof sampleComponents]?.props || {}).length}
+                    {
+                      Object.keys(
+                        sampleComponents[
+                          selectedComponent as keyof typeof sampleComponents
+                        ]?.props || {},
+                      ).length
+                    }
                   </div>
                   <div className="text-sm text-muted-foreground">Props</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {sampleComponents[selectedComponent as keyof typeof sampleComponents]?.props ?
-                      Object.values(sampleComponents[selectedComponent as keyof typeof sampleComponents].props)
-                        .filter((config: any) => config.type === 'select').length : 0}
+                    {sampleComponents[
+                      selectedComponent as keyof typeof sampleComponents
+                    ]?.props
+                      ? Object.values(
+                          sampleComponents[
+                            selectedComponent as keyof typeof sampleComponents
+                          ].props,
+                        ).filter((config: any) => config.type === "select")
+                          .length
+                      : 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Variants</div>
                 </div>
                 <div>
                   <div className="text-2xl font-bold text-primary">
-                    {generatedCode.split('\n').length}
+                    {generatedCode.split("\n").length}
                   </div>
                   <div className="text-sm text-muted-foreground">Lines</div>
                 </div>

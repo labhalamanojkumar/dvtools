@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Progress } from '@/components/ui/progress';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Progress } from "@/components/ui/progress";
 import {
   Download,
   FileText,
@@ -14,9 +14,9 @@ import {
   Calendar,
   AlertTriangle,
   CheckCircle,
-  RefreshCw
-} from 'lucide-react';
-import { useToast } from '@/components/ui/toaster';
+  RefreshCw,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
 
 interface ExportOption {
   id: string;
@@ -36,44 +36,46 @@ interface ExportResult {
 
 export default function ExportData() {
   const [isExporting, setIsExporting] = useState<string | null>(null);
-  const [exportedItems, setExportedItems] = useState<Map<string, ExportResult>>(new Map());
+  const [exportedItems, setExportedItems] = useState<Map<string, ExportResult>>(
+    new Map(),
+  );
   const [availableExports, setAvailableExports] = useState<ExportOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   const defaultExportOptions: ExportOption[] = [
     {
-      id: 'usage-data',
-      title: 'Usage Data',
-      description: 'Export your tool usage statistics and analytics',
+      id: "usage-data",
+      title: "Usage Data",
+      description: "Export your tool usage statistics and analytics",
       icon: BarChart3,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50 dark:bg-blue-950'
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950",
     },
     {
-      id: 'api-calls',
-      title: 'API Call History',
-      description: 'Export your API call logs and history',
+      id: "api-calls",
+      title: "API Call History",
+      description: "Export your API call logs and history",
       icon: Database,
-      color: 'text-green-500',
-      bgColor: 'bg-green-50 dark:bg-green-950'
+      color: "text-green-500",
+      bgColor: "bg-green-50 dark:bg-green-950",
     },
     {
-      id: 'tool-sessions',
-      title: 'Tool Sessions',
-      description: 'Export your tool usage sessions and timestamps',
+      id: "tool-sessions",
+      title: "Tool Sessions",
+      description: "Export your tool usage sessions and timestamps",
       icon: FileText,
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50 dark:bg-purple-950'
+      color: "text-purple-500",
+      bgColor: "bg-purple-50 dark:bg-purple-950",
     },
     {
-      id: 'account-data',
-      title: 'Account Data',
-      description: 'Export your profile and account information',
+      id: "account-data",
+      title: "Account Data",
+      description: "Export your profile and account information",
       icon: Calendar,
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-50 dark:bg-orange-950'
-    }
+      color: "text-orange-500",
+      bgColor: "bg-orange-50 dark:bg-orange-950",
+    },
   ];
 
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function ExportData() {
 
   const fetchAvailableExports = async () => {
     try {
-      const response = await fetch('/api/export/status');
+      const response = await fetch("/api/export/status");
       if (response.ok) {
         const data = await response.json();
         setAvailableExports(data.availableExports || defaultExportOptions);
@@ -90,7 +92,7 @@ export default function ExportData() {
         setAvailableExports(defaultExportOptions);
       }
     } catch (error) {
-      console.error('Failed to fetch available exports:', error);
+      console.error("Failed to fetch available exports:", error);
       setAvailableExports(defaultExportOptions);
     } finally {
       setIsLoading(false);
@@ -101,31 +103,32 @@ export default function ExportData() {
     setIsExporting(exportId);
 
     try {
-      const response = await fetch('/api/export', {
-        method: 'POST',
+      const response = await fetch("/api/export", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ type: exportId }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Export failed');
+        throw new Error(errorData.error || "Export failed");
       }
 
       const result: ExportResult = await response.json();
-      setExportedItems(prev => new Map(prev.set(exportId, result)));
+      setExportedItems((prev) => new Map(prev.set(exportId, result)));
 
       toast({
         title: "Export completed",
         description: result.message,
       });
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
       toast({
         title: "Export failed",
-        description: error instanceof Error ? error.message : "Failed to export data",
+        description:
+          error instanceof Error ? error.message : "Failed to export data",
         variant: "destructive",
       });
     } finally {
@@ -139,10 +142,10 @@ export default function ExportData() {
 
     try {
       const blob = new Blob([JSON.stringify(exportResult.data, null, 2)], {
-        type: 'application/json'
+        type: "application/json",
       });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = exportResult.fileName;
       document.body.appendChild(a);
@@ -164,7 +167,9 @@ export default function ExportData() {
   };
 
   const handleBulkExport = async () => {
-    const exportPromises = availableExports.map(option => handleExport(option.id));
+    const exportPromises = availableExports.map((option) =>
+      handleExport(option.id),
+    );
     await Promise.allSettled(exportPromises);
   };
 
@@ -199,7 +204,8 @@ export default function ExportData() {
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Your data will be exported in JSON format. All exports are processed securely and contain only your data.
+            Your data will be exported in JSON format. All exports are processed
+            securely and contain only your data.
           </AlertDescription>
         </Alert>
 
@@ -247,7 +253,7 @@ export default function ExportData() {
                             Exporting...
                           </>
                         ) : (
-                          'Export'
+                          "Export"
                         )}
                       </Button>
                     ) : (
@@ -261,7 +267,10 @@ export default function ExportData() {
                           <Download className="mr-2 h-4 w-4" />
                           Download
                         </Button>
-                        <Badge variant="secondary" className="flex items-center gap-1">
+                        <Badge
+                          variant="secondary"
+                          className="flex items-center gap-1"
+                        >
                           <CheckCircle className="h-3 w-3" />
                           Ready
                         </Badge>
@@ -288,21 +297,26 @@ export default function ExportData() {
                   Exporting All...
                 </>
               ) : (
-                'Export All Data'
+                "Export All Data"
               )}
             </Button>
-            <Button variant="outline">
-              Schedule Regular Exports
-            </Button>
+            <Button variant="outline">Schedule Regular Exports</Button>
           </div>
         </div>
 
         <div className="bg-muted/50 p-4 rounded-lg">
           <h4 className="font-medium mb-2">Data Privacy</h4>
           <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Your data is processed securely and never shared with third parties</li>
-            <li>• Exports contain only your personal data and usage statistics</li>
-            <li>• You can delete your account and all associated data at any time</li>
+            <li>
+              • Your data is processed securely and never shared with third
+              parties
+            </li>
+            <li>
+              • Exports contain only your personal data and usage statistics
+            </li>
+            <li>
+              • You can delete your account and all associated data at any time
+            </li>
             <li>• All exports are available for download for 30 days</li>
           </ul>
         </div>

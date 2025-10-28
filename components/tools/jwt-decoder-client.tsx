@@ -1,26 +1,34 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { copyToClipboard, downloadFile } from '../../lib/utils';
-import { useToast } from '../ui/toaster';
-import { Copy, Download, Clock, CheckCircle, XCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { copyToClipboard, downloadFile } from "../../lib/utils";
+import { useToast } from "../ui/toaster";
+import {
+  Copy,
+  Download,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 
 export function JwtDecoderClient() {
-  const [token, setToken] = useState('');
-  const [header, setHeader] = useState('');
-  const [payload, setPayload] = useState('');
+  const [token, setToken] = useState("");
+  const [header, setHeader] = useState("");
+  const [payload, setPayload] = useState("");
   const [isExpired, setIsExpired] = useState(false);
   const { toast } = useToast();
 
   const decodeJwt = () => {
     try {
-      const parts = token.split('.');
+      const parts = token.split(".");
       if (parts.length !== 3) {
-        throw new Error('Invalid JWT format');
+        throw new Error("Invalid JWT format");
       }
 
       const decodedHeader = JSON.parse(atob(parts[0]));
@@ -35,12 +43,12 @@ export function JwtDecoderClient() {
         setIsExpired(expiryDate < new Date());
       }
 
-      toast({ title: 'Success', description: 'JWT decoded successfully' });
+      toast({ title: "Success", description: "JWT decoded successfully" });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'Invalid JWT token',
-        variant: 'destructive',
+        title: "Error",
+        description: "Invalid JWT token",
+        variant: "destructive",
       });
     }
   };

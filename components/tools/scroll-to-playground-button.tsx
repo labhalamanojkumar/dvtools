@@ -1,10 +1,10 @@
-'use client';
+"use client";
 "use client";
 "use client";
 
 export default function ScrollToPlaygroundButton() {
   const handleClick = () => {
-    document.querySelector('textarea')?.scrollIntoView({ behavior: 'smooth' });
+    document.querySelector("textarea")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (

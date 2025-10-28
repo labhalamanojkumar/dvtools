@@ -41,6 +41,7 @@ NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 Generate a secret:
+
 ```bash
 openssl rand -base64 32
 ```
@@ -63,6 +64,7 @@ openssl rand -base64 32
 ### Using SQLite (Development Only)
 
 Update `prisma/schema.prisma`:
+
 ```prisma
 datasource db {
   provider = "sqlite"
@@ -108,6 +110,7 @@ prisma/             # Database
 ## Default Credentials
 
 After seeding:
+
 - Email: `admin@devtools.com`
 - Password: `admin123`
 
@@ -116,6 +119,7 @@ After seeding:
 ## Features
 
 ### Tools
+
 ✅ JSON Formatter & Validator
 ✅ Base64 Encoder/Decoder
 ✅ JWT Decoder
@@ -124,6 +128,7 @@ After seeding:
 🚧 RegExp Tester (implement following pattern)
 
 ### Admin Dashboard
+
 🚧 User Management
 🚧 Analytics
 🚧 SEO Monitoring
@@ -141,11 +146,12 @@ After seeding:
 ### Adding API Endpoints
 
 Create in `app/api/[endpoint]/route.ts`:
+
 ```typescript
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
-  return NextResponse.json({ data: 'hello' });
+  return NextResponse.json({ data: "hello" });
 }
 ```
 
@@ -162,15 +168,18 @@ npx prisma db push     # Update database
 ## Common Issues
 
 ### TypeScript Errors
+
 The errors shown are expected before running `npm install`. They will resolve after installing dependencies.
 
 ### Port Already in Use
+
 ```bash
 # Kill process on port 3000
 lsof -ti:3000 | xargs kill -9
 ```
 
 ### Database Connection Failed
+
 - Ensure PostgreSQL is running
 - Check DATABASE_URL in `.env`
 - Verify database exists

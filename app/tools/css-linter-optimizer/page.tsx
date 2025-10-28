@@ -1,33 +1,45 @@
-import { Metadata } from 'next';
-import CssLinterOptimizerClient from '@/components/tools/css-linter-optimizer-client';
+import { Metadata } from "next";
+import CssLinterOptimizerClient from "@/components/tools/css-linter-optimizer-client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: 'CSS Linter & Optimizer - Lint, Validate & Optimize CSS Online',
-  description: 'Free online CSS linter and optimizer. Validate CSS syntax, check for errors and warnings, optimize file size, and improve performance. Fast, secure, and client-side processing.',
-  keywords: ['CSS linter', 'CSS optimizer', 'CSS validator', 'CSS minifier', 'CSS compressor', 'CSS analysis', 'CSS performance', 'lint CSS online'],
+  title: "CSS Linter & Optimizer - Lint, Validate & Optimize CSS Online",
+  description:
+    "Free online CSS linter and optimizer. Validate CSS syntax, check for errors and warnings, optimize file size, and improve performance. Fast, secure, and client-side processing.",
+  keywords: [
+    "CSS linter",
+    "CSS optimizer",
+    "CSS validator",
+    "CSS minifier",
+    "CSS compressor",
+    "CSS analysis",
+    "CSS performance",
+    "lint CSS online",
+  ],
   openGraph: {
-    title: 'CSS Linter & Optimizer - DevTools Hub',
-    description: 'Lint, validate, and optimize CSS with error detection and performance improvements',
-    type: 'website',
+    title: "CSS Linter & Optimizer - DevTools Hub",
+    description:
+      "Lint, validate, and optimize CSS with error detection and performance improvements",
+    type: "website",
   },
   alternates: {
-    canonical: '/tools/css-linter-optimizer',
+    canonical: "/tools/css-linter-optimizer",
   },
 };
 
 const jsonLdSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'CSS Linter & Optimizer',
-  applicationCategory: 'DeveloperApplication',
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "CSS Linter & Optimizer",
+  applicationCategory: "DeveloperApplication",
   offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
   },
-  description: 'Free online CSS linter, validator, and optimizer with performance analysis',
+  description:
+    "Free online CSS linter, validator, and optimizer with performance analysis",
 };
 
 export default function CssLinterOptimizerPage() {
@@ -41,7 +53,8 @@ export default function CssLinterOptimizerPage() {
         <div className="tool-header">
           <h1 className="tool-title">CSS Linter & Optimizer</h1>
           <p className="tool-description">
-            Lint, validate, and optimize your CSS code with advanced error detection, performance analysis, and file size reduction
+            Lint, validate, and optimize your CSS code with advanced error
+            detection, performance analysis, and file size reduction
           </p>
         </div>
 
@@ -50,10 +63,13 @@ export default function CssLinterOptimizerPage() {
         {/* SEO Content */}
         <section className="mt-12 space-y-6">
           <div>
-            <h2 className="mb-4 text-2xl font-bold">About CSS Linter & Optimizer</h2>
+            <h2 className="mb-4 text-2xl font-bold">
+              About CSS Linter & Optimizer
+            </h2>
             <p className="text-muted-foreground">
-              Our comprehensive CSS analysis tool helps you write better, faster, and more maintainable CSS.
-              Catch errors before they reach production, optimize file sizes for better performance, and follow
+              Our comprehensive CSS analysis tool helps you write better,
+              faster, and more maintainable CSS. Catch errors before they reach
+              production, optimize file sizes for better performance, and follow
               best practices with our intelligent linting rules.
             </p>
           </div>
@@ -64,11 +80,17 @@ export default function CssLinterOptimizerPage() {
               <li>Advanced CSS syntax validation and error detection</li>
               <li>Performance optimization with file size reduction</li>
               <li>Configurable linting rules (Basic, Standard, Strict)</li>
-              <li>Multiple optimization levels (Conservative, Balanced, Aggressive)</li>
+              <li>
+                Multiple optimization levels (Conservative, Balanced,
+                Aggressive)
+              </li>
               <li>Detailed issue reporting with line and column numbers</li>
               <li>Real-time analysis with instant feedback</li>
               <li>Copy and download optimized CSS</li>
-              <li>Completely client-side &mdash; your code never leaves your browser</li>
+              <li>
+                Completely client-side &mdash; your code never leaves your
+                browser
+              </li>
             </ul>
           </div>
 
@@ -96,13 +118,30 @@ export default function CssLinterOptimizerPage() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-xl font-semibold">Optimization Features</h3>
+            <h3 className="mb-3 text-xl font-semibold">
+              Optimization Features
+            </h3>
             <ul className="list-inside list-disc space-y-2 text-muted-foreground">
-              <li><strong>Whitespace removal:</strong> Eliminate unnecessary spaces and line breaks</li>
-              <li><strong>Comment stripping:</strong> Remove CSS comments (aggressive mode)</li>
-              <li><strong>Property consolidation:</strong> Merge duplicate selectors</li>
-              <li><strong>Unit optimization:</strong> Use shorthand properties where possible</li>
-              <li><strong>Selector optimization:</strong> Simplify complex selectors</li>
+              <li>
+                <strong>Whitespace removal:</strong> Eliminate unnecessary
+                spaces and line breaks
+              </li>
+              <li>
+                <strong>Comment stripping:</strong> Remove CSS comments
+                (aggressive mode)
+              </li>
+              <li>
+                <strong>Property consolidation:</strong> Merge duplicate
+                selectors
+              </li>
+              <li>
+                <strong>Unit optimization:</strong> Use shorthand properties
+                where possible
+              </li>
+              <li>
+                <strong>Selector optimization:</strong> Simplify complex
+                selectors
+              </li>
             </ul>
           </div>
 

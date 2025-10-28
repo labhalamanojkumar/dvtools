@@ -25,23 +25,27 @@ By participating in this project, you agree to abide by our Code of Conduct:
 
 1. **Fork the repository**
 2. **Clone your fork:**
+
    ```bash
    git clone https://github.com/yourusername/devtools-hub.git
    cd devtools-hub
    ```
 
 3. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 4. **Set up environment:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 5. **Set up database:**
+
    ```bash
    npx prisma generate
    npx prisma db push
@@ -76,6 +80,7 @@ type(scope): description
 ```
 
 Types:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation
@@ -85,6 +90,7 @@ Types:
 - `chore`: Maintenance
 
 Examples:
+
 ```
 feat(tools): add regex tester tool
 fix(json): resolve validation error
@@ -98,6 +104,7 @@ docs(readme): update installation steps
 3. **Write/update tests** for your changes
 4. **Update documentation** if needed
 5. **Run tests:**
+
    ```bash
    npm test
    npm run type-check
@@ -167,7 +174,7 @@ interface ComponentNameProps {
 
 export function ComponentName({ title, onAction }: ComponentNameProps) {
   const [state, setState] = useState('');
-  
+
   return (
     <div>
       {/* Component JSX */}
@@ -219,11 +226,11 @@ describe('ComponentName', () => {
 ### E2E Tests
 
 ```typescript
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test('json formatter works', async ({ page }) => {
-  await page.goto('/tools/json-formatter');
-  await page.fill('textarea', '{"test":true}');
+test("json formatter works", async ({ page }) => {
+  await page.goto("/tools/json-formatter");
+  await page.fill("textarea", '{"test":true}');
   await page.click('button:has-text("Format")');
   // Add assertions
 });
@@ -258,6 +265,7 @@ function validateJson(json: string, schema: object): ValidationResult {
 ## 🐛 Reporting Bugs
 
 Use GitHub Issues with:
+
 - Clear title
 - Steps to reproduce
 - Expected vs actual behavior
@@ -267,6 +275,7 @@ Use GitHub Issues with:
 ## 💡 Suggesting Features
 
 Use GitHub Issues with:
+
 - Clear use case
 - Proposed solution
 - Alternative solutions considered
@@ -288,7 +297,7 @@ Use GitHub Issues with:
 - Follow OWASP guidelines
 - Report security issues privately
 
-##  Questions?
+## Questions?
 
 - Open a GitHub Discussion
 - Check existing Issues and PRs

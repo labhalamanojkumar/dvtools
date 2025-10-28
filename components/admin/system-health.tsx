@@ -1,10 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Activity, Cpu, HardDrive, Wifi, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Activity,
+  Cpu,
+  HardDrive,
+  Wifi,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 
 interface SystemMetrics {
   cpu: number;
@@ -12,10 +20,10 @@ interface SystemMetrics {
   disk: number;
   network: number;
   uptime: string;
-  status: 'healthy' | 'warning' | 'critical';
+  status: "healthy" | "warning" | "critical";
   services: {
     name: string;
-    status: 'running' | 'stopped' | 'error';
+    status: "running" | "stopped" | "error";
     uptime: string;
   }[];
 }
@@ -31,15 +39,15 @@ export function SystemHealth() {
       memory: 67,
       disk: 23,
       network: 12,
-      uptime: '7 days, 14 hours',
-      status: 'healthy',
+      uptime: "7 days, 14 hours",
+      status: "healthy",
       services: [
-        { name: 'Web Server', status: 'running', uptime: '7d 14h' },
-        { name: 'Database', status: 'running', uptime: '7d 14h' },
-        { name: 'Cache', status: 'running', uptime: '7d 14h' },
-        { name: 'API Gateway', status: 'running', uptime: '7d 14h' },
-        { name: 'Background Jobs', status: 'running', uptime: '7d 14h' },
-        { name: 'Monitoring', status: 'error', uptime: '2h 30m' },
+        { name: "Web Server", status: "running", uptime: "7d 14h" },
+        { name: "Database", status: "running", uptime: "7d 14h" },
+        { name: "Cache", status: "running", uptime: "7d 14h" },
+        { name: "API Gateway", status: "running", uptime: "7d 14h" },
+        { name: "Background Jobs", status: "running", uptime: "7d 14h" },
+        { name: "Monitoring", status: "error", uptime: "2h 30m" },
       ],
     };
 
@@ -51,30 +59,30 @@ export function SystemHealth() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy':
-      case 'running':
-        return 'text-green-600';
-      case 'warning':
-        return 'text-yellow-600';
-      case 'critical':
-      case 'error':
-      case 'stopped':
-        return 'text-red-600';
+      case "healthy":
+      case "running":
+        return "text-green-600";
+      case "warning":
+        return "text-yellow-600";
+      case "critical":
+      case "error":
+      case "stopped":
+        return "text-red-600";
       default:
-        return 'text-gray-600';
+        return "text-gray-600";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'healthy':
-      case 'running':
+      case "healthy":
+      case "running":
         return <CheckCircle className="h-4 w-4" />;
-      case 'warning':
+      case "warning":
         return <AlertTriangle className="h-4 w-4" />;
-      case 'critical':
-      case 'error':
-      case 'stopped':
+      case "critical":
+      case "error":
+      case "stopped":
         return <XCircle className="h-4 w-4" />;
       default:
         return <Activity className="h-4 w-4" />;
@@ -82,9 +90,9 @@ export function SystemHealth() {
   };
 
   const getProgressColor = (value: number) => {
-    if (value >= 90) return 'bg-red-500';
-    if (value >= 70) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (value >= 90) return "bg-red-500";
+    if (value >= 70) return "bg-yellow-500";
+    return "bg-green-500";
   };
 
   if (loading) {
@@ -151,7 +159,9 @@ export function SystemHealth() {
               <span className="text-sm font-medium">CPU</span>
             </div>
             <Progress value={metrics.cpu} className="h-2" />
-            <span className="text-xs text-muted-foreground">{metrics.cpu}%</span>
+            <span className="text-xs text-muted-foreground">
+              {metrics.cpu}%
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -160,7 +170,9 @@ export function SystemHealth() {
               <span className="text-sm font-medium">Memory</span>
             </div>
             <Progress value={metrics.memory} className="h-2" />
-            <span className="text-xs text-muted-foreground">{metrics.memory}%</span>
+            <span className="text-xs text-muted-foreground">
+              {metrics.memory}%
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -169,7 +181,9 @@ export function SystemHealth() {
               <span className="text-sm font-medium">Disk</span>
             </div>
             <Progress value={metrics.disk} className="h-2" />
-            <span className="text-xs text-muted-foreground">{metrics.disk}%</span>
+            <span className="text-xs text-muted-foreground">
+              {metrics.disk}%
+            </span>
           </div>
 
           <div className="space-y-2">
@@ -178,7 +192,9 @@ export function SystemHealth() {
               <span className="text-sm font-medium">Network</span>
             </div>
             <Progress value={metrics.network} className="h-2" />
-            <span className="text-xs text-muted-foreground">{metrics.network}%</span>
+            <span className="text-xs text-muted-foreground">
+              {metrics.network}%
+            </span>
           </div>
         </div>
 
@@ -192,7 +208,8 @@ export function SystemHealth() {
           <div className="p-4 bg-muted rounded-lg">
             <h4 className="font-semibold mb-2">Active Services</h4>
             <p className="text-2xl font-bold text-primary">
-              {metrics.services.filter(s => s.status === 'running').length}/{metrics.services.length}
+              {metrics.services.filter((s) => s.status === "running").length}/
+              {metrics.services.length}
             </p>
           </div>
         </div>
@@ -202,17 +219,25 @@ export function SystemHealth() {
           <h4 className="font-semibold mb-4">Service Status</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {metrics.services.map((service) => (
-              <div key={service.name} className="flex items-center justify-between p-3 border rounded-lg">
+              <div
+                key={service.name}
+                className="flex items-center justify-between p-3 border rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <div className={getStatusColor(service.status)}>
                     {getStatusIcon(service.status)}
                   </div>
                   <div>
                     <p className="font-medium">{service.name}</p>
-                    <p className="text-xs text-muted-foreground">Uptime: {service.uptime}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Uptime: {service.uptime}
+                    </p>
                   </div>
                 </div>
-                <Badge variant="outline" className={getStatusColor(service.status)}>
+                <Badge
+                  variant="outline"
+                  className={getStatusColor(service.status)}
+                >
                   {service.status}
                 </Badge>
               </div>

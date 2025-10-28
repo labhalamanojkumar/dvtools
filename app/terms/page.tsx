@@ -1,8 +1,8 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Metadata } from "next";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   FileText,
   Shield,
@@ -14,43 +14,46 @@ import {
   Lock,
   Ban,
   DollarSign,
-  Globe
-} from 'lucide-react';
+  Globe,
+} from "lucide-react";
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | DevTools Hub - Usage Agreement',
-  description: 'Read DevTools Hub\'s Terms of Service. Understand your rights and responsibilities when using our developer tools and services.',
+  title: "Terms of Service | DevTools Hub - Usage Agreement",
+  description:
+    "Read DevTools Hub's Terms of Service. Understand your rights and responsibilities when using our developer tools and services.",
   keywords: [
-    'terms of service',
-    'terms and conditions',
-    'usage agreement',
-    'developer tools terms',
-    'service agreement',
-    'legal terms'
+    "terms of service",
+    "terms and conditions",
+    "usage agreement",
+    "developer tools terms",
+    "service agreement",
+    "legal terms",
   ],
   openGraph: {
-    title: 'Terms of Service | DevTools Hub - Usage Agreement',
-    description: 'Read DevTools Hub\'s Terms of Service and understand your rights and responsibilities.',
-    type: 'website',
-    url: '/terms',
-    siteName: 'DevTools Hub',
+    title: "Terms of Service | DevTools Hub - Usage Agreement",
+    description:
+      "Read DevTools Hub's Terms of Service and understand your rights and responsibilities.",
+    type: "website",
+    url: "/terms",
+    siteName: "DevTools Hub",
     images: [
       {
-        url: '/terms-og.jpg',
+        url: "/terms-og.jpg",
         width: 1200,
         height: 630,
-        alt: 'DevTools Hub Terms of Service',
+        alt: "DevTools Hub Terms of Service",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Terms of Service | DevTools Hub - Usage Agreement',
-    description: 'Read DevTools Hub\'s Terms of Service and understand your rights and responsibilities.',
-    images: ['/terms-og.jpg'],
+    card: "summary_large_image",
+    title: "Terms of Service | DevTools Hub - Usage Agreement",
+    description:
+      "Read DevTools Hub's Terms of Service and understand your rights and responsibilities.",
+    images: ["/terms-og.jpg"],
   },
   alternates: {
-    canonical: '/terms',
+    canonical: "/terms",
   },
   robots: {
     index: true,
@@ -58,17 +61,17 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
 
 const sections = [
   {
-    id: 'acceptance',
-    title: 'Acceptance of Terms',
+    id: "acceptance",
+    title: "Acceptance of Terms",
     icon: <CheckCircle className="h-5 w-5" />,
     content: `
       <p>By accessing and using DevTools Hub ("the Service"), you accept and agree to be bound by the terms and provision of this agreement.</p>
@@ -84,11 +87,11 @@ const sections = [
           </div>
         </div>
       </div>
-    `
+    `,
   },
   {
-    id: 'description-of-service',
-    title: 'Description of Service',
+    id: "description-of-service",
+    title: "Description of Service",
     icon: <FileText className="h-5 w-5" />,
     content: `
       <p>DevTools Hub provides a comprehensive suite of developer tools and utilities designed to assist developers in their work.</p>
@@ -104,11 +107,11 @@ const sections = [
 
       <h3>Service Availability</h3>
       <p>We strive to provide continuous availability of our services but do not guarantee uninterrupted access. We reserve the right to modify or discontinue services at any time.</p>
-    `
+    `,
   },
   {
-    id: 'user-accounts',
-    title: 'User Accounts',
+    id: "user-accounts",
+    title: "User Accounts",
     icon: <Users className="h-5 w-5" />,
     content: `
       <h3>Account Creation</h3>
@@ -124,11 +127,11 @@ const sections = [
 
       <h3>Account Termination</h3>
       <p>We reserve the right to terminate or suspend accounts that violate these terms or engage in prohibited activities.</p>
-    `
+    `,
   },
   {
-    id: 'acceptable-use',
-    title: 'Acceptable Use Policy',
+    id: "acceptable-use",
+    title: "Acceptable Use Policy",
     icon: <Shield className="h-5 w-5" />,
     content: `
       <p>You agree to use DevTools Hub only for lawful purposes and in accordance with these terms.</p>
@@ -160,11 +163,11 @@ const sections = [
           </div>
         </div>
       </div>
-    `
+    `,
   },
   {
-    id: 'intellectual-property',
-    title: 'Intellectual Property',
+    id: "intellectual-property",
+    title: "Intellectual Property",
     icon: <Lock className="h-5 w-5" />,
     content: `
       <h3>Our Intellectual Property</h3>
@@ -175,11 +178,11 @@ const sections = [
 
       <h3>License Grant</h3>
       <p>Subject to these terms, we grant you a limited, non-exclusive, non-transferable license to use the Service for your personal or commercial use.</p>
-    `
+    `,
   },
   {
-    id: 'privacy-and-data',
-    title: 'Privacy and Data Protection',
+    id: "privacy-and-data",
+    title: "Privacy and Data Protection",
     icon: <Lock className="h-5 w-5" />,
     content: `
       <p>Your privacy is important to us. Our collection and use of personal information is governed by our Privacy Policy, which is incorporated into these terms by reference.</p>
@@ -191,11 +194,11 @@ const sections = [
       <p>We implement appropriate technical and organizational measures to protect your data against unauthorized access, alteration, or disclosure.</p>
 
       <p>For more information about how we handle your data, please review our <a href="/privacy" class="text-primary hover:underline">Privacy Policy</a>.</p>
-    `
+    `,
   },
   {
-    id: 'billing-and-payment',
-    title: 'Billing and Payment',
+    id: "billing-and-payment",
+    title: "Billing and Payment",
     icon: <DollarSign className="h-5 w-5" />,
     content: `
       <h3>Free Tier</h3>
@@ -213,11 +216,11 @@ const sections = [
       </ul>
 
       <p>For detailed pricing information, please visit our <a href="/pricing" class="text-primary hover:underline">Pricing page</a>.</p>
-    `
+    `,
   },
   {
-    id: 'disclaimers',
-    title: 'Disclaimers and Limitations',
+    id: "disclaimers",
+    title: "Disclaimers and Limitations",
     icon: <AlertTriangle className="h-5 w-5" />,
     content: `
       <h3>Service "As Is"</h3>
@@ -228,11 +231,11 @@ const sections = [
 
       <h3>Service Interruptions</h3>
       <p>We do not guarantee uninterrupted or error-free service. We may perform maintenance or updates that temporarily disrupt service availability.</p>
-    `
+    `,
   },
   {
-    id: 'termination',
-    title: 'Termination',
+    id: "termination",
+    title: "Termination",
     icon: <Ban className="h-5 w-5" />,
     content: `
       <h3>Termination by User</h3>
@@ -243,11 +246,11 @@ const sections = [
 
       <h3>Effect of Termination</h3>
       <p>Upon termination, your right to use the Service ceases immediately. We may delete your account data after a reasonable period.</p>
-    `
+    `,
   },
   {
-    id: 'governing-law',
-    title: 'Governing Law',
+    id: "governing-law",
+    title: "Governing Law",
     icon: <Scale className="h-5 w-5" />,
     content: `
       <p>These Terms of Service are governed by and construed in accordance with applicable laws.</p>
@@ -257,11 +260,11 @@ const sections = [
 
       <h3>International Users</h3>
       <p>If you are accessing the Service from outside our jurisdiction, you are responsible for compliance with local laws.</p>
-    `
+    `,
   },
   {
-    id: 'changes-to-terms',
-    title: 'Changes to Terms',
+    id: "changes-to-terms",
+    title: "Changes to Terms",
     icon: <FileText className="h-5 w-5" />,
     content: `
       <p>We reserve the right to modify these Terms of Service at any time.</p>
@@ -274,11 +277,11 @@ const sections = [
       </ul>
 
       <p>For significant changes, we may provide additional notice through email or service notifications.</p>
-    `
+    `,
   },
   {
-    id: 'contact-information',
-    title: 'Contact Information',
+    id: "contact-information",
+    title: "Contact Information",
     icon: <Globe className="h-5 w-5" />,
     content: `
       <p>If you have questions about these Terms of Service, please contact us:</p>
@@ -291,8 +294,8 @@ const sections = [
       </div>
 
       <p>We will respond to your inquiries within a reasonable timeframe.</p>
-    `
-  }
+    `,
+  },
 ];
 
 export default function TermsOfServicePage() {
@@ -305,33 +308,39 @@ export default function TermsOfServicePage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Terms of Service - DevTools Hub",
-            "description": "DevTools Hub terms of service and usage agreement",
-            "url": "https://devtoolshub.com/terms",
-            "publisher": {
+            name: "Terms of Service - DevTools Hub",
+            description: "DevTools Hub terms of service and usage agreement",
+            url: "https://devtoolshub.com/terms",
+            publisher: {
               "@type": "Organization",
-              "name": "DevTools Hub",
-              "contactPoint": {
+              name: "DevTools Hub",
+              contactPoint: {
                 "@type": "ContactPoint",
-                "email": "legal@devtoolshub.com",
-                "contactType": "terms of service"
-              }
-            }
-          })
+                email: "legal@devtoolshub.com",
+                contactType: "terms of service",
+              },
+            },
+          }),
         }}
       />
 
       {/* Header */}
       <div className="mb-8">
-        <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-primary mb-4">
+        <Link
+          href="/"
+          className="inline-flex items-center text-muted-foreground hover:text-primary mb-4"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
         </Link>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Terms of Service</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            Terms of Service
+          </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Please read these terms carefully before using DevTools Hub services.
+            Please read these terms carefully before using DevTools Hub
+            services.
           </p>
           <div className="flex items-center justify-center gap-4 mt-4 text-sm text-muted-foreground">
             <span>Last updated: October 27, 2025</span>
@@ -370,9 +379,7 @@ export default function TermsOfServicePage() {
           <Card key={section.id} id={section.id}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <div className="text-primary">
-                  {section.icon}
-                </div>
+                <div className="text-primary">{section.icon}</div>
                 {section.title}
               </CardTitle>
             </CardHeader>
@@ -389,15 +396,15 @@ export default function TermsOfServicePage() {
       {/* Contact CTA */}
       <Card className="mt-12 bg-primary/5 border-primary/20">
         <CardContent className="p-8 text-center">
-          <h3 className="text-xl font-semibold mb-4">Questions About These Terms?</h3>
+          <h3 className="text-xl font-semibold mb-4">
+            Questions About These Terms?
+          </h3>
           <p className="text-muted-foreground mb-6">
-            If you have any questions about these Terms of Service or need clarification,
-            please contact our legal team.
+            If you have any questions about these Terms of Service or need
+            clarification, please contact our legal team.
           </p>
           <Button asChild>
-            <Link href="mailto:legal@devtoolshub.com">
-              Contact Legal Team
-            </Link>
+            <Link href="mailto:legal@devtoolshub.com">Contact Legal Team</Link>
           </Button>
         </CardContent>
       </Card>

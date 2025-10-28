@@ -1,97 +1,103 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { Card, CardContent } from '../ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { copyToClipboard, downloadFile } from '../../lib/utils';
-import { useToast } from '../ui/toaster';
-import { Copy, Download } from 'lucide-react';
-import * as beautify from 'js-beautify';
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Card, CardContent } from "../ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { copyToClipboard, downloadFile } from "../../lib/utils";
+import { useToast } from "../ui/toaster";
+import { Copy, Download } from "lucide-react";
+import * as beautify from "js-beautify";
 
 export function CodeBeautifierClient() {
-  const [input, setInput] = useState('');
-  const [output, setOutput] = useState('');
-  const [language, setLanguage] = useState('javascript');
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [language, setLanguage] = useState("javascript");
   const { toast } = useToast();
 
   const formatCode = () => {
     try {
-      let formatted = '';
+      let formatted = "";
 
       switch (language) {
-        case 'html':
+        case "html":
           formatted = beautify.html(input, {
             indent_size: 2,
-            indent_char: ' ',
+            indent_char: " ",
             max_preserve_newlines: 1,
             preserve_newlines: true,
-            end_with_newline: false
+            end_with_newline: false,
           });
           break;
 
-        case 'css':
+        case "css":
           formatted = beautify.css(input, {
             indent_size: 2,
-            indent_char: ' ',
+            indent_char: " ",
             max_preserve_newlines: 1,
             preserve_newlines: true,
-            end_with_newline: false
+            end_with_newline: false,
           });
           break;
 
-        case 'javascript':
+        case "javascript":
         default:
           formatted = beautify.js(input, {
             indent_size: 2,
-            indent_char: ' ',
+            indent_char: " ",
             max_preserve_newlines: 2,
             preserve_newlines: true,
-            end_with_newline: false
+            end_with_newline: false,
           });
           break;
       }
 
       setOutput(formatted);
-      toast({ title: 'Success', description: 'Code formatted successfully' });
+      toast({ title: "Success", description: "Code formatted successfully" });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'Failed to format code',
-        variant: 'destructive'
+        title: "Error",
+        description: "Failed to format code",
+        variant: "destructive",
       });
     }
   };
 
   const minifyCode = () => {
     try {
-      let minified = '';
+      let minified = "";
 
       switch (language) {
-        case 'html':
+        case "html":
           minified = beautify.html(input, {
             indent_size: 0,
-            indent_char: ' ',
+            indent_char: " ",
             max_preserve_newlines: 0,
             preserve_newlines: false,
           });
           break;
 
-        case 'css':
+        case "css":
           minified = beautify.css(input, {
             indent_size: 0,
-            indent_char: ' ',
+            indent_char: " ",
             max_preserve_newlines: 0,
             preserve_newlines: false,
           });
           break;
 
-        case 'javascript':
+        case "javascript":
         default:
           minified = beautify.js(input, {
             indent_size: 0,
-            indent_char: ' ',
+            indent_char: " ",
             max_preserve_newlines: 0,
             preserve_newlines: false,
           });
@@ -99,12 +105,12 @@ export function CodeBeautifierClient() {
       }
 
       setOutput(minified);
-      toast({ title: 'Success', description: 'Code minified successfully' });
+      toast({ title: "Success", description: "Code minified successfully" });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'Failed to minify code',
-        variant: 'destructive'
+        title: "Error",
+        description: "Failed to minify code",
+        variant: "destructive",
       });
     }
   };
@@ -135,7 +141,9 @@ export function CodeBeautifierClient() {
             />
             <div className="mt-4 flex gap-2">
               <Button onClick={formatCode}>Format</Button>
-              <Button onClick={minifyCode} variant="outline">Minify</Button>
+              <Button onClick={minifyCode} variant="outline">
+                Minify
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -146,17 +154,31 @@ export function CodeBeautifierClient() {
               <h3 className="text-lg font-semibold">Formatted Code</h3>
               {output && (
                 <div className="flex gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => copyToClipboard(output)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(output)}
+                  >
                     <Copy className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => downloadFile(output, `formatted.${language}`, 'text/plain')}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      downloadFile(
+                        output,
+                        `formatted.${language}`,
+                        "text/plain",
+                      )
+                    }
+                  >
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
               )}
             </div>
             <pre className="code-editor min-h-[400px] overflow-auto">
-              <code>{output || 'Formatted code will appear here...'}</code>
+              <code>{output || "Formatted code will appear here..."}</code>
             </pre>
           </CardContent>
         </Card>
@@ -171,39 +193,49 @@ export function CodeBeautifierClient() {
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setLanguage('javascript');
-                setInput('function hello(name){console.log("Hello "+name);return true;}');
+                setLanguage("javascript");
+                setInput(
+                  'function hello(name){console.log("Hello "+name);return true;}',
+                );
               }}
             >
               <div>
                 <div className="font-semibold">JavaScript</div>
-                <div className="text-sm text-muted-foreground">Minified function</div>
+                <div className="text-sm text-muted-foreground">
+                  Minified function
+                </div>
               </div>
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setLanguage('html');
-                setInput('<div><h1>Hello</h1><p>World</p></div>');
+                setLanguage("html");
+                setInput("<div><h1>Hello</h1><p>World</p></div>");
               }}
             >
               <div>
                 <div className="font-semibold">HTML</div>
-                <div className="text-sm text-muted-foreground">Simple markup</div>
+                <div className="text-sm text-muted-foreground">
+                  Simple markup
+                </div>
               </div>
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setLanguage('css');
-                setInput('.container{margin:0 auto;max-width:1200px;padding:20px;}');
+                setLanguage("css");
+                setInput(
+                  ".container{margin:0 auto;max-width:1200px;padding:20px;}",
+                );
               }}
             >
               <div>
                 <div className="font-semibold">CSS</div>
-                <div className="text-sm text-muted-foreground">Compact styles</div>
+                <div className="text-sm text-muted-foreground">
+                  Compact styles
+                </div>
               </div>
             </Button>
           </div>

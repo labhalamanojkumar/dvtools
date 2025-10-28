@@ -1,9 +1,9 @@
-'use client';
+"use client";
 "use client";
 
 export default function ScrollToStaticExporterButton() {
   const handleClick = () => {
-    document.querySelector('textarea')?.scrollIntoView({ behavior: 'smooth' });
+    document.querySelector("textarea")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (

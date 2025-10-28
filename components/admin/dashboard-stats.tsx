@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Users, Activity, TrendingUp, Clock } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Users, Activity, TrendingUp, Clock } from "lucide-react";
 
 interface StatsData {
   totalUsers: { value: number; change: string };
@@ -18,16 +18,20 @@ export function DashboardStats() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const response = await fetch('/api/admin/stats');
+        const response = await fetch("/api/admin/stats");
         if (response.ok) {
           const data = await response.json();
           setStats(data);
         } else {
-          console.error('Failed to fetch stats:', response.status, response.statusText);
+          console.error(
+            "Failed to fetch stats:",
+            response.status,
+            response.statusText,
+          );
           setStats(null);
         }
       } catch (error) {
-        console.error('Failed to fetch stats:', error);
+        console.error("Failed to fetch stats:", error);
         setStats(null);
       } finally {
         setLoading(false);
@@ -62,25 +66,25 @@ export function DashboardStats() {
 
   const statItems = [
     {
-      title: 'Total Users',
+      title: "Total Users",
       value: stats.totalUsers.value.toLocaleString(),
       change: stats.totalUsers.change,
       icon: Users,
     },
     {
-      title: 'Total Tool Uses',
+      title: "Total Tool Uses",
       value: stats.totalToolUses.value.toLocaleString(),
       change: stats.totalToolUses.change,
       icon: Activity,
     },
     {
-      title: 'Popular Tool',
+      title: "Popular Tool",
       value: stats.popularTool.value,
       change: `${stats.popularTool.percentage}% of total`,
       icon: TrendingUp,
     },
     {
-      title: 'Avg. Session Time',
+      title: "Avg. Session Time",
       value: `${Math.floor(stats.avgSessionTime.value / 60)}m ${stats.avgSessionTime.value % 60}s`,
       change: stats.avgSessionTime.change,
       icon: Clock,

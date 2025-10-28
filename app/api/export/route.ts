@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/db';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { z } from "zod";
 
 // Validation schema
 const exportRequestSchema = z.object({
-  type: z.enum(['usage-data', 'api-calls', 'tool-sessions', 'account-data']),
+  type: z.enum(["usage-data", "api-calls", "tool-sessions", "account-data"]),
 });
 
 // POST /api/export - Export user data
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -23,43 +23,45 @@ export async function POST(request: NextRequest) {
 
     const userId = session.user.id;
     let exportData: any = {};
-    let fileName = '';
+    let fileName = "";
 
     switch (type) {
-      case 'usage-data':
+      case "usage-data":
         // Export usage statistics
         const toolUsageStats = await prisma.toolSession.groupBy({
-          by: ['toolType'],
+          by: ["toolType"],
           where: { userId },
           _count: { id: true },
           _sum: { duration: true },
         });
 
-        const totalSessions = await prisma.toolSession.count({ where: { userId } });
+        const totalSessions = await prisma.toolSession.count({
+          where: { userId },
+        });
         const totalDuration = await prisma.toolSession.aggregate({
           where: { userId },
           _sum: { duration: true },
         });
 
         exportData = {
-          type: 'usage-data',
+          type: "usage-data",
           totalSessions,
           totalDurationMs: totalDuration._sum.duration || 0,
-          toolBreakdown: toolUsageStats.map(stat => ({
+          toolBreakdown: toolUsageStats.map((stat) => ({
             toolType: stat.toolType,
             sessions: stat._count.id,
             totalDurationMs: stat._sum.duration || 0,
           })),
         };
-        fileName = `usage-data-export-${new Date().toISOString().split('T')[0]}.json`;
+        fileName = `usage-data-export-${new Date().toISOString().split("T")[0]}.json`;
         break;
 
-      case 'api-calls':
+      case "api-calls":
         // Export API call logs (from audit logs)
         const apiCallLogs = await prisma.auditLog.findMany({
           where: {
             userId,
-            action: { in: ['API_KEY_CREATED', 'API_KEY_REVOKED', 'TOOL_USED'] },
+            action: { in: ["API_KEY_CREATED", "API_KEY_REVOKED", "TOOL_USED"] },
           },
           select: {
             action: true,
@@ -69,18 +71,18 @@ export async function POST(request: NextRequest) {
             createdAt: true,
             ipAddress: true,
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 1000, // Limit to last 1000 entries
         });
 
         exportData = {
-          type: 'api-calls',
+          type: "api-calls",
           logs: apiCallLogs,
         };
-        fileName = `api-calls-export-${new Date().toISOString().split('T')[0]}.json`;
+        fileName = `api-calls-export-${new Date().toISOString().split("T")[0]}.json`;
         break;
 
-      case 'tool-sessions':
+      case "tool-sessions":
         // Export tool usage sessions
         const toolSessions = await prisma.toolSession.findMany({
           where: { userId },
@@ -92,18 +94,18 @@ export async function POST(request: NextRequest) {
             errorMsg: true,
             createdAt: true,
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 1000, // Limit to last 1000 sessions
         });
 
         exportData = {
-          type: 'tool-sessions',
+          type: "tool-sessions",
           sessions: toolSessions,
         };
-        fileName = `tool-sessions-export-${new Date().toISOString().split('T')[0]}.json`;
+        fileName = `tool-sessions-export-${new Date().toISOString().split("T")[0]}.json`;
         break;
 
-      case 'account-data':
+      case "account-data":
         // Export account information (excluding sensitive data)
         const user = await prisma.user.findUnique({
           where: { id: userId },
@@ -128,11 +130,14 @@ export async function POST(request: NextRequest) {
         });
 
         if (!user) {
-          return NextResponse.json({ error: 'User not found' }, { status: 404 });
+          return NextResponse.json(
+            { error: "User not found" },
+            { status: 404 },
+          );
         }
 
         exportData = {
-          type: 'account-data',
+          type: "account-data",
           user: {
             ...user,
             // Remove sensitive information
@@ -140,11 +145,14 @@ export async function POST(request: NextRequest) {
             twoFactorSecret: undefined,
           },
         };
-        fileName = `account-data-export-${new Date().toISOString().split('T')[0]}.json`;
+        fileName = `account-data-export-${new Date().toISOString().split("T")[0]}.json`;
         break;
 
       default:
-        return NextResponse.json({ error: 'Invalid export type' }, { status: 400 });
+        return NextResponse.json(
+          { error: "Invalid export type" },
+          { status: 400 },
+        );
     }
 
     // Add metadata to the export
@@ -152,7 +160,7 @@ export async function POST(request: NextRequest) {
       exportedAt: new Date().toISOString(),
       userId,
       exportType: type,
-      version: '1.0',
+      version: "1.0",
     };
 
     const finalExportData = {
@@ -162,7 +170,7 @@ export async function POST(request: NextRequest) {
 
     // Create the JSON blob
     const jsonString = JSON.stringify(finalExportData, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
+    const blob = new Blob([jsonString], { type: "application/json" });
 
     // In a real implementation, you might want to:
     // 1. Save the export to a temporary file/storage
@@ -174,8 +182,8 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         userId,
-        action: 'SETTING_CHANGED', // Using existing audit action
-        resource: 'export',
+        action: "SETTING_CHANGED", // Using existing audit action
+        resource: "export",
         resourceId: type,
         details: { exportType: type, fileName },
       },
@@ -185,15 +193,21 @@ export async function POST(request: NextRequest) {
       success: true,
       fileName,
       data: finalExportData,
-      message: 'Data exported successfully',
+      message: "Data exported successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
+      return NextResponse.json(
+        { error: error.errors[0].message },
+        { status: 400 },
+      );
     }
 
-    console.error('Error exporting data:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error exporting data:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -203,36 +217,39 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // For now, just return available export types
     const availableExports = [
       {
-        id: 'usage-data',
-        title: 'Usage Data',
-        description: 'Export your tool usage statistics and analytics',
+        id: "usage-data",
+        title: "Usage Data",
+        description: "Export your tool usage statistics and analytics",
       },
       {
-        id: 'api-calls',
-        title: 'API Call History',
-        description: 'Export your API call logs and history',
+        id: "api-calls",
+        title: "API Call History",
+        description: "Export your API call logs and history",
       },
       {
-        id: 'tool-sessions',
-        title: 'Tool Sessions',
-        description: 'Export your tool usage sessions and timestamps',
+        id: "tool-sessions",
+        title: "Tool Sessions",
+        description: "Export your tool usage sessions and timestamps",
       },
       {
-        id: 'account-data',
-        title: 'Account Data',
-        description: 'Export your profile and account information',
+        id: "account-data",
+        title: "Account Data",
+        description: "Export your profile and account information",
       },
     ];
 
     return NextResponse.json({ availableExports });
   } catch (error) {
-    console.error('Error fetching export status:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching export status:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

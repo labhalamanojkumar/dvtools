@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcrypt';
-import { prisma } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcrypt";
+import { prisma } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,15 +9,15 @@ export async function POST(request: NextRequest) {
     // Validation
     if (!name || !email || !password) {
       return NextResponse.json(
-        { error: 'Name, email, and password are required' },
-        { status: 400 }
+        { error: "Name, email, and password are required" },
+        { status: 400 },
       );
     }
 
     if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
-        { status: 400 }
+        { error: "Password must be at least 8 characters long" },
+        { status: 400 },
       );
     }
 
@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 400 }
+        { error: "User with this email already exists" },
+        { status: 400 },
       );
     }
 
@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
         name,
         email,
         password: hashedPassword,
-        role: email === process.env.ADMIN_EMAIL ? 'SUPERADMIN' : 'USER',
-        status: 'ACTIVE',
+        role: email === process.env.ADMIN_EMAIL ? "SUPERADMIN" : "USER",
+        status: "ACTIVE",
       },
     });
 
@@ -52,16 +52,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
-        message: 'User created successfully',
-        user: userWithoutPassword
+        message: "User created successfully",
+        user: userWithoutPassword,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

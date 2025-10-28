@@ -1,15 +1,41 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Users, UserPlus, Search, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Badge } from "../ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import {
+  Users,
+  UserPlus,
+  Search,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+} from "lucide-react";
 
 interface User {
   id: string;
@@ -37,25 +63,31 @@ interface UsersResponse {
 export function UserManagement() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [pagination, setPagination] = useState({ page: 1, total: 0, pages: 0 });
 
   const fetchUsers = useCallback(async () => {
     try {
-      const response = await fetch(`/api/admin/users?search=${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(
+        `/api/admin/users?search=${encodeURIComponent(searchTerm)}`,
+      );
       if (response.ok) {
         const data: UsersResponse = await response.json();
         setUsers(data.users);
         setPagination(data.pagination);
       } else {
-        console.error('Failed to fetch users:', response.status, response.statusText);
+        console.error(
+          "Failed to fetch users:",
+          response.status,
+          response.statusText,
+        );
         setUsers([]);
         setPagination({ page: 1, total: 0, pages: 0 });
       }
     } catch (error) {
-      console.error('Failed to fetch users:', error);
+      console.error("Failed to fetch users:", error);
       setUsers([]);
       setPagination({ page: 1, total: 0, pages: 0 });
     } finally {
@@ -69,29 +101,37 @@ export function UserManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-gray-100 text-gray-800';
-      case 'suspended': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "active":
+        return "bg-green-100 text-green-800";
+      case "inactive":
+        return "bg-gray-100 text-gray-800";
+      case "suspended":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'admin': return 'bg-purple-100 text-purple-800';
-      case 'moderator': return 'bg-blue-100 text-blue-800';
-      case 'user': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "admin":
+        return "bg-purple-100 text-purple-800";
+      case "moderator":
+        return "bg-blue-100 text-blue-800";
+      case "user":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -144,7 +184,11 @@ export function UserManagement() {
                 </div>
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="Enter email address" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter email address"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="role">Role</Label>
@@ -160,10 +204,17 @@ export function UserManagement() {
                   </Select>
                 </div>
                 <div className="flex gap-2 pt-4">
-                  <Button onClick={() => setIsDialogOpen(false)} className="flex-1">
+                  <Button
+                    onClick={() => setIsDialogOpen(false)}
+                    className="flex-1"
+                  >
                     Add User
                   </Button>
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="flex-1">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                    className="flex-1"
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -200,7 +251,7 @@ export function UserManagement() {
             <TableBody>
               {users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell>{user.name || 'N/A'}</TableCell>
+                  <TableCell>{user.name || "N/A"}</TableCell>
                   <TableCell>{user.email}</TableCell>
                   <TableCell>
                     <Badge className={getRoleColor(user.role)}>
@@ -213,7 +264,7 @@ export function UserManagement() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
-                    {user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Never'}
+                    {user.lastLoginAt ? formatDate(user.lastLoginAt) : "Never"}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">

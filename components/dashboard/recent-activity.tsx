@@ -1,52 +1,52 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Clock, FileText, Code, Key, Download } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Clock, FileText, Code, Key, Download } from "lucide-react";
 
 export default function RecentActivity() {
   // Mock data - in a real app, this would come from your database
   const activities = [
     {
       id: 1,
-      action: 'Formatted JSON',
-      tool: 'JSON Formatter',
-      timestamp: '2 minutes ago',
+      action: "Formatted JSON",
+      tool: "JSON Formatter",
+      timestamp: "2 minutes ago",
       icon: FileText,
-      color: 'text-blue-500'
+      color: "text-blue-500",
     },
     {
       id: 2,
-      action: 'Generated API Key',
-      tool: 'API Management',
-      timestamp: '15 minutes ago',
+      action: "Generated API Key",
+      tool: "API Management",
+      timestamp: "15 minutes ago",
       icon: Key,
-      color: 'text-green-500'
+      color: "text-green-500",
     },
     {
       id: 3,
-      action: 'Decoded JWT',
-      tool: 'JWT Decoder',
-      timestamp: '1 hour ago',
+      action: "Decoded JWT",
+      tool: "JWT Decoder",
+      timestamp: "1 hour ago",
       icon: Code,
-      color: 'text-purple-500'
+      color: "text-purple-500",
     },
     {
       id: 4,
-      action: 'Exported Data',
-      tool: 'Data Export',
-      timestamp: '2 hours ago',
+      action: "Exported Data",
+      tool: "Data Export",
+      timestamp: "2 hours ago",
       icon: Download,
-      color: 'text-orange-500'
+      color: "text-orange-500",
     },
     {
       id: 5,
-      action: 'Tested RegExp',
-      tool: 'RegExp Tester',
-      timestamp: '3 hours ago',
+      action: "Tested RegExp",
+      tool: "RegExp Tester",
+      timestamp: "3 hours ago",
       icon: Code,
-      color: 'text-red-500'
-    }
+      color: "text-red-500",
+    },
   ];
 
   return (

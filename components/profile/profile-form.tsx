@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { User, Mail, Save, Camera } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { User, Mail, Save, Camera } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 interface ProfileFormProps {
   user: {
@@ -26,9 +26,9 @@ export default function ProfileForm({ user }: ProfileFormProps) {
   const { data: session, update } = useSession();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user.name || '',
-    email: user.email || '',
-    bio: '',
+    name: user.name || "",
+    email: user.email || "",
+    bio: "",
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,16 +49,16 @@ export default function ProfileForm({ user }: ProfileFormProps) {
 
       setIsEditing(false);
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error("Failed to update profile:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -74,16 +74,24 @@ export default function ProfileForm({ user }: ProfileFormProps) {
         {/* Avatar Section */}
         <div className="flex items-center gap-6">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={user.image || ''} alt={user.name || 'User'} />
+            <AvatarImage src={user.image || ""} alt={user.name || "User"} />
             <AvatarFallback className="text-lg">
-              {user.name?.charAt(0)?.toUpperCase() || 'U'}
+              {user.name?.charAt(0)?.toUpperCase() || "U"}
             </AvatarFallback>
           </Avatar>
           <div className="space-y-2">
-            <h3 className="text-lg font-medium">{user.name || 'User'}</h3>
+            <h3 className="text-lg font-medium">{user.name || "User"}</h3>
             <p className="text-sm text-muted-foreground">{user.email}</p>
-            <Badge variant={user.role === 'ADMIN' || user.role === 'SUPERADMIN' ? 'destructive' : 'outline'}>
-              {user.role === 'ADMIN' || user.role === 'SUPERADMIN' ? 'Administrator' : 'User'}
+            <Badge
+              variant={
+                user.role === "ADMIN" || user.role === "SUPERADMIN"
+                  ? "destructive"
+                  : "outline"
+              }
+            >
+              {user.role === "ADMIN" || user.role === "SUPERADMIN"
+                ? "Administrator"
+                : "User"}
             </Badge>
           </div>
           <Button variant="outline" size="sm" className="ml-auto">
@@ -102,7 +110,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               <Input
                 id="name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => handleInputChange("name", e.target.value)}
                 disabled={!isEditing}
                 placeholder="Enter your full name"
               />
@@ -115,7 +123,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
                   disabled={!isEditing}
                   className="pl-10"
                   placeholder="Enter your email"
@@ -129,7 +137,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             <Textarea
               id="bio"
               value={formData.bio}
-              onChange={(e) => handleInputChange('bio', e.target.value)}
+              onChange={(e) => handleInputChange("bio", e.target.value)}
               disabled={!isEditing}
               placeholder="Tell us about yourself..."
               rows={3}
@@ -145,16 +153,16 @@ export default function ProfileForm({ user }: ProfileFormProps) {
               <>
                 <Button type="submit" disabled={isLoading}>
                   <Save className="mr-2 h-4 w-4" />
-                  {isLoading ? 'Saving...' : 'Save Changes'}
+                  {isLoading ? "Saving..." : "Save Changes"}
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => {
                     setFormData({
-                      name: user.name || '',
-                      email: user.email || '',
-                      bio: '',
+                      name: user.name || "",
+                      email: user.email || "",
+                      bio: "",
                     });
                     setIsEditing(false);
                   }}

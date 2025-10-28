@@ -1,33 +1,43 @@
-import { Metadata } from 'next';
-import { RegexpTesterClient } from '@/components/tools/regexp-tester-client';
+import { Metadata } from "next";
+import { RegexpTesterClient } from "@/components/tools/regexp-tester-client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: 'Regexp Tester - Test and Validate Regular Expressions Online',
-  description: 'Free online regular expression tester. Test regex patterns with real-time matching, supports all flags, and provides detailed match information.',
-  keywords: ['regex tester', 'regular expression', 'regexp validator', 'pattern matching', 'javascript regex', 'regex flags'],
+  title: "Regexp Tester - Test and Validate Regular Expressions Online",
+  description:
+    "Free online regular expression tester. Test regex patterns with real-time matching, supports all flags, and provides detailed match information.",
+  keywords: [
+    "regex tester",
+    "regular expression",
+    "regexp validator",
+    "pattern matching",
+    "javascript regex",
+    "regex flags",
+  ],
   openGraph: {
-    title: 'Regexp Tester - Multi-Tool Platform',
-    description: 'Test and validate regular expressions with real-time matching',
-    type: 'website',
+    title: "Regexp Tester - Multi-Tool Platform",
+    description:
+      "Test and validate regular expressions with real-time matching",
+    type: "website",
   },
   alternates: {
-    canonical: '/tools/regexp-tester',
+    canonical: "/tools/regexp-tester",
   },
 };
 
 const jsonLdSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Regexp Tester',
-  applicationCategory: 'DeveloperApplication',
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Regexp Tester",
+  applicationCategory: "DeveloperApplication",
   offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
   },
-  description: 'Free online regular expression tester with real-time matching and flag support',
+  description:
+    "Free online regular expression tester with real-time matching and flag support",
 };
 
 export default function RegexpTesterPage() {

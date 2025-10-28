@@ -1,29 +1,29 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { Card, CardContent } from '../ui/card';
-import { copyToClipboard, downloadFile } from '../../lib/utils';
-import { useToast } from '../ui/toaster';
-import { Copy, Download, Upload } from 'lucide-react';
+import { useState, useRef } from "react";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Card, CardContent } from "../ui/card";
+import { copyToClipboard, downloadFile } from "../../lib/utils";
+import { useToast } from "../ui/toaster";
+import { Copy, Download, Upload } from "lucide-react";
 
 export function Base64Client() {
-  const [input, setInput] = useState('');
-  const [output, setOutput] = useState('');
-  const [mimeType, setMimeType] = useState('');
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [mimeType, setMimeType] = useState("");
   const { toast } = useToast();
 
   const encode = () => {
     try {
       const encoded = btoa(input);
       setOutput(encoded);
-      toast({ title: 'Encoded', description: 'Text encoded to Base64' });
+      toast({ title: "Encoded", description: "Text encoded to Base64" });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'Failed to encode text',
-        variant: 'destructive'
+        title: "Error",
+        description: "Failed to encode text",
+        variant: "destructive",
       });
     }
   };
@@ -34,17 +34,17 @@ export function Base64Client() {
       setOutput(decoded);
 
       // Try to detect MIME type
-      if (decoded.startsWith('data:')) {
+      if (decoded.startsWith("data:")) {
         const match = decoded.match(/^data:([^;]+);/);
         if (match) setMimeType(match[1]);
       }
 
-      toast({ title: 'Decoded', description: 'Base64 decoded successfully' });
+      toast({ title: "Decoded", description: "Base64 decoded successfully" });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'Invalid Base64 string',
-        variant: 'destructive'
+        title: "Error",
+        description: "Invalid Base64 string",
+        variant: "destructive",
       });
     }
   };
@@ -56,7 +56,7 @@ export function Base64Client() {
     const reader = new FileReader();
     reader.onload = (event) => {
       const base64 = event.target?.result as string;
-      setInput(base64.split(',')[1]);
+      setInput(base64.split(",")[1]);
       setMimeType(file.type);
     };
     reader.readAsDataURL(file);
@@ -76,7 +76,9 @@ export function Base64Client() {
             />
             <div className="mt-4 flex gap-2">
               <Button onClick={encode}>Encode</Button>
-              <Button onClick={decode} variant="outline">Decode</Button>
+              <Button onClick={decode} variant="outline">
+                Decode
+              </Button>
               <label className="cursor-pointer">
                 <input
                   type="file"
@@ -84,7 +86,10 @@ export function Base64Client() {
                   onChange={handleFileUpload}
                 />
                 <Button variant="outline" asChild>
-                  <span><Upload className="mr-2 h-4 w-4" />Upload File</span>
+                  <span>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload File
+                  </span>
                 </Button>
               </label>
             </div>
@@ -102,18 +107,20 @@ export function Base64Client() {
               )}
             </div>
             <pre className="code-editor min-h-[300px] overflow-auto">
-              <code>{output || 'Output will appear here...'}</code>
+              <code>{output || "Output will appear here..."}</code>
             </pre>
             {output && (
               <div className="mt-4 flex gap-2">
                 <Button onClick={() => copyToClipboard(output)}>
-                  <Copy className="mr-2 h-4 w-4" />Copy
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => downloadFile(output, 'output.txt')}
+                  onClick={() => downloadFile(output, "output.txt")}
                 >
-                  <Download className="mr-2 h-4 w-4" />Download
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
                 </Button>
               </div>
             )}

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
 // GET /api/tools/stats - Get tool usage statistics
 export async function GET(request: NextRequest) {
@@ -9,25 +9,25 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const userId = session.user.id;
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || '30d'; // 7d, 30d, 90d
+    const period = searchParams.get("period") || "30d"; // 7d, 30d, 90d
 
     // Calculate date range
     const now = new Date();
     const startDate = new Date();
 
     switch (period) {
-      case '7d':
+      case "7d":
         startDate.setDate(now.getDate() - 7);
         break;
-      case '30d':
+      case "30d":
         startDate.setDate(now.getDate() - 30);
         break;
-      case '90d':
+      case "90d":
         startDate.setDate(now.getDate() - 90);
         break;
       default:
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     // Get tool usage statistics
     const toolStats = await prisma.toolSession.groupBy({
-      by: ['toolType'],
+      by: ["toolType"],
       where: {
         userId,
         createdAt: {
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     // Get success rate
     const successStats = await prisma.toolSession.groupBy({
-      by: ['success'],
+      by: ["success"],
       where: {
         userId,
         createdAt: {
@@ -74,11 +74,13 @@ export async function GET(request: NextRequest) {
     });
 
     const totalSessions = totalStats._count.id;
-    const successfulSessions = successStats.find(s => s.success)?._count.id || 0;
-    const successRate = totalSessions > 0 ? (successfulSessions / totalSessions) * 100 : 0;
+    const successfulSessions =
+      successStats.find((s) => s.success)?._count.id || 0;
+    const successRate =
+      totalSessions > 0 ? (successfulSessions / totalSessions) * 100 : 0;
 
     // Format the response
-    const formattedStats = toolStats.map(stat => ({
+    const formattedStats = toolStats.map((stat) => ({
       toolType: stat.toolType,
       sessions: stat._count.id,
       totalDuration: stat._sum.duration || 0,
@@ -100,7 +102,10 @@ export async function GET(request: NextRequest) {
       tools: formattedStats,
     });
   } catch (error) {
-    console.error('Error fetching tool stats:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching tool stats:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

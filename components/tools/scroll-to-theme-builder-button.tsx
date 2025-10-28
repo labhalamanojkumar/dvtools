@@ -1,9 +1,9 @@
-'use client';
+"use client";
 "use client";
 
 export default function ScrollToThemeBuilderButton() {
   const handleClick = () => {
-    document.querySelector('button')?.scrollIntoView({ behavior: 'smooth' });
+    document.querySelector("button")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (

@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Search,
   AlertTriangle,
@@ -21,16 +21,16 @@ import {
   Eye,
   Zap,
   Shield,
-  Users
-} from 'lucide-react';
-import { useToast } from '@/components/ui/toaster';
+  Users,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
 
 interface AccessibilityIssue {
   id: string;
-  type: 'error' | 'warning' | 'info';
+  type: "error" | "warning" | "info";
   title: string;
   description: string;
-  impact: 'critical' | 'serious' | 'moderate' | 'minor';
+  impact: "critical" | "serious" | "moderate" | "minor";
   wcag: string;
   element?: string;
   code?: string;
@@ -57,26 +57,31 @@ interface AccessibilityRule {
   description: string;
   impact: string;
   wcag: string;
-  check: ((element: Element) => boolean) | ((elements: Element[]) => boolean) | (() => boolean);
+  check:
+    | ((element: Element) => boolean)
+    | ((elements: Element[]) => boolean)
+    | (() => boolean);
 }
 
 const accessibilityRules: AccessibilityRule[] = [
   {
-    id: 'img-alt',
-    title: 'Missing alt text',
-    description: 'Images must have alt text',
-    impact: 'critical',
-    wcag: '1.1.1',
-    check: (element: Element) => !element.hasAttribute('alt') || element.getAttribute('alt')?.trim() === ''
+    id: "img-alt",
+    title: "Missing alt text",
+    description: "Images must have alt text",
+    impact: "critical",
+    wcag: "1.1.1",
+    check: (element: Element) =>
+      !element.hasAttribute("alt") ||
+      element.getAttribute("alt")?.trim() === "",
   },
   {
-    id: 'heading-order',
-    title: 'Heading order skipped',
-    description: 'Headings should not skip levels',
-    impact: 'serious',
-    wcag: '1.3.1',
+    id: "heading-order",
+    title: "Heading order skipped",
+    description: "Headings should not skip levels",
+    impact: "serious",
+    wcag: "1.3.1",
     check: (elements: Element[]) => {
-      const headings = elements.filter(el => /^h[1-6]$/i.test(el.tagName));
+      const headings = elements.filter((el) => /^h[1-6]$/i.test(el.tagName));
       let lastLevel = 0;
       for (const heading of headings) {
         const level = parseInt(heading.tagName.charAt(1));
@@ -84,74 +89,76 @@ const accessibilityRules: AccessibilityRule[] = [
         lastLevel = level;
       }
       return false;
-    }
+    },
   },
   {
-    id: 'color-contrast',
-    title: 'Insufficient color contrast',
-    description: 'Text must have sufficient contrast with background',
-    impact: 'serious',
-    wcag: '1.4.3',
-    check: () => Math.random() > 0.7 // Placeholder - would need actual color analysis
+    id: "color-contrast",
+    title: "Insufficient color contrast",
+    description: "Text must have sufficient contrast with background",
+    impact: "serious",
+    wcag: "1.4.3",
+    check: () => Math.random() > 0.7, // Placeholder - would need actual color analysis
   },
   {
-    id: 'button-label',
-    title: 'Button without accessible label',
-    description: 'Buttons must have accessible text',
-    impact: 'critical',
-    wcag: '4.1.2',
+    id: "button-label",
+    title: "Button without accessible label",
+    description: "Buttons must have accessible text",
+    impact: "critical",
+    wcag: "4.1.2",
     check: (element: Element) => {
       const hasText = element.textContent?.trim();
-      const hasAriaLabel = element.hasAttribute('aria-label');
-      const hasAriaLabelledBy = element.hasAttribute('aria-labelledby');
+      const hasAriaLabel = element.hasAttribute("aria-label");
+      const hasAriaLabelledBy = element.hasAttribute("aria-labelledby");
       return !hasText && !hasAriaLabel && !hasAriaLabelledBy;
-    }
+    },
   },
   {
-    id: 'link-name',
-    title: 'Link without accessible name',
-    description: 'Links must have accessible text',
-    impact: 'serious',
-    wcag: '4.1.2',
+    id: "link-name",
+    title: "Link without accessible name",
+    description: "Links must have accessible text",
+    impact: "serious",
+    wcag: "4.1.2",
     check: (element: Element) => {
       const hasText = element.textContent?.trim();
-      const hasAriaLabel = element.hasAttribute('aria-label');
-      const hasTitle = element.hasAttribute('title');
+      const hasAriaLabel = element.hasAttribute("aria-label");
+      const hasTitle = element.hasAttribute("title");
       return !hasText && !hasAriaLabel && !hasTitle;
-    }
+    },
   },
   {
-    id: 'form-label',
-    title: 'Form field without label',
-    description: 'Form inputs must have associated labels',
-    impact: 'critical',
-    wcag: '3.3.2',
+    id: "form-label",
+    title: "Form field without label",
+    description: "Form inputs must have associated labels",
+    impact: "critical",
+    wcag: "3.3.2",
     check: (element: Element) => {
-      const hasLabel = element.hasAttribute('aria-label') ||
-                      element.hasAttribute('aria-labelledby') ||
-                      document.querySelector(`label[for="${element.id}"]`);
+      const hasLabel =
+        element.hasAttribute("aria-label") ||
+        element.hasAttribute("aria-labelledby") ||
+        document.querySelector(`label[for="${element.id}"]`);
       return !hasLabel;
-    }
+    },
   },
   {
-    id: 'lang-attribute',
-    title: 'Missing language attribute',
-    description: 'Page should have lang attribute',
-    impact: 'moderate',
-    wcag: '3.1.1',
-    check: (element: Element) => element.tagName === 'HTML' && !element.hasAttribute('lang')
+    id: "lang-attribute",
+    title: "Missing language attribute",
+    description: "Page should have lang attribute",
+    impact: "moderate",
+    wcag: "3.1.1",
+    check: (element: Element) =>
+      element.tagName === "HTML" && !element.hasAttribute("lang"),
   },
   {
-    id: 'title-attribute',
-    title: 'Missing page title',
-    description: 'Page should have a descriptive title',
-    impact: 'moderate',
-    wcag: '2.4.2',
+    id: "title-attribute",
+    title: "Missing page title",
+    description: "Page should have a descriptive title",
+    impact: "moderate",
+    wcag: "2.4.2",
     check: (element: Element) => {
-      const title = document.querySelector('title');
+      const title = document.querySelector("title");
       return !title || !title.textContent?.trim();
-    }
-  }
+    },
+  },
 ];
 
 const sampleHTML = `<!DOCTYPE html>
@@ -213,61 +220,76 @@ const sampleHTML = `<!DOCTYPE html>
 </html>`;
 
 export default function AccessibilityScannerClient() {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState("");
   const [html, setHtml] = useState(sampleHTML);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [inputMode, setInputMode] = useState<'url' | 'html'>('html');
+  const [inputMode, setInputMode] = useState<"url" | "html">("html");
   const { toast } = useToast();
 
-  const scanAccessibility = async (content: string, sourceUrl?: string): Promise<ScanResult> => {
+  const scanAccessibility = async (
+    content: string,
+    sourceUrl?: string,
+  ): Promise<ScanResult> => {
     const issues: AccessibilityIssue[] = [];
 
     // Create a temporary DOM element to parse HTML
     const parser = new DOMParser();
-    const doc = parser.parseFromString(content, 'text/html');
+    const doc = parser.parseFromString(content, "text/html");
 
     // Run each accessibility rule
-    accessibilityRules.forEach(rule => {
-      if (rule.id === 'heading-order') {
-        const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+    accessibilityRules.forEach((rule) => {
+      if (rule.id === "heading-order") {
+        const headings = Array.from(
+          doc.querySelectorAll("h1, h2, h3, h4, h5, h6"),
+        );
         if ((rule.check as (elements: Element[]) => boolean)(headings)) {
           issues.push({
             id: rule.id,
-            type: 'warning',
+            type: "warning",
             title: rule.title,
             description: rule.description,
             impact: rule.impact as any,
             wcag: rule.wcag,
-            suggestion: 'Ensure heading levels increase sequentially (h1 → h2 → h3, etc.)'
+            suggestion:
+              "Ensure heading levels increase sequentially (h1 → h2 → h3, etc.)",
           });
         }
-      } else if (rule.id === 'color-contrast') {
+      } else if (rule.id === "color-contrast") {
         if ((rule.check as () => boolean)()) {
           issues.push({
             id: rule.id,
-            type: 'warning',
+            type: "warning",
             title: rule.title,
             description: rule.description,
             impact: rule.impact as any,
             wcag: rule.wcag,
-            suggestion: getSuggestionForRule(rule.id)
+            suggestion: getSuggestionForRule(rule.id),
           });
         }
       } else {
-        const elements = Array.from(doc.querySelectorAll('*'));
-        elements.forEach(element => {
+        const elements = Array.from(doc.querySelectorAll("*"));
+        elements.forEach((element) => {
           if ((rule.check as (element: Element) => boolean)(element)) {
             issues.push({
               id: rule.id,
-              type: rule.impact === 'critical' ? 'error' : rule.impact === 'serious' ? 'warning' : 'info',
+              type:
+                rule.impact === "critical"
+                  ? "error"
+                  : rule.impact === "serious"
+                    ? "warning"
+                    : "info",
               title: rule.title,
               description: rule.description,
               impact: rule.impact as any,
               wcag: rule.wcag,
-              element: element.tagName.toLowerCase() + (element.id ? `#${element.id}` : ''),
-              code: element.outerHTML.substring(0, 100) + (element.outerHTML.length > 100 ? '...' : ''),
-              suggestion: getSuggestionForRule(rule.id)
+              element:
+                element.tagName.toLowerCase() +
+                (element.id ? `#${element.id}` : ""),
+              code:
+                element.outerHTML.substring(0, 100) +
+                (element.outerHTML.length > 100 ? "..." : ""),
+              suggestion: getSuggestionForRule(rule.id),
             });
           }
         });
@@ -276,13 +298,16 @@ export default function AccessibilityScannerClient() {
 
     // Calculate score (0-100, higher is better)
     const totalChecks = accessibilityRules.length * 10; // Assume 10 elements per rule
-    const score = Math.max(0, Math.min(100, 100 - (issues.length / totalChecks) * 100));
+    const score = Math.max(
+      0,
+      Math.min(100, 100 - (issues.length / totalChecks) * 100),
+    );
 
     const summary = {
-      errors: issues.filter(i => i.type === 'error').length,
-      warnings: issues.filter(i => i.type === 'warning').length,
-      info: issues.filter(i => i.type === 'info').length,
-      passed: Math.max(0, totalChecks - issues.length)
+      errors: issues.filter((i) => i.type === "error").length,
+      warnings: issues.filter((i) => i.type === "warning").length,
+      info: issues.filter((i) => i.type === "info").length,
+      passed: Math.max(0, totalChecks - issues.length),
     };
 
     return {
@@ -291,22 +316,29 @@ export default function AccessibilityScannerClient() {
       issues,
       score,
       summary,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   };
 
   const getSuggestionForRule = (ruleId: string): string => {
     const suggestions: Record<string, string> = {
-      'img-alt': 'Add descriptive alt text: <img src="image.jpg" alt="Description of image">',
-      'button-label': 'Add text content or aria-label: <button aria-label="Close">×</button>',
-      'link-name': 'Add link text or aria-label: <a href="#" aria-label="Home">⌂</a>',
-      'form-label': 'Associate input with label: <label for="email">Email:</label><input id="email">',
-      'lang-attribute': 'Add lang attribute: <html lang="en">',
-      'title-attribute': 'Add page title: <title>Page Title</title>',
-      'color-contrast': 'Increase contrast ratio to at least 4.5:1',
-      'heading-order': 'Use sequential heading levels without skipping'
+      "img-alt":
+        'Add descriptive alt text: <img src="image.jpg" alt="Description of image">',
+      "button-label":
+        'Add text content or aria-label: <button aria-label="Close">×</button>',
+      "link-name":
+        'Add link text or aria-label: <a href="#" aria-label="Home">⌂</a>',
+      "form-label":
+        'Associate input with label: <label for="email">Email:</label><input id="email">',
+      "lang-attribute": 'Add lang attribute: <html lang="en">',
+      "title-attribute": "Add page title: <title>Page Title</title>",
+      "color-contrast": "Increase contrast ratio to at least 4.5:1",
+      "heading-order": "Use sequential heading levels without skipping",
     };
-    return suggestions[ruleId] || 'Fix the accessibility issue according to WCAG guidelines';
+    return (
+      suggestions[ruleId] ||
+      "Fix the accessibility issue according to WCAG guidelines"
+    );
   };
 
   const handleScan = async () => {
@@ -325,12 +357,13 @@ export default function AccessibilityScannerClient() {
       let content = html;
       const sourceUrl = url;
 
-      if (inputMode === 'url' && url) {
+      if (inputMode === "url" && url) {
         // Note: In a real implementation, you'd need a backend proxy to fetch URLs
         // For demo purposes, we'll show a message
         toast({
           title: "URL scanning",
-          description: "URL scanning requires backend proxy. Using sample HTML instead.",
+          description:
+            "URL scanning requires backend proxy. Using sample HTML instead.",
         });
         content = sampleHTML;
       }
@@ -355,35 +388,44 @@ export default function AccessibilityScannerClient() {
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
-      case 'critical': return 'text-red-600';
-      case 'serious': return 'text-orange-600';
-      case 'moderate': return 'text-yellow-600';
-      case 'minor': return 'text-blue-600';
-      default: return 'text-gray-600';
+      case "critical":
+        return "text-red-600";
+      case "serious":
+        return "text-orange-600";
+      case "moderate":
+        return "text-yellow-600";
+      case "minor":
+        return "text-blue-600";
+      default:
+        return "text-gray-600";
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'error': return <XCircle className="h-4 w-4 text-red-500" />;
-      case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'info': return <Info className="h-4 w-4 text-blue-500" />;
-      default: return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "error":
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      case "warning":
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case "info":
+        return <Info className="h-4 w-4 text-blue-500" />;
+      default:
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 70) return 'text-yellow-600';
-    if (score >= 50) return 'text-orange-600';
-    return 'text-red-600';
+    if (score >= 90) return "text-green-600";
+    if (score >= 70) return "text-yellow-600";
+    if (score >= 50) return "text-orange-600";
+    return "text-red-600";
   };
 
   const getScoreLabel = (score: number) => {
-    if (score >= 90) return 'Excellent';
-    if (score >= 70) return 'Good';
-    if (score >= 50) return 'Needs Improvement';
-    return 'Poor';
+    if (score >= 90) return "Excellent";
+    if (score >= 70) return "Good";
+    if (score >= 50) return "Needs Improvement";
+    return "Poor";
   };
 
   return (
@@ -397,7 +439,10 @@ export default function AccessibilityScannerClient() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'url' | 'html')}>
+          <Tabs
+            value={inputMode}
+            onValueChange={(value) => setInputMode(value as "url" | "html")}
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="url">URL</TabsTrigger>
               <TabsTrigger value="html">HTML Code</TabsTrigger>
@@ -414,7 +459,8 @@ export default function AccessibilityScannerClient() {
                   onChange={(e) => setUrl(e.target.value)}
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Note: URL scanning requires server-side proxy for CORS compliance
+                  Note: URL scanning requires server-side proxy for CORS
+                  compliance
                 </p>
               </div>
             </TabsContent>
@@ -433,11 +479,7 @@ export default function AccessibilityScannerClient() {
             </TabsContent>
           </Tabs>
 
-          <Button
-            onClick={handleScan}
-            disabled={isScanning}
-            className="w-full"
-          >
+          <Button onClick={handleScan} disabled={isScanning} className="w-full">
             {isScanning ? (
               <>
                 <Zap className="mr-2 h-4 w-4 animate-spin" />
@@ -458,7 +500,9 @@ export default function AccessibilityScannerClient() {
         <Tabs defaultValue="overview" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="issues">Issues ({result.issues.length})</TabsTrigger>
+            <TabsTrigger value="issues">
+              Issues ({result.issues.length})
+            </TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
           </TabsList>
 
@@ -466,10 +510,14 @@ export default function AccessibilityScannerClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="pt-6">
-                  <div className={`text-3xl font-bold ${getScoreColor(result.score)}`}>
+                  <div
+                    className={`text-3xl font-bold ${getScoreColor(result.score)}`}
+                  >
                     {result.score.toFixed(0)}
                   </div>
-                  <p className="text-xs text-muted-foreground">Accessibility Score</p>
+                  <p className="text-xs text-muted-foreground">
+                    Accessibility Score
+                  </p>
                   <p className={`text-xs ${getScoreColor(result.score)}`}>
                     {getScoreLabel(result.score)}
                   </p>
@@ -478,21 +526,27 @@ export default function AccessibilityScannerClient() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-3xl font-bold text-red-600">{result.summary.errors}</div>
+                  <div className="text-3xl font-bold text-red-600">
+                    {result.summary.errors}
+                  </div>
                   <p className="text-xs text-muted-foreground">Errors</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-3xl font-bold text-yellow-600">{result.summary.warnings}</div>
+                  <div className="text-3xl font-bold text-yellow-600">
+                    {result.summary.warnings}
+                  </div>
                   <p className="text-xs text-muted-foreground">Warnings</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-3xl font-bold text-blue-600">{result.summary.info}</div>
+                  <div className="text-3xl font-bold text-blue-600">
+                    {result.summary.info}
+                  </div>
                   <p className="text-xs text-muted-foreground">Info</p>
                 </CardContent>
               </Card>
@@ -513,19 +567,36 @@ export default function AccessibilityScannerClient() {
                       {result.score >= 90
                         ? "Excellent! Your content meets most accessibility standards."
                         : result.score >= 70
-                        ? "Good progress, but there are some issues to address."
-                        : "Several accessibility issues need attention to improve usability."}
+                          ? "Good progress, but there are some issues to address."
+                          : "Several accessibility issues need attention to improve usability."}
                     </p>
                   </div>
 
                   <div>
                     <h4 className="font-semibold mb-2">WCAG Compliance:</h4>
                     <div className="flex flex-wrap gap-2">
-                      <Badge variant={result.summary.errors === 0 ? "default" : "destructive"}>
+                      <Badge
+                        variant={
+                          result.summary.errors === 0
+                            ? "default"
+                            : "destructive"
+                        }
+                      >
                         A Level: {result.summary.errors === 0 ? "Pass" : "Fail"}
                       </Badge>
-                      <Badge variant={result.summary.errors === 0 && result.summary.warnings <= 5 ? "default" : "secondary"}>
-                        AA Level: {result.summary.errors === 0 && result.summary.warnings <= 5 ? "Pass" : "Partial"}
+                      <Badge
+                        variant={
+                          result.summary.errors === 0 &&
+                          result.summary.warnings <= 5
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
+                        AA Level:{" "}
+                        {result.summary.errors === 0 &&
+                        result.summary.warnings <= 5
+                          ? "Pass"
+                          : "Partial"}
                       </Badge>
                       <Badge variant="outline">
                         AAA Level: Manual Review Required
@@ -550,7 +621,9 @@ export default function AccessibilityScannerClient() {
                   <div className="text-center py-8">
                     <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
                     <p className="text-lg font-medium">No issues found!</p>
-                    <p className="text-muted-foreground">Your content appears to be accessible.</p>
+                    <p className="text-muted-foreground">
+                      Your content appears to be accessible.
+                    </p>
                   </div>
                 ) : (
                   <ScrollArea className="h-[600px] w-full">
@@ -562,17 +635,26 @@ export default function AccessibilityScannerClient() {
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <h4 className="font-semibold">{issue.title}</h4>
-                                <Badge variant="outline" className={getImpactColor(issue.impact)}>
+                                <Badge
+                                  variant="outline"
+                                  className={getImpactColor(issue.impact)}
+                                >
                                   {issue.impact}
                                 </Badge>
-                                <Badge variant="outline">WCAG {issue.wcag}</Badge>
+                                <Badge variant="outline">
+                                  WCAG {issue.wcag}
+                                </Badge>
                               </div>
 
-                              <p className="text-muted-foreground mb-2">{issue.description}</p>
+                              <p className="text-muted-foreground mb-2">
+                                {issue.description}
+                              </p>
 
                               {issue.element && (
                                 <div className="mb-2">
-                                  <span className="text-sm font-medium">Element: </span>
+                                  <span className="text-sm font-medium">
+                                    Element:{" "}
+                                  </span>
                                   <code className="text-sm bg-muted px-1 py-0.5 rounded">
                                     {issue.element}
                                   </code>
@@ -581,7 +663,9 @@ export default function AccessibilityScannerClient() {
 
                               {issue.code && (
                                 <div className="mb-2">
-                                  <span className="text-sm font-medium">Code: </span>
+                                  <span className="text-sm font-medium">
+                                    Code:{" "}
+                                  </span>
                                   <code className="text-sm bg-muted px-1 py-0.5 rounded block mt-1">
                                     {issue.code}
                                   </code>
@@ -589,8 +673,12 @@ export default function AccessibilityScannerClient() {
                               )}
 
                               <div>
-                                <span className="text-sm font-medium">Suggestion: </span>
-                                <p className="text-sm text-muted-foreground">{issue.suggestion}</p>
+                                <span className="text-sm font-medium">
+                                  Suggestion:{" "}
+                                </span>
+                                <p className="text-sm text-muted-foreground">
+                                  {issue.suggestion}
+                                </p>
                               </div>
                             </div>
                           </div>
@@ -615,14 +703,21 @@ export default function AccessibilityScannerClient() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label className="text-sm font-medium">Scan Type</Label>
-                    <p className="text-sm text-muted-foreground capitalize">{inputMode}</p>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      {inputMode}
+                    </p>
                   </div>
 
                   {result.url && (
                     <div>
                       <Label className="text-sm font-medium">URL</Label>
                       <p className="text-sm text-muted-foreground">
-                        <a href={result.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1">
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1"
+                        >
                           {result.url}
                           <ExternalLink className="h-3 w-3" />
                         </a>
@@ -650,8 +745,11 @@ export default function AccessibilityScannerClient() {
                 <div>
                   <h4 className="font-semibold mb-3">Rules Checked</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {accessibilityRules.map(rule => (
-                      <div key={rule.id} className="flex items-center justify-between text-sm">
+                    {accessibilityRules.map((rule) => (
+                      <div
+                        key={rule.id}
+                        className="flex items-center justify-between text-sm"
+                      >
                         <span>{rule.title}</span>
                         <Badge variant="outline" className="text-xs">
                           WCAG {rule.wcag}

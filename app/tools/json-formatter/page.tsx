@@ -1,33 +1,43 @@
-import { Metadata } from 'next';
-import { JsonFormatterClient } from '../../../components/tools/json-formatter-client';
+import { Metadata } from "next";
+import { JsonFormatterClient } from "../../../components/tools/json-formatter-client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: 'JSON Formatter & Validator - Format and Validate JSON Online',
-  description: 'Free online JSON formatter and validator. Pretty-print, minify, validate JSON with syntax highlighting, error detection, and JSON Schema validation. Fast and secure.',
-  keywords: ['JSON formatter', 'JSON validator', 'JSON beautifier', 'JSON minifier', 'JSON schema', 'validate JSON online'],
+  title: "JSON Formatter & Validator - Format and Validate JSON Online",
+  description:
+    "Free online JSON formatter and validator. Pretty-print, minify, validate JSON with syntax highlighting, error detection, and JSON Schema validation. Fast and secure.",
+  keywords: [
+    "JSON formatter",
+    "JSON validator",
+    "JSON beautifier",
+    "JSON minifier",
+    "JSON schema",
+    "validate JSON online",
+  ],
   openGraph: {
-    title: 'JSON Formatter & Validator - DevTools Hub',
-    description: 'Format, validate, and beautify JSON with schema support and error detection',
-    type: 'website',
+    title: "JSON Formatter & Validator - DevTools Hub",
+    description:
+      "Format, validate, and beautify JSON with schema support and error detection",
+    type: "website",
   },
   alternates: {
-    canonical: '/tools/json-formatter',
+    canonical: "/tools/json-formatter",
   },
 };
 
 const jsonLdSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'JSON Formatter & Validator',
-  applicationCategory: 'DeveloperApplication',
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "JSON Formatter & Validator",
+  applicationCategory: "DeveloperApplication",
   offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
   },
-  description: 'Free online JSON formatter, validator, and beautifier with schema support',
+  description:
+    "Free online JSON formatter, validator, and beautifier with schema support",
 };
 
 export default function JsonFormatterPage() {
@@ -41,10 +51,11 @@ export default function JsonFormatterPage() {
         <div className="tool-header">
           <h1 className="tool-title">JSON Formatter & Validator</h1>
           <p className="tool-description">
-            Format, validate, and beautify JSON with syntax highlighting and schema validation
+            Format, validate, and beautify JSON with syntax highlighting and
+            schema validation
           </p>
         </div>
-        
+
         <JsonFormatterClient />
 
         {/* SEO Content */}
@@ -52,9 +63,11 @@ export default function JsonFormatterPage() {
           <div>
             <h2 className="mb-4 text-2xl font-bold">About JSON Formatter</h2>
             <p className="text-muted-foreground">
-              Our JSON formatter helps you beautify, validate, and work with JSON data effortlessly. 
-              Whether you&apos;re debugging API responses, formatting configuration files, or validating 
-              JSON schemas, our tool provides instant feedback with clear error messages.
+              Our JSON formatter helps you beautify, validate, and work with
+              JSON data effortlessly. Whether you&apos;re debugging API
+              responses, formatting configuration files, or validating JSON
+              schemas, our tool provides instant feedback with clear error
+              messages.
             </p>
           </div>
 
@@ -67,7 +80,10 @@ export default function JsonFormatterPage() {
               <li>Syntax highlighting for better readability</li>
               <li>Minify/compact JSON for production use</li>
               <li>Copy to clipboard and download options</li>
-              <li>Completely client-side &mdash; your data never leaves your browser</li>
+              <li>
+                Completely client-side &mdash; your data never leaves your
+                browser
+              </li>
             </ul>
           </div>
 

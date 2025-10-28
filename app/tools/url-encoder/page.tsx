@@ -1,26 +1,34 @@
-import { Metadata } from 'next';
-import { UrlEncoderClient } from '@/components/tools/url-encoder-client';
+import { Metadata } from "next";
+import { UrlEncoderClient } from "@/components/tools/url-encoder-client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: 'URL Encoder/Decoder - Encode and Decode URLs Online',
-  description: 'Free online URL encoder and decoder. Encode and decode URLs, query strings, and special characters for web development.',
-  keywords: ['URL encoder', 'URL decoder', 'encode URL', 'decode URL', 'URL encoding', 'percent encoding'],
-  alternates: { canonical: '/tools/url-encoder' },
+  title: "URL Encoder/Decoder - Encode and Decode URLs Online",
+  description:
+    "Free online URL encoder and decoder. Encode and decode URLs, query strings, and special characters for web development.",
+  keywords: [
+    "URL encoder",
+    "URL decoder",
+    "encode URL",
+    "decode URL",
+    "URL encoding",
+    "percent encoding",
+  ],
+  alternates: { canonical: "/tools/url-encoder" },
 };
 
 const jsonLdSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'URL Encoder/Decoder',
-  applicationCategory: 'DeveloperApplication',
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "URL Encoder/Decoder",
+  applicationCategory: "DeveloperApplication",
   offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
   },
-  description: 'Free online URL encoder and decoder for web development',
+  description: "Free online URL encoder and decoder for web development",
 };
 
 export default function UrlEncoderPage() {

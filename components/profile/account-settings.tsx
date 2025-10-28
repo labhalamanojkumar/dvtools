@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Shield,
   Bell,
@@ -13,8 +13,8 @@ import {
   Globe,
   Download,
   Trash2,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+} from "lucide-react";
 
 interface AccountSettingsProps {
   user: {
@@ -27,7 +27,10 @@ interface AccountSettingsProps {
   isAdmin: boolean;
 }
 
-export default function AccountSettings({ user, isAdmin }: AccountSettingsProps) {
+export default function AccountSettings({
+  user,
+  isAdmin,
+}: AccountSettingsProps) {
   return (
     <Card>
       <CardHeader>
@@ -126,7 +129,10 @@ export default function AccountSettings({ user, isAdmin }: AccountSettingsProps)
               <Download className="mr-2 h-4 w-4" />
               Export my data
             </Button>
-            <Button variant="outline" className="w-full justify-start text-muted-foreground">
+            <Button
+              variant="outline"
+              className="w-full justify-start text-muted-foreground"
+            >
               <Download className="mr-2 h-4 w-4" />
               Download usage report
             </Button>
@@ -145,12 +151,16 @@ export default function AccountSettings({ user, isAdmin }: AccountSettingsProps)
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              These actions cannot be undone. Please be certain before proceeding.
+              These actions cannot be undone. Please be certain before
+              proceeding.
             </AlertDescription>
           </Alert>
 
           <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground">
+            <Button
+              variant="outline"
+              className="w-full justify-start text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+            >
               <Trash2 className="mr-2 h-4 w-4" />
               Delete all API keys
             </Button>

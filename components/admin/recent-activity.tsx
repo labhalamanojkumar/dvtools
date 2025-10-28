@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { FileJson, Binary, Lock, Code2, Link2, Regex } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { FileJson, Binary, Lock, Code2, Link2, Regex } from "lucide-react";
 
 interface Activity {
   id: string;
@@ -16,12 +16,12 @@ interface Activity {
 }
 
 const toolIcons: Record<string, { icon: any; color: string }> = {
-  'JSON Formatter': { icon: FileJson, color: 'text-blue-500' },
-  'Base64 Encoder': { icon: Binary, color: 'text-green-500' },
-  'JWT Decoder': { icon: Lock, color: 'text-purple-500' },
-  'Code Beautifier': { icon: Code2, color: 'text-orange-500' },
-  'URL Encoder': { icon: Link2, color: 'text-cyan-500' },
-  'Regexp Tester': { icon: Regex, color: 'text-red-500' },
+  "JSON Formatter": { icon: FileJson, color: "text-blue-500" },
+  "Base64 Encoder": { icon: Binary, color: "text-green-500" },
+  "JWT Decoder": { icon: Lock, color: "text-purple-500" },
+  "Code Beautifier": { icon: Code2, color: "text-orange-500" },
+  "URL Encoder": { icon: Link2, color: "text-cyan-500" },
+  "Regexp Tester": { icon: Regex, color: "text-red-500" },
 };
 
 export function RecentActivity() {
@@ -31,16 +31,20 @@ export function RecentActivity() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/admin/tool-sessions?limit=10');
+        const response = await fetch("/api/admin/tool-sessions?limit=10");
         if (response.ok) {
           const sessions = await response.json();
           setActivities(sessions);
         } else {
-          console.error('Failed to fetch activity data:', response.status, response.statusText);
+          console.error(
+            "Failed to fetch activity data:",
+            response.status,
+            response.statusText,
+          );
           setActivities([]);
         }
       } catch (error) {
-        console.error('Failed to fetch activity data:', error);
+        console.error("Failed to fetch activity data:", error);
         setActivities([]);
       } finally {
         setLoading(false);
@@ -53,9 +57,11 @@ export function RecentActivity() {
   const formatTimestamp = (timestamp: string) => {
     const now = new Date();
     const activityTime = new Date(timestamp);
-    const diffInMinutes = Math.floor((now.getTime() - activityTime.getTime()) / (1000 * 60));
+    const diffInMinutes = Math.floor(
+      (now.getTime() - activityTime.getTime()) / (1000 * 60),
+    );
 
-    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 1) return "Just now";
     if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
 
     const diffInHours = Math.floor(diffInMinutes / 60);
@@ -120,8 +126,11 @@ export function RecentActivity() {
       <CardContent>
         <div className="space-y-4">
           {activities.map((activity) => {
-            const toolName = activity.toolType.replace('_', ' ').toUpperCase();
-            const toolConfig = toolIcons[toolName] || { icon: FileJson, color: 'text-gray-500' };
+            const toolName = activity.toolType.replace("_", " ").toUpperCase();
+            const toolConfig = toolIcons[toolName] || {
+              icon: FileJson,
+              color: "text-gray-500",
+            };
             const IconComponent = toolConfig.icon;
 
             return (
@@ -131,15 +140,14 @@ export function RecentActivity() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium truncate">
-                      {toolName}
-                    </p>
+                    <p className="text-sm font-medium truncate">{toolName}</p>
                     <Badge variant="secondary" className="text-xs">
                       {formatTimestamp(activity.createdAt)}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Used by {activity.user?.name || activity.user?.email || 'Anonymous'}
+                    Used by{" "}
+                    {activity.user?.name || activity.user?.email || "Anonymous"}
                   </p>
                 </div>
               </div>

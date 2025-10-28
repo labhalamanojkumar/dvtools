@@ -1,8 +1,8 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Metadata } from "next";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Code2,
@@ -16,45 +16,48 @@ import {
   Search,
   Zap,
   Shield,
-  Smartphone
-} from 'lucide-react';
+  Smartphone,
+} from "lucide-react";
 
 export const metadata: Metadata = {
-  title: 'Documentation | DevTools Hub - Developer Tools Guide',
-  description: 'Comprehensive documentation for DevTools Hub. Learn how to use JSON formatter, Base64 encoder, JWT decoder, RegExp tester, code beautifier, and more developer tools.',
+  title: "Documentation | DevTools Hub - Developer Tools Guide",
+  description:
+    "Comprehensive documentation for DevTools Hub. Learn how to use JSON formatter, Base64 encoder, JWT decoder, RegExp tester, code beautifier, and more developer tools.",
   keywords: [
-    'documentation',
-    'developer tools',
-    'JSON formatter docs',
-    'Base64 encoder guide',
-    'JWT decoder documentation',
-    'RegExp tester manual',
-    'code beautifier docs',
-    'URL encoder guide'
+    "documentation",
+    "developer tools",
+    "JSON formatter docs",
+    "Base64 encoder guide",
+    "JWT decoder documentation",
+    "RegExp tester manual",
+    "code beautifier docs",
+    "URL encoder guide",
   ],
   openGraph: {
-    title: 'Documentation | DevTools Hub - Developer Tools Guide',
-    description: 'Comprehensive documentation for DevTools Hub. Learn how to use our developer tools effectively.',
-    type: 'website',
-    url: '/docs',
-    siteName: 'DevTools Hub',
+    title: "Documentation | DevTools Hub - Developer Tools Guide",
+    description:
+      "Comprehensive documentation for DevTools Hub. Learn how to use our developer tools effectively.",
+    type: "website",
+    url: "/docs",
+    siteName: "DevTools Hub",
     images: [
       {
-        url: '/docs-og.jpg',
+        url: "/docs-og.jpg",
         width: 1200,
         height: 630,
-        alt: 'DevTools Hub Documentation',
+        alt: "DevTools Hub Documentation",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Documentation | DevTools Hub - Developer Tools Guide',
-    description: 'Comprehensive documentation for DevTools Hub. Learn how to use our developer tools effectively.',
-    images: ['/docs-og.jpg'],
+    card: "summary_large_image",
+    title: "Documentation | DevTools Hub - Developer Tools Guide",
+    description:
+      "Comprehensive documentation for DevTools Hub. Learn how to use our developer tools effectively.",
+    images: ["/docs-og.jpg"],
   },
   alternates: {
-    canonical: '/docs',
+    canonical: "/docs",
   },
   robots: {
     index: true,
@@ -62,94 +65,178 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
 
 const docCategories = [
   {
-    id: 'getting-started',
-    title: 'Getting Started',
-    description: 'Learn the basics and get up and running quickly',
+    id: "getting-started",
+    title: "Getting Started",
+    description: "Learn the basics and get up and running quickly",
     icon: <BookOpen className="h-8 w-8" />,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50 dark:bg-blue-950',
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 dark:bg-blue-950",
     sections: [
-      { title: 'Introduction', href: '/docs/introduction', description: 'Overview of DevTools Hub' },
-      { title: 'Quick Start Guide', href: '/docs/quick-start', description: 'Get started in 5 minutes' },
-      { title: 'Installation', href: '/docs/installation', description: 'How to install and setup' },
-    ]
+      {
+        title: "Introduction",
+        href: "/docs/introduction",
+        description: "Overview of DevTools Hub",
+      },
+      {
+        title: "Quick Start Guide",
+        href: "/docs/quick-start",
+        description: "Get started in 5 minutes",
+      },
+      {
+        title: "Installation",
+        href: "/docs/installation",
+        description: "How to install and setup",
+      },
+    ],
   },
   {
-    id: 'tools',
-    title: 'Tools Documentation',
-    description: 'Detailed guides for each tool and feature',
+    id: "tools",
+    title: "Tools Documentation",
+    description: "Detailed guides for each tool and feature",
     icon: <Code2 className="h-8 w-8" />,
-    color: 'text-green-600',
-    bgColor: 'bg-green-50 dark:bg-green-950',
+    color: "text-green-600",
+    bgColor: "bg-green-50 dark:bg-green-950",
     sections: [
-      { title: 'JSON Tools', href: '/docs/json-tools', description: 'Format, validate, and minify JSON' },
-      { title: 'Encoding Tools', href: '/docs/encoding-tools', description: 'Base64, URL encoding/decoding' },
-      { title: 'JWT Tools', href: '/docs/jwt-tools', description: 'Decode and verify JWT tokens' },
-      { title: 'RegExp Tools', href: '/docs/regexp-tools', description: 'Test and debug regular expressions' },
-      { title: 'Code Tools', href: '/docs/code-tools', description: 'Beautify and format code' },
-    ]
+      {
+        title: "JSON Tools",
+        href: "/docs/json-tools",
+        description: "Format, validate, and minify JSON",
+      },
+      {
+        title: "Encoding Tools",
+        href: "/docs/encoding-tools",
+        description: "Base64, URL encoding/decoding",
+      },
+      {
+        title: "JWT Tools",
+        href: "/docs/jwt-tools",
+        description: "Decode and verify JWT tokens",
+      },
+      {
+        title: "RegExp Tools",
+        href: "/docs/regexp-tools",
+        description: "Test and debug regular expressions",
+      },
+      {
+        title: "Code Tools",
+        href: "/docs/code-tools",
+        description: "Beautify and format code",
+      },
+    ],
   },
   {
-    id: 'api',
-    title: 'API Reference',
-    description: 'Integrate DevTools Hub into your applications',
+    id: "api",
+    title: "API Reference",
+    description: "Integrate DevTools Hub into your applications",
     icon: <Zap className="h-8 w-8" />,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50 dark:bg-purple-950',
+    color: "text-purple-600",
+    bgColor: "bg-purple-50 dark:bg-purple-950",
     sections: [
-      { title: 'API Overview', href: '/docs/api-overview', description: 'API basics and authentication' },
-      { title: 'Endpoints', href: '/docs/api-endpoints', description: 'Available API endpoints' },
-      { title: 'Rate Limits', href: '/docs/api-limits', description: 'API usage limits and quotas' },
-      { title: 'SDKs', href: '/docs/api-sdks', description: 'Official SDKs and libraries' },
-    ]
-  }
+      {
+        title: "API Overview",
+        href: "/docs/api-overview",
+        description: "API basics and authentication",
+      },
+      {
+        title: "Endpoints",
+        href: "/docs/api-endpoints",
+        description: "Available API endpoints",
+      },
+      {
+        title: "Rate Limits",
+        href: "/docs/api-limits",
+        description: "API usage limits and quotas",
+      },
+      {
+        title: "SDKs",
+        href: "/docs/api-sdks",
+        description: "Official SDKs and libraries",
+      },
+    ],
+  },
 ];
 
 const featuredTools = [
   {
     icon: <FileJson className="h-6 w-6" />,
-    title: 'JSON Formatter',
-    description: 'Validate, format, and beautify JSON with syntax highlighting',
-    href: '/docs/json-tools',
-    features: ['Syntax highlighting', 'Error detection', 'Tree view', 'Minification']
+    title: "JSON Formatter",
+    description: "Validate, format, and beautify JSON with syntax highlighting",
+    href: "/docs/json-tools",
+    features: [
+      "Syntax highlighting",
+      "Error detection",
+      "Tree view",
+      "Minification",
+    ],
   },
   {
     icon: <Binary className="h-6 w-6" />,
-    title: 'Base64 Encoder',
-    description: 'Encode and decode Base64 strings and files',
-    href: '/docs/encoding-tools',
-    features: ['Text encoding', 'File support', 'MIME detection', 'URL-safe mode']
+    title: "Base64 Encoder",
+    description: "Encode and decode Base64 strings and files",
+    href: "/docs/encoding-tools",
+    features: [
+      "Text encoding",
+      "File support",
+      "MIME detection",
+      "URL-safe mode",
+    ],
   },
   {
     icon: <Lock className="h-6 w-6" />,
-    title: 'JWT Decoder',
-    description: 'Decode and validate JWT tokens with signature verification',
-    href: '/docs/jwt-tools',
-    features: ['Token decoding', 'Signature verification', 'Payload inspection', 'Header analysis']
+    title: "JWT Decoder",
+    description: "Decode and validate JWT tokens with signature verification",
+    href: "/docs/jwt-tools",
+    features: [
+      "Token decoding",
+      "Signature verification",
+      "Payload inspection",
+      "Header analysis",
+    ],
   },
   {
     icon: <Regex className="h-6 w-6" />,
-    title: 'RegExp Tester',
-    description: 'Test regular expressions with real-time match highlighting',
-    href: '/docs/regexp-tools',
-    features: ['Real-time testing', 'Match highlighting', 'Group capture', 'Flags support']
-  }
+    title: "RegExp Tester",
+    description: "Test regular expressions with real-time match highlighting",
+    href: "/docs/regexp-tools",
+    features: [
+      "Real-time testing",
+      "Match highlighting",
+      "Group capture",
+      "Flags support",
+    ],
+  },
 ];
 
 const quickLinks = [
-  { title: 'FAQ', href: '/docs/faq', description: 'Frequently asked questions' },
-  { title: 'Troubleshooting', href: '/docs/troubleshooting', description: 'Common issues and solutions' },
-  { title: 'Changelog', href: '/docs/changelog', description: 'Latest updates and changes' },
-  { title: 'Support', href: '/docs/support', description: 'Get help and contact support' },
+  {
+    title: "FAQ",
+    href: "/docs/faq",
+    description: "Frequently asked questions",
+  },
+  {
+    title: "Troubleshooting",
+    href: "/docs/troubleshooting",
+    description: "Common issues and solutions",
+  },
+  {
+    title: "Changelog",
+    href: "/docs/changelog",
+    description: "Latest updates and changes",
+  },
+  {
+    title: "Support",
+    href: "/docs/support",
+    description: "Get help and contact support",
+  },
 ];
 
 export default function DocsPage() {
@@ -162,28 +249,29 @@ export default function DocsPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "TechArticle",
-            "name": "DevTools Hub Documentation",
-            "description": "Comprehensive documentation for developer tools including JSON formatter, Base64 encoder, JWT decoder, and more",
-            "url": "https://devtoolshub.com/docs",
-            "publisher": {
+            name: "DevTools Hub Documentation",
+            description:
+              "Comprehensive documentation for developer tools including JSON formatter, Base64 encoder, JWT decoder, and more",
+            url: "https://devtoolshub.com/docs",
+            publisher: {
               "@type": "Organization",
-              "name": "DevTools Hub",
-              "logo": {
+              name: "DevTools Hub",
+              logo: {
                 "@type": "ImageObject",
-                "url": "https://devtoolshub.com/logo.png"
-              }
+                url: "https://devtoolshub.com/logo.png",
+              },
             },
-            "mainEntity": {
+            mainEntity: {
               "@type": "ItemList",
-              "name": "Documentation Categories",
-              "itemListElement": docCategories.map((category, index) => ({
+              name: "Documentation Categories",
+              itemListElement: docCategories.map((category, index) => ({
                 "@type": "ListItem",
-                "position": index + 1,
-                "name": category.title,
-                "description": category.description
-              }))
-            }
-          })
+                position: index + 1,
+                name: category.title,
+                description: category.description,
+              })),
+            },
+          }),
         }}
       />
 
@@ -193,8 +281,8 @@ export default function DocsPage() {
           Developer Tools <span className="text-primary">Documentation</span>
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-          Comprehensive guides, tutorials, and API references to help you make the most
-          of DevTools Hub. From basic usage to advanced integrations.
+          Comprehensive guides, tutorials, and API references to help you make
+          the most of DevTools Hub. From basic usage to advanced integrations.
         </p>
 
         {/* Search Bar */}
@@ -232,15 +320,20 @@ export default function DocsPage() {
 
       {/* Documentation Categories */}
       <section className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-12">Documentation Categories</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Documentation Categories
+        </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {docCategories.map((category) => (
-            <Card key={category.id} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={category.id}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardHeader>
-                <div className={`w-16 h-16 rounded-lg ${category.bgColor} flex items-center justify-center mb-4`}>
-                  <div className={category.color}>
-                    {category.icon}
-                  </div>
+                <div
+                  className={`w-16 h-16 rounded-lg ${category.bgColor} flex items-center justify-center mb-4`}
+                >
+                  <div className={category.color}>{category.icon}</div>
                 </div>
                 <CardTitle className="text-xl">{category.title}</CardTitle>
                 <p className="text-muted-foreground">{category.description}</p>
@@ -276,22 +369,29 @@ export default function DocsPage() {
         <h2 className="text-3xl font-bold text-center mb-12">Popular Tools</h2>
         <div className="grid md:grid-cols-2 gap-6">
           {featuredTools.map((tool) => (
-            <Card key={tool.title} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={tool.title}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className="text-primary">
-                    {tool.icon}
-                  </div>
+                  <div className="text-primary">{tool.icon}</div>
                   <div className="flex-1">
                     <Link href={tool.href}>
                       <h3 className="text-lg font-semibold mb-2 hover:text-primary transition-colors">
                         {tool.title}
                       </h3>
                     </Link>
-                    <p className="text-muted-foreground mb-4">{tool.description}</p>
+                    <p className="text-muted-foreground mb-4">
+                      {tool.description}
+                    </p>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {tool.features.map((feature) => (
-                        <Badge key={feature} variant="secondary" className="text-xs">
+                        <Badge
+                          key={feature}
+                          variant="secondary"
+                          className="text-xs"
+                        >
                           {feature}
                         </Badge>
                       ))}
@@ -312,15 +412,20 @@ export default function DocsPage() {
 
       {/* Key Features */}
       <section className="mb-16 bg-muted/50 rounded-lg p-8">
-        <h2 className="text-3xl font-bold text-center mb-12">Why Our Documentation?</h2>
+        <h2 className="text-3xl font-bold text-center mb-12">
+          Why Our Documentation?
+        </h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
               <Shield className="h-8 w-8 text-primary" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">Comprehensive Coverage</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              Comprehensive Coverage
+            </h3>
             <p className="text-muted-foreground">
-              Every tool and feature is thoroughly documented with examples and best practices.
+              Every tool and feature is thoroughly documented with examples and
+              best practices.
             </p>
           </div>
           <div className="text-center">
@@ -329,7 +434,8 @@ export default function DocsPage() {
             </div>
             <h3 className="text-lg font-semibold mb-2">Up-to-Date</h3>
             <p className="text-muted-foreground">
-              Documentation is regularly updated with the latest features and improvements.
+              Documentation is regularly updated with the latest features and
+              improvements.
             </p>
           </div>
           <div className="text-center">
@@ -338,7 +444,8 @@ export default function DocsPage() {
             </div>
             <h3 className="text-lg font-semibold mb-2">Developer Friendly</h3>
             <p className="text-muted-foreground">
-              Written by developers, for developers. Clear, concise, and actionable guidance.
+              Written by developers, for developers. Clear, concise, and
+              actionable guidance.
             </p>
           </div>
         </div>
@@ -349,14 +456,19 @@ export default function DocsPage() {
         <h2 className="text-3xl font-bold text-center mb-12">Quick Links</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {quickLinks.map((link) => (
-            <Card key={link.title} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={link.title}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardContent className="p-6 text-center">
                 <Link href={link.href}>
                   <h3 className="font-semibold mb-2 hover:text-primary transition-colors">
                     {link.title}
                   </h3>
                 </Link>
-                <p className="text-sm text-muted-foreground">{link.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {link.description}
+                </p>
               </CardContent>
             </Card>
           ))}
@@ -367,7 +479,8 @@ export default function DocsPage() {
       <section className="text-center bg-primary text-primary-foreground rounded-lg p-8">
         <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
         <p className="text-lg opacity-90 mb-6 max-w-2xl mx-auto">
-          Jump into our documentation and start building amazing things with DevTools Hub.
+          Jump into our documentation and start building amazing things with
+          DevTools Hub.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" variant="secondary" asChild>
@@ -376,10 +489,13 @@ export default function DocsPage() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10" asChild>
-            <Link href="/tools">
-              Try Tools Now
-            </Link>
+          <Button
+            size="lg"
+            variant="outline"
+            className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
+            asChild
+          >
+            <Link href="/tools">Try Tools Now</Link>
           </Button>
         </div>
       </section>

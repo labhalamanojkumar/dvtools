@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { Code2, Github, Twitter, Linkedin } from 'lucide-react';
+import Link from "next/link";
+import { Code2, Github, Twitter, Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
@@ -12,8 +12,8 @@ export function Footer() {
               <span className="text-lg font-bold">DevTools Hub</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              Professional developer tools for modern web development.
-              Fast, secure, and privacy-focused.
+              Professional developer tools for modern web development. Fast,
+              secure, and privacy-focused.
             </p>
           </div>
 
@@ -21,22 +21,34 @@ export function Footer() {
             <h3 className="mb-4 text-sm font-semibold">Tools</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/tools/json-formatter" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/tools/json-formatter"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   JSON Formatter
                 </Link>
               </li>
               <li>
-                <Link href="/tools/base64" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/tools/base64"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Base64 Encoder
                 </Link>
               </li>
               <li>
-                <Link href="/tools/jwt-decoder" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/tools/jwt-decoder"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   JWT Decoder
                 </Link>
               </li>
               <li>
-                <Link href="/tools/regexp-tester" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/tools/regexp-tester"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   RegExp Tester
                 </Link>
               </li>
@@ -47,22 +59,34 @@ export function Footer() {
             <h3 className="mb-4 text-sm font-semibold">Resources</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/blog" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/blog"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Blog
                 </Link>
               </li>
               <li>
-                <Link href="/docs" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/docs"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Documentation
                 </Link>
               </li>
               <li>
-                <Link href="/api" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/api"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   API Reference
                 </Link>
               </li>
               <li>
-                <Link href="/changelog" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/changelog"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Changelog
                 </Link>
               </li>
@@ -73,17 +97,26 @@ export function Footer() {
             <h3 className="mb-4 text-sm font-semibold">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/privacy" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/privacy"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/terms"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/cookies" className="text-muted-foreground hover:text-primary">
+                <Link
+                  href="/cookies"
+                  className="text-muted-foreground hover:text-primary"
+                >
                   Cookie Policy
                 </Link>
               </li>

@@ -1,22 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/db';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/db";
+import { z } from "zod";
 
 // Validation schemas
 const createApiKeySchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
 });
 
 const updateApiKeySchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
 });
 
 // Generate a secure API key
 function generateApiKey(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let result = 'key_';
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "key_";
   for (let i = 0; i < 32; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -29,7 +36,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const apiKeys = await prisma.apiKey.findMany({
@@ -46,7 +53,7 @@ export async function GET(request: NextRequest) {
         expiresAt: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
@@ -58,8 +65,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ apiKeys: maskedKeys });
   } catch (error) {
-    console.error('Error fetching API keys:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching API keys:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -69,7 +79,7 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -84,7 +94,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingKeysCount >= 10) {
-      return NextResponse.json({ error: 'Maximum number of API keys reached' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Maximum number of API keys reached" },
+        { status: 400 },
+      );
     }
 
     // Generate a unique API key
@@ -94,7 +107,10 @@ export async function POST(request: NextRequest) {
       apiKey = generateApiKey();
       attempts++;
       if (attempts > 10) {
-        return NextResponse.json({ error: 'Failed to generate unique API key' }, { status: 500 });
+        return NextResponse.json(
+          { error: "Failed to generate unique API key" },
+          { status: 500 },
+        );
       }
     } while (await prisma.apiKey.findUnique({ where: { key: apiKey } }));
 
@@ -116,8 +132,8 @@ export async function POST(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         userId: session.user.id,
-        action: 'API_KEY_CREATED',
-        resource: 'api_key',
+        action: "API_KEY_CREATED",
+        resource: "api_key",
         resourceId: newApiKey.id,
         details: { name: newApiKey.name },
       },
@@ -125,15 +141,22 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       apiKey: newApiKey,
-      message: 'API key created successfully. Make sure to copy it now as it won\'t be shown again.',
+      message:
+        "API key created successfully. Make sure to copy it now as it won't be shown again.",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
+      return NextResponse.json(
+        { error: error.errors[0].message },
+        { status: 400 },
+      );
     }
 
-    console.error('Error creating API key:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error creating API key:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -143,14 +166,17 @@ export async function PUT(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const url = new URL(request.url);
-    const id = url.pathname.split('/').pop();
+    const id = url.pathname.split("/").pop();
 
     if (!id) {
-      return NextResponse.json({ error: 'API key ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "API key ID is required" },
+        { status: 400 },
+      );
     }
 
     const body = await request.json();
@@ -166,7 +192,7 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!existingKey) {
-      return NextResponse.json({ error: 'API key not found' }, { status: 404 });
+      return NextResponse.json({ error: "API key not found" }, { status: 404 });
     }
 
     const updatedKey = await prisma.apiKey.update({
@@ -182,14 +208,22 @@ export async function PUT(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ apiKey: { ...updatedKey, key: maskApiKey(updatedKey.key) } });
+    return NextResponse.json({
+      apiKey: { ...updatedKey, key: maskApiKey(updatedKey.key) },
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
+      return NextResponse.json(
+        { error: error.errors[0].message },
+        { status: 400 },
+      );
     }
 
-    console.error('Error updating API key:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error updating API key:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -199,14 +233,17 @@ export async function DELETE(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const url = new URL(request.url);
-    const id = url.pathname.split('/').pop();
+    const id = url.pathname.split("/").pop();
 
     if (!id) {
-      return NextResponse.json({ error: 'API key ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "API key ID is required" },
+        { status: 400 },
+      );
     }
 
     // Check if the API key belongs to the user
@@ -219,7 +256,7 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!existingKey) {
-      return NextResponse.json({ error: 'API key not found' }, { status: 404 });
+      return NextResponse.json({ error: "API key not found" }, { status: 404 });
     }
 
     // Revoke the API key
@@ -232,22 +269,25 @@ export async function DELETE(request: NextRequest) {
     await prisma.auditLog.create({
       data: {
         userId: session.user.id,
-        action: 'API_KEY_REVOKED',
-        resource: 'api_key',
+        action: "API_KEY_REVOKED",
+        resource: "api_key",
         resourceId: id,
         details: { name: existingKey.name },
       },
     });
 
-    return NextResponse.json({ message: 'API key revoked successfully' });
+    return NextResponse.json({ message: "API key revoked successfully" });
   } catch (error) {
-    console.error('Error revoking API key:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error revoking API key:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
 // Helper function to mask API keys
 function maskApiKey(key: string): string {
   if (key.length <= 16) return key;
-  return `${key.substring(0, 8)}${'•'.repeat(key.length - 16)}${key.substring(key.length - 8)}`;
+  return `${key.substring(0, 8)}${"•".repeat(key.length - 16)}${key.substring(key.length - 8)}`;
 }

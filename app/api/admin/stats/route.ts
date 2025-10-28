@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
 export async function GET() {
   try {
@@ -11,13 +11,13 @@ export async function GET() {
 
     // Get popular tool
     const popularTool = await prisma.toolSession.groupBy({
-      by: ['toolType'],
+      by: ["toolType"],
       _count: {
         toolType: true,
       },
       orderBy: {
         _count: {
-          toolType: 'desc',
+          toolType: "desc",
         },
       },
       take: 1,
@@ -36,28 +36,30 @@ export async function GET() {
     const stats = {
       totalUsers: {
         value: totalUsers,
-        change: '+12%', // TODO: calculate real change
+        change: "+12%", // TODO: calculate real change
       },
       totalToolUses: {
         value: totalToolUses,
-        change: '+8%', // TODO: calculate real change
+        change: "+8%", // TODO: calculate real change
       },
       popularTool: {
-        value: popularTool[0]?.toolType || 'None',
-        percentage: popularTool[0] ? Math.round((popularTool[0]._count.toolType / totalToolUses) * 100) : 0,
+        value: popularTool[0]?.toolType || "None",
+        percentage: popularTool[0]
+          ? Math.round((popularTool[0]._count.toolType / totalToolUses) * 100)
+          : 0,
       },
       avgSessionTime: {
         value: Math.round(avgDuration / 1000), // in seconds
-        change: '+5%', // TODO: calculate real change
+        change: "+5%", // TODO: calculate real change
       },
     };
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error('Error fetching admin stats:', error);
+    console.error("Error fetching admin stats:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch stats' },
-      { status: 500 }
+      { error: "Failed to fetch stats" },
+      { status: 500 },
     );
   }
 }

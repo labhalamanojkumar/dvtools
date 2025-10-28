@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Activity,
   Zap,
@@ -22,15 +22,15 @@ import {
   ExternalLink,
   BarChart3,
   Cpu,
-  Wifi
-} from 'lucide-react';
-import { useToast } from '@/components/ui/toaster';
+  Wifi,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
 
 interface PerformanceMetric {
   name: string;
   value: number;
   unit: string;
-  status: 'good' | 'needs-improvement' | 'poor';
+  status: "good" | "needs-improvement" | "poor";
   description: string;
   recommendation?: string;
 }
@@ -40,7 +40,7 @@ interface ResourceTiming {
   duration: number;
   size: number;
   type: string;
-  status: 'good' | 'needs-improvement' | 'poor';
+  status: "good" | "needs-improvement" | "poor";
 }
 
 interface PerformanceResult {
@@ -48,7 +48,7 @@ interface PerformanceResult {
   metrics: PerformanceMetric[];
   resources: ResourceTiming[];
   score: number;
-  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  grade: "A" | "B" | "C" | "D" | "F";
   summary: {
     totalRequests: number;
     totalSize: number;
@@ -60,81 +60,119 @@ interface PerformanceResult {
 
 const sampleMetrics: PerformanceMetric[] = [
   {
-    name: 'First Contentful Paint',
+    name: "First Contentful Paint",
     value: 1200,
-    unit: 'ms',
-    status: 'good',
-    description: 'Time to first contentful paint'
+    unit: "ms",
+    status: "good",
+    description: "Time to first contentful paint",
   },
   {
-    name: 'Largest Contentful Paint',
+    name: "Largest Contentful Paint",
     value: 2500,
-    unit: 'ms',
-    status: 'needs-improvement',
-    description: 'Time to largest contentful paint',
-    recommendation: 'Optimize images and reduce render-blocking resources'
+    unit: "ms",
+    status: "needs-improvement",
+    description: "Time to largest contentful paint",
+    recommendation: "Optimize images and reduce render-blocking resources",
   },
   {
-    name: 'First Input Delay',
+    name: "First Input Delay",
     value: 50,
-    unit: 'ms',
-    status: 'good',
-    description: 'First input delay'
+    unit: "ms",
+    status: "good",
+    description: "First input delay",
   },
   {
-    name: 'Cumulative Layout Shift',
+    name: "Cumulative Layout Shift",
     value: 0.05,
-    unit: '',
-    status: 'good',
-    description: 'Cumulative layout shift score'
+    unit: "",
+    status: "good",
+    description: "Cumulative layout shift score",
   },
   {
-    name: 'Total Blocking Time',
+    name: "Total Blocking Time",
     value: 200,
-    unit: 'ms',
-    status: 'needs-improvement',
-    description: 'Total blocking time',
-    recommendation: 'Reduce JavaScript execution time'
-  }
+    unit: "ms",
+    status: "needs-improvement",
+    description: "Total blocking time",
+    recommendation: "Reduce JavaScript execution time",
+  },
 ];
 
 const sampleResources: ResourceTiming[] = [
-  { name: 'index.html', duration: 150, size: 25000, type: 'document', status: 'good' },
-  { name: 'style.css', duration: 200, size: 50000, type: 'stylesheet', status: 'good' },
-  { name: 'app.js', duration: 300, size: 150000, type: 'script', status: 'needs-improvement' },
-  { name: 'hero-image.jpg', duration: 450, size: 800000, type: 'image', status: 'poor' },
-  { name: 'font.woff2', duration: 100, size: 30000, type: 'font', status: 'good' }
+  {
+    name: "index.html",
+    duration: 150,
+    size: 25000,
+    type: "document",
+    status: "good",
+  },
+  {
+    name: "style.css",
+    duration: 200,
+    size: 50000,
+    type: "stylesheet",
+    status: "good",
+  },
+  {
+    name: "app.js",
+    duration: 300,
+    size: 150000,
+    type: "script",
+    status: "needs-improvement",
+  },
+  {
+    name: "hero-image.jpg",
+    duration: 450,
+    size: 800000,
+    type: "image",
+    status: "poor",
+  },
+  {
+    name: "font.woff2",
+    duration: 100,
+    size: 30000,
+    type: "font",
+    status: "good",
+  },
 ];
 
 export default function PerformanceProfilerClient() {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState("");
   const [result, setResult] = useState<PerformanceResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
 
-  const analyzePerformance = async (targetUrl?: string): Promise<PerformanceResult> => {
+  const analyzePerformance = async (
+    targetUrl?: string,
+  ): Promise<PerformanceResult> => {
     // Simulate analysis with realistic data
     const metrics = [...sampleMetrics];
     const resources = [...sampleResources];
 
     // Add some randomization for demo purposes
-    metrics.forEach(metric => {
+    metrics.forEach((metric) => {
       metric.value = Math.round(metric.value * (0.8 + Math.random() * 0.4));
     });
 
-    resources.forEach(resource => {
-      resource.duration = Math.round(resource.duration * (0.7 + Math.random() * 0.6));
+    resources.forEach((resource) => {
+      resource.duration = Math.round(
+        resource.duration * (0.7 + Math.random() * 0.6),
+      );
       resource.size = Math.round(resource.size * (0.9 + Math.random() * 0.2));
     });
 
     // Calculate overall score (0-100)
-    const scores = metrics.map(m => {
+    const scores = metrics.map((m) => {
       switch (m.status) {
-        case 'good': return 100;
-        case 'needs-improvement': return 70;
-        case 'poor': return 40;
-        default: return 50;
+        case "good":
+          return 100;
+        case "needs-improvement":
+          return 70;
+        case "poor":
+          return 40;
+        default:
+          return 50;
       }
     });
 
@@ -142,17 +180,18 @@ export default function PerformanceProfilerClient() {
     const score = Math.round(avgScore);
 
     // Determine grade
-    let grade: 'A' | 'B' | 'C' | 'D' | 'F';
-    if (score >= 90) grade = 'A';
-    else if (score >= 80) grade = 'B';
-    else if (score >= 70) grade = 'C';
-    else if (score >= 60) grade = 'D';
-    else grade = 'F';
+    let grade: "A" | "B" | "C" | "D" | "F";
+    if (score >= 90) grade = "A";
+    else if (score >= 80) grade = "B";
+    else if (score >= 70) grade = "C";
+    else if (score >= 60) grade = "D";
+    else grade = "F";
 
     const totalSize = resources.reduce((sum, r) => sum + r.size, 0);
-    const loadTime = Math.max(...resources.map(r => r.duration));
-    const issues = metrics.filter(m => m.status !== 'good').length +
-                   resources.filter(r => r.status !== 'good').length;
+    const loadTime = Math.max(...resources.map((r) => r.duration));
+    const issues =
+      metrics.filter((m) => m.status !== "good").length +
+      resources.filter((r) => r.status !== "good").length;
 
     return {
       url: targetUrl,
@@ -164,9 +203,9 @@ export default function PerformanceProfilerClient() {
         totalRequests: resources.length,
         totalSize,
         loadTime,
-        issues
+        issues,
       },
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   };
 
@@ -186,7 +225,7 @@ export default function PerformanceProfilerClient() {
     try {
       // Simulate progress updates
       const progressInterval = setInterval(() => {
-        setProgress(prev => {
+        setProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return prev;
@@ -218,11 +257,11 @@ export default function PerformanceProfilerClient() {
   };
 
   const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
   const formatTime = (ms: number): string => {
@@ -232,30 +271,44 @@ export default function PerformanceProfilerClient() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'good': return 'text-green-600';
-      case 'needs-improvement': return 'text-yellow-600';
-      case 'poor': return 'text-red-600';
-      default: return 'text-gray-600';
+      case "good":
+        return "text-green-600";
+      case "needs-improvement":
+        return "text-yellow-600";
+      case "poor":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'good': return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'needs-improvement': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      case 'poor': return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      default: return <Activity className="h-4 w-4 text-gray-500" />;
+      case "good":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "needs-improvement":
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
+      case "poor":
+        return <AlertTriangle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Activity className="h-4 w-4 text-gray-500" />;
     }
   };
 
   const getGradeColor = (grade: string) => {
     switch (grade) {
-      case 'A': return 'text-green-600';
-      case 'B': return 'text-blue-600';
-      case 'C': return 'text-yellow-600';
-      case 'D': return 'text-orange-600';
-      case 'F': return 'text-red-600';
-      default: return 'text-gray-600';
+      case "A":
+        return "text-green-600";
+      case "B":
+        return "text-blue-600";
+      case "C":
+        return "text-yellow-600";
+      case "D":
+        return "text-orange-600";
+      case "F":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
     }
   };
 
@@ -328,10 +381,14 @@ export default function PerformanceProfilerClient() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
                 <CardContent className="pt-6">
-                  <div className={`text-4xl font-bold ${getGradeColor(result.grade)}`}>
+                  <div
+                    className={`text-4xl font-bold ${getGradeColor(result.grade)}`}
+                  >
                     {result.grade}
                   </div>
-                  <p className="text-xs text-muted-foreground">Performance Grade</p>
+                  <p className="text-xs text-muted-foreground">
+                    Performance Grade
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Score: {result.score}/100
                   </p>
@@ -340,21 +397,29 @@ export default function PerformanceProfilerClient() {
 
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{formatTime(result.summary.loadTime)}</div>
+                  <div className="text-2xl font-bold">
+                    {formatTime(result.summary.loadTime)}
+                  </div>
                   <p className="text-xs text-muted-foreground">Load Time</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{result.summary.totalRequests}</div>
-                  <p className="text-xs text-muted-foreground">Total Requests</p>
+                  <div className="text-2xl font-bold">
+                    {result.summary.totalRequests}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Total Requests
+                  </p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="pt-6">
-                  <div className="text-2xl font-bold">{formatBytes(result.summary.totalSize)}</div>
+                  <div className="text-2xl font-bold">
+                    {formatBytes(result.summary.totalSize)}
+                  </div>
                   <p className="text-xs text-muted-foreground">Total Size</p>
                 </CardContent>
               </Card>
@@ -366,10 +431,16 @@ export default function PerformanceProfilerClient() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">Analyzed URL</p>
-                      <p className="text-sm text-muted-foreground">{result.url}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {result.url}
+                      </p>
                     </div>
                     <Button variant="outline" size="sm" asChild>
-                      <a href={result.url} target="_blank" rel="noopener noreferrer">
+                      <a
+                        href={result.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         <ExternalLink className="h-4 w-4 mr-1" />
                         Visit Site
                       </a>
@@ -391,40 +462,58 @@ export default function PerformanceProfilerClient() {
                   <div>
                     <h4 className="font-semibold mb-2">Overall Assessment</h4>
                     <p className="text-sm text-muted-foreground">
-                      {result.grade === 'A'
+                      {result.grade === "A"
                         ? "Excellent performance! Your website loads quickly and efficiently."
-                        : result.grade === 'B'
-                        ? "Good performance with room for improvement."
-                        : result.grade === 'C'
-                        ? "Average performance. Consider optimizations for better user experience."
-                        : "Poor performance. Significant improvements needed."}
+                        : result.grade === "B"
+                          ? "Good performance with room for improvement."
+                          : result.grade === "C"
+                            ? "Average performance. Consider optimizations for better user experience."
+                            : "Poor performance. Significant improvements needed."}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">
-                        {result.metrics.filter(m => m.status === 'good').length}
+                        {
+                          result.metrics.filter((m) => m.status === "good")
+                            .length
+                        }
                       </div>
-                      <div className="text-sm text-muted-foreground">Good Metrics</div>
+                      <div className="text-sm text-muted-foreground">
+                        Good Metrics
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-yellow-600">
-                        {result.metrics.filter(m => m.status === 'needs-improvement').length}
+                        {
+                          result.metrics.filter(
+                            (m) => m.status === "needs-improvement",
+                          ).length
+                        }
                       </div>
-                      <div className="text-sm text-muted-foreground">Needs Work</div>
+                      <div className="text-sm text-muted-foreground">
+                        Needs Work
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-red-600">
-                        {result.metrics.filter(m => m.status === 'poor').length}
+                        {
+                          result.metrics.filter((m) => m.status === "poor")
+                            .length
+                        }
                       </div>
-                      <div className="text-sm text-muted-foreground">Poor Metrics</div>
+                      <div className="text-sm text-muted-foreground">
+                        Poor Metrics
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">
                         {result.summary.issues}
                       </div>
-                      <div className="text-sm text-muted-foreground">Issues Found</div>
+                      <div className="text-sm text-muted-foreground">
+                        Issues Found
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -449,16 +538,21 @@ export default function PerformanceProfilerClient() {
                           {getStatusIcon(metric.status)}
                           <h4 className="font-semibold">{metric.name}</h4>
                         </div>
-                        <Badge variant="outline" className={getStatusColor(metric.status)}>
-                          {metric.status.replace('-', ' ')}
+                        <Badge
+                          variant="outline"
+                          className={getStatusColor(metric.status)}
+                        >
+                          {metric.status.replace("-", " ")}
                         </Badge>
                       </div>
 
                       <div className="flex items-center gap-4 mb-2">
                         <div className="text-2xl font-bold">
-                          {metric.unit === 'ms' ? formatTime(metric.value) :
-                           metric.unit === '' ? metric.value.toFixed(3) :
-                           `${metric.value}${metric.unit}`}
+                          {metric.unit === "ms"
+                            ? formatTime(metric.value)
+                            : metric.unit === ""
+                              ? metric.value.toFixed(3)
+                              : `${metric.value}${metric.unit}`}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {metric.description}
@@ -467,7 +561,8 @@ export default function PerformanceProfilerClient() {
 
                       {metric.recommendation && (
                         <div className="bg-muted p-3 rounded text-sm">
-                          <strong>Recommendation:</strong> {metric.recommendation}
+                          <strong>Recommendation:</strong>{" "}
+                          {metric.recommendation}
                         </div>
                       )}
                     </div>
@@ -489,7 +584,10 @@ export default function PerformanceProfilerClient() {
                 <ScrollArea className="h-[600px] w-full">
                   <div className="space-y-3">
                     {result.resources.map((resource, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="flex items-center gap-3">
                           {getStatusIcon(resource.status)}
                           <div>
@@ -501,7 +599,9 @@ export default function PerformanceProfilerClient() {
                         </div>
 
                         <div className="text-right">
-                          <div className="font-medium">{formatTime(resource.duration)}</div>
+                          <div className="font-medium">
+                            {formatTime(resource.duration)}
+                          </div>
                           <div className="text-sm text-muted-foreground">
                             {formatBytes(resource.size)}
                           </div>
@@ -525,26 +625,38 @@ export default function PerformanceProfilerClient() {
               <CardContent>
                 <div className="space-y-6">
                   <div>
-                    <h4 className="font-semibold mb-3">Priority Improvements</h4>
+                    <h4 className="font-semibold mb-3">
+                      Priority Improvements
+                    </h4>
                     <div className="space-y-3">
-                      {result.metrics.filter(m => m.status !== 'good').map((metric, index) => (
-                        <div key={index} className="border-l-4 border-l-yellow-500 pl-4">
-                          <h5 className="font-medium">{metric.name}</h5>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            Current: {metric.unit === 'ms' ? formatTime(metric.value) : `${metric.value}${metric.unit}`}
-                          </p>
-                          {metric.recommendation && (
-                            <p className="text-sm">{metric.recommendation}</p>
-                          )}
-                        </div>
-                      ))}
+                      {result.metrics
+                        .filter((m) => m.status !== "good")
+                        .map((metric, index) => (
+                          <div
+                            key={index}
+                            className="border-l-4 border-l-yellow-500 pl-4"
+                          >
+                            <h5 className="font-medium">{metric.name}</h5>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              Current:{" "}
+                              {metric.unit === "ms"
+                                ? formatTime(metric.value)
+                                : `${metric.value}${metric.unit}`}
+                            </p>
+                            {metric.recommendation && (
+                              <p className="text-sm">{metric.recommendation}</p>
+                            )}
+                          </div>
+                        ))}
                     </div>
                   </div>
 
                   <Separator />
 
                   <div>
-                    <h4 className="font-semibold mb-3">General Best Practices</h4>
+                    <h4 className="font-semibold mb-3">
+                      General Best Practices
+                    </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <h5 className="font-medium flex items-center gap-2">

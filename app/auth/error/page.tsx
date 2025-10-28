@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Suspense } from 'react';
-import AuthErrorContent from './auth-error-content';
+import { Suspense } from "react";
+import AuthErrorContent from "./auth-error-content";
 
 export default function AuthErrorPage() {
   return (

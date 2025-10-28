@@ -51,6 +51,7 @@ NODE_ENV="development"
 ```
 
 Generate NEXTAUTH_SECRET:
+
 ```bash
 openssl rand -base64 32
 ```
@@ -122,10 +123,10 @@ export function Base64Client() {
       setOutput(encoded);
       toast({ title: 'Encoded', description: 'Text encoded to Base64' });
     } catch (err) {
-      toast({ 
-        title: 'Error', 
-        description: 'Failed to encode text', 
-        variant: 'destructive' 
+      toast({
+        title: 'Error',
+        description: 'Failed to encode text',
+        variant: 'destructive'
       });
     }
   };
@@ -134,19 +135,19 @@ export function Base64Client() {
     try {
       const decoded = atob(input);
       setOutput(decoded);
-      
+
       // Try to detect MIME type
       if (decoded.startsWith('data:')) {
         const match = decoded.match(/^data:([^;]+);/);
         if (match) setMimeType(match[1]);
       }
-      
+
       toast({ title: 'Decoded', description: 'Base64 decoded successfully' });
     } catch (err) {
-      toast({ 
-        title: 'Error', 
-        description: 'Invalid Base64 string', 
-        variant: 'destructive' 
+      toast({
+        title: 'Error',
+        description: 'Invalid Base64 string',
+        variant: 'destructive'
       });
     }
   };
@@ -211,7 +212,7 @@ export function Base64Client() {
                 <Button onClick={() => copyToClipboard(output)}>
                   <Copy className="mr-2 h-4 w-4" />Copy
                 </Button>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => downloadFile(output, 'output.txt')}
                 >
@@ -385,9 +386,9 @@ export default function AdminDashboard() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="mb-8 text-3xl font-bold">Dashboard</h1>
-      
+
       <DashboardStats />
-      
+
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <UsageChart />
         <RecentActivity />
@@ -468,19 +469,19 @@ export function DashboardStats() {
 Create `app/api/track/route.ts`:
 
 ```typescript
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { hashString } from '@/lib/utils';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { hashString } from "@/lib/utils";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
     const { toolType, input, duration, success } = await request.json();
-    
+
     const inputHash = hashString(input);
-    const ipAddress = request.headers.get('x-forwarded-for') || 'unknown';
-    const userAgent = request.headers.get('user-agent') || '';
+    const ipAddress = request.headers.get("x-forwarded-for") || "unknown";
+    const userAgent = request.headers.get("user-agent") || "";
 
     await prisma.toolSession.create({
       data: {
@@ -496,8 +497,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to track usage' },
-      { status: 500 }
+      { error: "Failed to track usage" },
+      { status: 500 },
     );
   }
 }
@@ -508,8 +509,8 @@ export async function POST(request: NextRequest) {
 Create `app/api/admin/analytics/route.ts`:
 
 ```typescript
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -528,7 +529,7 @@ export async function GET() {
     ]);
 
     const toolUsage = await prisma.toolSession.groupBy({
-      by: ['toolType'],
+      by: ["toolType"],
       _count: true,
     });
 
@@ -540,8 +541,8 @@ export async function GET() {
     });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch analytics' },
-      { status: 500 }
+      { error: "Failed to fetch analytics" },
+      { status: 500 },
     );
   }
 }
@@ -554,28 +555,28 @@ export async function GET() {
 Create `prisma/seed.ts`:
 
 ```typescript
-import { PrismaClient, Role, UserStatus } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import { PrismaClient, Role, UserStatus } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
 async function main() {
   // Create superadmin
-  const hashedPassword = await bcrypt.hash('admin123', 10);
-  
+  const hashedPassword = await bcrypt.hash("admin123", 10);
+
   await prisma.user.upsert({
-    where: { email: 'admin@devtools.com' },
+    where: { email: "admin@devtools.com" },
     update: {},
     create: {
-      email: 'admin@devtools.com',
-      name: 'Super Admin',
+      email: "admin@devtools.com",
+      name: "Super Admin",
       password: hashedPassword,
       role: Role.SUPERADMIN,
       status: UserStatus.ACTIVE,
     },
   });
 
-  console.log('Seeding completed!');
+  console.log("Seeding completed!");
 }
 
 main()
@@ -607,18 +608,18 @@ Add to `package.json`:
 Create `app/api/sitemap/route.ts`:
 
 ```typescript
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
   const tools = [
-    'json-formatter',
-    'base64',
-    'code-beautifier',
-    'url-encoder',
-    'jwt-decoder',
-    'regexp-tester',
+    "json-formatter",
+    "base64",
+    "code-beautifier",
+    "url-encoder",
+    "jwt-decoder",
+    "regexp-tester",
   ];
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -628,17 +629,21 @@ export async function GET() {
     <priority>1.0</priority>
     <changefreq>daily</changefreq>
   </url>
-  ${tools.map(tool => `
+  ${tools
+    .map(
+      (tool) => `
   <url>
     <loc>${baseUrl}/tools/${tool}</loc>
     <priority>0.8</priority>
     <changefreq>weekly</changefreq>
-  </url>`).join('')}
+  </url>`,
+    )
+    .join("")}
 </urlset>`;
 
   return new NextResponse(sitemap, {
     headers: {
-      'Content-Type': 'application/xml',
+      "Content-Type": "application/xml",
     },
   });
 }
@@ -649,11 +654,11 @@ export async function GET() {
 Create `app/robots.txt/route.ts`:
 
 ```typescript
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
   const robots = `User-agent: *
 Allow: /
 
@@ -661,7 +666,7 @@ Sitemap: ${baseUrl}/sitemap.xml`;
 
   return new NextResponse(robots, {
     headers: {
-      'Content-Type': 'text/plain',
+      "Content-Type": "text/plain",
     },
   });
 }
@@ -722,17 +727,17 @@ CMD ["node", "server.js"]
 Create `jest.config.js`:
 
 ```javascript
-const nextJest = require('next/jest');
+const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
-  dir: './',
+  dir: "./",
 });
 
 const customJestConfig = {
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-  testEnvironment: 'jest-environment-jsdom',
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  testEnvironment: "jest-environment-jsdom",
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1',
+    "^@/(.*)$": "<rootDir>/$1",
   },
 };
 
@@ -744,22 +749,22 @@ module.exports = createJestConfig(customJestConfig);
 Create `__tests__/utils.test.ts`:
 
 ```typescript
-import { formatBytes, isValidEmail, isValidUrl } from '@/lib/utils';
+import { formatBytes, isValidEmail, isValidUrl } from "@/lib/utils";
 
-describe('Utils', () => {
-  test('formatBytes formats correctly', () => {
-    expect(formatBytes(1024)).toBe('1 KB');
-    expect(formatBytes(1048576)).toBe('1 MB');
+describe("Utils", () => {
+  test("formatBytes formats correctly", () => {
+    expect(formatBytes(1024)).toBe("1 KB");
+    expect(formatBytes(1048576)).toBe("1 MB");
   });
 
-  test('isValidEmail validates emails', () => {
-    expect(isValidEmail('test@example.com')).toBe(true);
-    expect(isValidEmail('invalid')).toBe(false);
+  test("isValidEmail validates emails", () => {
+    expect(isValidEmail("test@example.com")).toBe(true);
+    expect(isValidEmail("invalid")).toBe(false);
   });
 
-  test('isValidUrl validates URLs', () => {
-    expect(isValidUrl('https://example.com')).toBe(true);
-    expect(isValidUrl('not-a-url')).toBe(false);
+  test("isValidUrl validates URLs", () => {
+    expect(isValidUrl("https://example.com")).toBe(true);
+    expect(isValidUrl("not-a-url")).toBe(false);
   });
 });
 ```

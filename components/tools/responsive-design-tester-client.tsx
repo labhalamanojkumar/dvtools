@@ -1,15 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Monitor,
   Smartphone,
@@ -21,9 +27,9 @@ import {
   ExternalLink,
   SmartphoneIcon,
   MonitorIcon,
-  TabletIcon
-} from 'lucide-react';
-import { useToast } from '@/components/ui/toaster';
+  TabletIcon,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
 
 interface DevicePreset {
   name: string;
@@ -35,26 +41,110 @@ interface DevicePreset {
 
 const devicePresets: DevicePreset[] = [
   // Phones
-  { name: 'iPhone 14', width: 390, height: 844, icon: <SmartphoneIcon className="h-4 w-4" />, category: 'phone' },
-  { name: 'iPhone 14 Pro Max', width: 428, height: 926, icon: <SmartphoneIcon className="h-4 w-4" />, category: 'phone' },
-  { name: 'Samsung Galaxy S23', width: 360, height: 780, icon: <SmartphoneIcon className="h-4 w-4" />, category: 'phone' },
-  { name: 'Google Pixel 7', width: 412, height: 915, icon: <SmartphoneIcon className="h-4 w-4" />, category: 'phone' },
+  {
+    name: "iPhone 14",
+    width: 390,
+    height: 844,
+    icon: <SmartphoneIcon className="h-4 w-4" />,
+    category: "phone",
+  },
+  {
+    name: "iPhone 14 Pro Max",
+    width: 428,
+    height: 926,
+    icon: <SmartphoneIcon className="h-4 w-4" />,
+    category: "phone",
+  },
+  {
+    name: "Samsung Galaxy S23",
+    width: 360,
+    height: 780,
+    icon: <SmartphoneIcon className="h-4 w-4" />,
+    category: "phone",
+  },
+  {
+    name: "Google Pixel 7",
+    width: 412,
+    height: 915,
+    icon: <SmartphoneIcon className="h-4 w-4" />,
+    category: "phone",
+  },
 
   // Tablets
-  { name: 'iPad', width: 810, height: 1080, icon: <TabletIcon className="h-4 w-4" />, category: 'tablet' },
-  { name: 'iPad Pro 12.9"', width: 1024, height: 1366, icon: <TabletIcon className="h-4 w-4" />, category: 'tablet' },
-  { name: 'Samsung Galaxy Tab S8', width: 800, height: 1280, icon: <TabletIcon className="h-4 w-4" />, category: 'tablet' },
+  {
+    name: "iPad",
+    width: 810,
+    height: 1080,
+    icon: <TabletIcon className="h-4 w-4" />,
+    category: "tablet",
+  },
+  {
+    name: 'iPad Pro 12.9"',
+    width: 1024,
+    height: 1366,
+    icon: <TabletIcon className="h-4 w-4" />,
+    category: "tablet",
+  },
+  {
+    name: "Samsung Galaxy Tab S8",
+    width: 800,
+    height: 1280,
+    icon: <TabletIcon className="h-4 w-4" />,
+    category: "tablet",
+  },
 
   // Desktops
-  { name: 'Desktop 1080p', width: 1920, height: 1080, icon: <MonitorIcon className="h-4 w-4" />, category: 'desktop' },
-  { name: 'Desktop 1440p', width: 2560, height: 1440, icon: <MonitorIcon className="h-4 w-4" />, category: 'desktop' },
-  { name: 'Desktop 4K', width: 3840, height: 2160, icon: <MonitorIcon className="h-4 w-4" />, category: 'desktop' },
+  {
+    name: "Desktop 1080p",
+    width: 1920,
+    height: 1080,
+    icon: <MonitorIcon className="h-4 w-4" />,
+    category: "desktop",
+  },
+  {
+    name: "Desktop 1440p",
+    width: 2560,
+    height: 1440,
+    icon: <MonitorIcon className="h-4 w-4" />,
+    category: "desktop",
+  },
+  {
+    name: "Desktop 4K",
+    width: 3840,
+    height: 2160,
+    icon: <MonitorIcon className="h-4 w-4" />,
+    category: "desktop",
+  },
 
   // Custom breakpoints
-  { name: 'Mobile (sm)', width: 640, height: 800, icon: <SmartphoneIcon className="h-4 w-4" />, category: 'breakpoint' },
-  { name: 'Tablet (md)', width: 768, height: 1024, icon: <TabletIcon className="h-4 w-4" />, category: 'breakpoint' },
-  { name: 'Desktop (lg)', width: 1024, height: 768, icon: <MonitorIcon className="h-4 w-4" />, category: 'breakpoint' },
-  { name: 'Large Desktop (xl)', width: 1280, height: 720, icon: <MonitorIcon className="h-4 w-4" />, category: 'breakpoint' },
+  {
+    name: "Mobile (sm)",
+    width: 640,
+    height: 800,
+    icon: <SmartphoneIcon className="h-4 w-4" />,
+    category: "breakpoint",
+  },
+  {
+    name: "Tablet (md)",
+    width: 768,
+    height: 1024,
+    icon: <TabletIcon className="h-4 w-4" />,
+    category: "breakpoint",
+  },
+  {
+    name: "Desktop (lg)",
+    width: 1024,
+    height: 768,
+    icon: <MonitorIcon className="h-4 w-4" />,
+    category: "breakpoint",
+  },
+  {
+    name: "Large Desktop (xl)",
+    width: 1280,
+    height: 720,
+    icon: <MonitorIcon className="h-4 w-4" />,
+    category: "breakpoint",
+  },
 ];
 
 const sampleHTML = `<!DOCTYPE html>
@@ -231,14 +321,18 @@ const sampleHTML = `<!DOCTYPE html>
 </html>`;
 
 export default function ResponsiveDesignTesterClient() {
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState("");
   const [html, setHtml] = useState(sampleHTML);
-  const [selectedDevice, setSelectedDevice] = useState<DevicePreset>(devicePresets[0]);
-  const [customWidth, setCustomWidth] = useState('');
-  const [customHeight, setCustomHeight] = useState('');
+  const [selectedDevice, setSelectedDevice] = useState<DevicePreset>(
+    devicePresets[0],
+  );
+  const [customWidth, setCustomWidth] = useState("");
+  const [customHeight, setCustomHeight] = useState("");
   const [zoom, setZoom] = useState(100);
-  const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
-  const [inputMode, setInputMode] = useState<'url' | 'html'>('html');
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">(
+    "portrait",
+  );
+  const [inputMode, setInputMode] = useState<"url" | "html">("html");
   const { toast } = useToast();
 
   const handleDeviceSelect = (device: DevicePreset) => {
@@ -253,11 +347,11 @@ export default function ResponsiveDesignTesterClient() {
 
     if (width && height && width > 0 && height > 0) {
       setSelectedDevice({
-        name: 'Custom',
+        name: "Custom",
         width,
         height,
         icon: <Monitor className="h-4 w-4" />,
-        category: 'custom'
+        category: "custom",
       });
     } else {
       toast({
@@ -269,10 +363,11 @@ export default function ResponsiveDesignTesterClient() {
   };
 
   const rotateDevice = () => {
-    const newOrientation = orientation === 'portrait' ? 'landscape' : 'portrait';
+    const newOrientation =
+      orientation === "portrait" ? "landscape" : "portrait";
     setOrientation(newOrientation);
 
-    if (selectedDevice.category !== 'custom') {
+    if (selectedDevice.category !== "custom") {
       // Swap width and height for rotation
       const temp = customWidth;
       setCustomWidth(customHeight);
@@ -284,7 +379,7 @@ export default function ResponsiveDesignTesterClient() {
     const width = parseInt(customWidth) || selectedDevice.width;
     const height = parseInt(customHeight) || selectedDevice.height;
 
-    if (orientation === 'landscape') {
+    if (orientation === "landscape") {
       return { width: height, height: width };
     }
 
@@ -294,7 +389,7 @@ export default function ResponsiveDesignTesterClient() {
   const copyEmbedCode = () => {
     const dimensions = getViewportDimensions();
     const embedCode = `<iframe
-  src="${url || 'data:text/html,' + encodeURIComponent(html)}"
+  src="${url || "data:text/html," + encodeURIComponent(html)}"
   width="${dimensions.width}"
   height="${dimensions.height}"
   style="border: 1px solid #ccc; border-radius: 8px;"
@@ -309,12 +404,12 @@ export default function ResponsiveDesignTesterClient() {
   };
 
   const openInNewTab = () => {
-    if (inputMode === 'url' && url) {
-      window.open(url, '_blank');
-    } else if (inputMode === 'html') {
-      const blob = new Blob([html], { type: 'text/html' });
+    if (inputMode === "url" && url) {
+      window.open(url, "_blank");
+    } else if (inputMode === "html") {
+      const blob = new Blob([html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      window.open(url, "_blank");
       URL.revokeObjectURL(url);
     }
   };
@@ -335,7 +430,10 @@ export default function ResponsiveDesignTesterClient() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'url' | 'html')}>
+          <Tabs
+            value={inputMode}
+            onValueChange={(value) => setInputMode(value as "url" | "html")}
+          >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="url">URL</TabsTrigger>
               <TabsTrigger value="html">HTML Code</TabsTrigger>
@@ -381,13 +479,19 @@ export default function ResponsiveDesignTesterClient() {
         <CardContent className="space-y-4">
           {/* Device Presets */}
           <div>
-            <Label className="text-sm font-medium mb-3 block">Popular Devices</Label>
+            <Label className="text-sm font-medium mb-3 block">
+              Popular Devices
+            </Label>
             <ScrollArea className="w-full">
               <div className="flex gap-2 pb-2">
                 {devicePresets.map((device) => (
                   <Button
                     key={device.name}
-                    variant={selectedDevice.name === device.name ? "default" : "outline"}
+                    variant={
+                      selectedDevice.name === device.name
+                        ? "default"
+                        : "outline"
+                    }
                     size="sm"
                     onClick={() => handleDeviceSelect(device)}
                     className="flex items-center gap-2 whitespace-nowrap"
@@ -426,7 +530,10 @@ export default function ResponsiveDesignTesterClient() {
             </div>
             <div>
               <Label htmlFor="zoom">Zoom (%)</Label>
-              <Select value={zoom.toString()} onValueChange={(value) => setZoom(parseInt(value))}>
+              <Select
+                value={zoom.toString()}
+                onValueChange={(value) => setZoom(parseInt(value))}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -463,9 +570,7 @@ export default function ResponsiveDesignTesterClient() {
               <Badge variant="outline">
                 {dimensions.width} × {dimensions.height}px
               </Badge>
-              <Badge variant="outline">
-                {zoom}%
-              </Badge>
+              <Badge variant="outline">{zoom}%</Badge>
               <Button variant="outline" size="sm" onClick={copyEmbedCode}>
                 <Copy className="h-4 w-4 mr-1" />
                 Embed
@@ -484,20 +589,24 @@ export default function ResponsiveDesignTesterClient() {
               style={{
                 width: containerWidth,
                 height: containerHeight,
-                maxWidth: '100%',
-                maxHeight: '600px'
+                maxWidth: "100%",
+                maxHeight: "600px",
               }}
             >
               <iframe
-                src={inputMode === 'url' ? url : `data:text/html;charset=utf-8,${encodeURIComponent(html)}`}
+                src={
+                  inputMode === "url"
+                    ? url
+                    : `data:text/html;charset=utf-8,${encodeURIComponent(html)}`
+                }
                 width="100%"
                 height="100%"
                 style={{
                   transform: `scale(${scale})`,
-                  transformOrigin: 'top left',
+                  transformOrigin: "top left",
                   width: `${dimensions.width}px`,
                   height: `${dimensions.height}px`,
-                  border: 'none'
+                  border: "none",
                 }}
                 title="Responsive Preview"
                 sandbox="allow-scripts allow-same-origin"
@@ -513,7 +622,9 @@ export default function ResponsiveDesignTesterClient() {
             </div>
             <div>
               <div className="text-sm text-muted-foreground">Resolution</div>
-              <div className="font-medium">{dimensions.width} × {dimensions.height}</div>
+              <div className="font-medium">
+                {dimensions.width} × {dimensions.height}
+              </div>
             </div>
             <div>
               <div className="text-sm text-muted-foreground">Orientation</div>
@@ -541,12 +652,16 @@ export default function ResponsiveDesignTesterClient() {
             </div>
             <div className="text-center p-4 border rounded-lg">
               <div className="text-lg font-bold text-green-600">Tablet</div>
-              <div className="text-sm text-muted-foreground">768px - 1023px</div>
+              <div className="text-sm text-muted-foreground">
+                768px - 1023px
+              </div>
               <div className="text-xs mt-2">Tablets and small laptops</div>
             </div>
             <div className="text-center p-4 border rounded-lg">
               <div className="text-lg font-bold text-orange-600">Desktop</div>
-              <div className="text-sm text-muted-foreground">1024px - 1279px</div>
+              <div className="text-sm text-muted-foreground">
+                1024px - 1279px
+              </div>
               <div className="text-xs mt-2">Laptops and desktops</div>
             </div>
             <div className="text-center p-4 border rounded-lg">

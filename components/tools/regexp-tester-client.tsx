@@ -1,28 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { Input } from '../ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { copyToClipboard, downloadFile } from '../../lib/utils';
-import { useToast } from '../ui/toaster';
-import { Copy, Download, CheckCircle, XCircle } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Input } from "../ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { copyToClipboard, downloadFile } from "../../lib/utils";
+import { useToast } from "../ui/toaster";
+import { Copy, Download, CheckCircle, XCircle } from "lucide-react";
 
 export function RegexpTesterClient() {
-  const [pattern, setPattern] = useState('');
-  const [testString, setTestString] = useState('');
-  const [flags, setFlags] = useState('g');
+  const [pattern, setPattern] = useState("");
+  const [testString, setTestString] = useState("");
+  const [flags, setFlags] = useState("g");
   const [matches, setMatches] = useState<RegExpExecArray[]>([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     if (!pattern) {
       setMatches([]);
-      setError('');
+      setError("");
       setIsValid(false);
       return;
     }
@@ -30,7 +30,7 @@ export function RegexpTesterClient() {
     try {
       const regex = new RegExp(pattern, flags);
       setIsValid(true);
-      setError('');
+      setError("");
 
       if (testString) {
         const results: RegExpExecArray[] = [];
@@ -48,30 +48,35 @@ export function RegexpTesterClient() {
       }
     } catch (err) {
       setIsValid(false);
-      setError(err instanceof Error ? err.message : 'Invalid regex pattern');
+      setError(err instanceof Error ? err.message : "Invalid regex pattern");
       setMatches([]);
     }
   }, [pattern, testString, flags]);
 
   const copyMatches = () => {
-    const matchText = matches.map((match, index) =>
-      `Match ${index + 1}: "${match[0]}" at position ${match.index}`
-    ).join('\n');
+    const matchText = matches
+      .map(
+        (match, index) =>
+          `Match ${index + 1}: "${match[0]}" at position ${match.index}`,
+      )
+      .join("\n");
     copyToClipboard(matchText);
-    toast({ title: 'Success', description: 'Matches copied to clipboard' });
+    toast({ title: "Success", description: "Matches copied to clipboard" });
   };
 
   const downloadMatches = () => {
-    const matchText = matches.map((match, index) =>
-      `Match ${index + 1}: "${match[0]}" at position ${match.index}`
-    ).join('\n');
-    downloadFile(matchText, 'regex-matches.txt', 'text/plain');
+    const matchText = matches
+      .map(
+        (match, index) =>
+          `Match ${index + 1}: "${match[0]}" at position ${match.index}`,
+      )
+      .join("\n");
+    downloadFile(matchText, "regex-matches.txt", "text/plain");
   };
 
   const toggleFlag = (flag: string) => {
-    setFlags(prev => prev.includes(flag)
-      ? prev.replace(flag, '')
-      : prev + flag
+    setFlags((prev) =>
+      prev.includes(flag) ? prev.replace(flag, "") : prev + flag,
     );
   };
 
@@ -102,16 +107,20 @@ export function RegexpTesterClient() {
           {/* Flags */}
           <div className="flex flex-wrap gap-2">
             {[
-              { key: 'g', label: 'Global', desc: 'Find all matches' },
-              { key: 'i', label: 'Case Insensitive', desc: 'Ignore case' },
-              { key: 'm', label: 'Multiline', desc: '^ and $ match line starts/ends' },
-              { key: 's', label: 'Dot All', desc: '. matches newlines' },
-              { key: 'u', label: 'Unicode', desc: 'Unicode support' },
-              { key: 'y', label: 'Sticky', desc: 'Sticky matching' }
+              { key: "g", label: "Global", desc: "Find all matches" },
+              { key: "i", label: "Case Insensitive", desc: "Ignore case" },
+              {
+                key: "m",
+                label: "Multiline",
+                desc: "^ and $ match line starts/ends",
+              },
+              { key: "s", label: "Dot All", desc: ". matches newlines" },
+              { key: "u", label: "Unicode", desc: "Unicode support" },
+              { key: "y", label: "Sticky", desc: "Sticky matching" },
             ].map(({ key, label, desc }) => (
               <Button
                 key={key}
-                variant={flags.includes(key) ? 'default' : 'outline'}
+                variant={flags.includes(key) ? "default" : "outline"}
                 size="sm"
                 onClick={() => toggleFlag(key)}
                 title={desc}
@@ -164,7 +173,9 @@ export function RegexpTesterClient() {
         <CardContent>
           {matches.length === 0 ? (
             <div className="text-muted-foreground">
-              {testString ? 'No matches found' : 'Enter a test string to see matches'}
+              {testString
+                ? "No matches found"
+                : "Enter a test string to see matches"}
             </div>
           ) : (
             <div className="space-y-3">
@@ -185,7 +196,10 @@ export function RegexpTesterClient() {
                       <div className="grid gap-1">
                         {match.slice(1).map((group, groupIndex) => (
                           <div key={groupIndex} className="text-sm">
-                            <span className="font-mono">Group {groupIndex + 1}:</span> &ldquo;{group}&rdquo;
+                            <span className="font-mono">
+                              Group {groupIndex + 1}:
+                            </span>{" "}
+                            &ldquo;{group}&rdquo;
                           </div>
                         ))}
                       </div>
@@ -209,73 +223,87 @@ export function RegexpTesterClient() {
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setPattern('\\w+@\\w+\\.\\w+');
-                setTestString('Contact us at support@example.com or admin@test.org');
+                setPattern("\\w+@\\w+\\.\\w+");
+                setTestString(
+                  "Contact us at support@example.com or admin@test.org",
+                );
               }}
             >
               <div>
                 <div className="font-semibold">Email Addresses</div>
-                <div className="text-sm text-muted-foreground">\w+@\w+\.\w+</div>
+                <div className="text-sm text-muted-foreground">
+                  \w+@\w+\.\w+
+                </div>
               </div>
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setPattern('\\d{3}-\\d{3}-\\d{4}');
-                setTestString('Call me at 555-123-4567 or 999-888-7777');
+                setPattern("\\d{3}-\\d{3}-\\d{4}");
+                setTestString("Call me at 555-123-4567 or 999-888-7777");
               }}
             >
               <div>
                 <div className="font-semibold">Phone Numbers</div>
-                <div className="text-sm text-muted-foreground">\d{3}-\d{3}-\d{4}</div>
+                <div className="text-sm text-muted-foreground">
+                  \d{3}-\d{3}-\d{4}
+                </div>
               </div>
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setPattern('https?://\\S+');
-                setTestString('Visit https://example.com and http://test.org for more info');
+                setPattern("https?://\\S+");
+                setTestString(
+                  "Visit https://example.com and http://test.org for more info",
+                );
               }}
             >
               <div>
                 <div className="font-semibold">URLs</div>
-                <div className="text-sm text-muted-foreground">https?://\S+</div>
+                <div className="text-sm text-muted-foreground">
+                  https?://\S+
+                </div>
               </div>
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setPattern('#[0-9a-fA-F]{6}');
-                setTestString('Colors: #FF0000, #00FF00, #0000FF, #invalid');
+                setPattern("#[0-9a-fA-F]{6}");
+                setTestString("Colors: #FF0000, #00FF00, #0000FF, #invalid");
               }}
             >
               <div>
                 <div className="font-semibold">Hex Colors</div>
-                <div className="text-sm text-muted-foreground">#[0-9a-fA-F]{6}</div>
+                <div className="text-sm text-muted-foreground">
+                  #[0-9a-fA-F]{6}
+                </div>
               </div>
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setPattern('\\b\\d{4}-\\d{2}-\\d{2}\\b');
-                setTestString('Dates: 2023-12-25, 2024-01-01, invalid-date');
+                setPattern("\\b\\d{4}-\\d{2}-\\d{2}\\b");
+                setTestString("Dates: 2023-12-25, 2024-01-01, invalid-date");
               }}
             >
               <div>
                 <div className="font-semibold">ISO Dates</div>
-                <div className="text-sm text-muted-foreground">\b\d{4}-\d{2}-\d{2}\b</div>
+                <div className="text-sm text-muted-foreground">
+                  \b\d{4}-\d{2}-\d{2}\b
+                </div>
               </div>
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left h-auto p-4"
               onClick={() => {
-                setPattern('\\b\\w+\\b');
-                setTestString('Hello world! This is a test.');
+                setPattern("\\b\\w+\\b");
+                setTestString("Hello world! This is a test.");
               }}
             >
               <div>
@@ -297,24 +325,50 @@ export function RegexpTesterClient() {
             <div>
               <h4 className="font-semibold mb-2">Common Patterns</h4>
               <div className="space-y-1 text-sm">
-                <div><code>\d</code> - Digit (0-9)</div>
-                <div><code>\w</code> - Word character (a-z, A-Z, 0-9, _)</div>
-                <div><code>\s</code> - Whitespace</div>
-                <div><code>.</code> - Any character</div>
-                <div><code>\b</code> - Word boundary</div>
-                <div><code>^</code> - Start of string/line</div>
-                <div><code>$</code> - End of string/line</div>
+                <div>
+                  <code>\d</code> - Digit (0-9)
+                </div>
+                <div>
+                  <code>\w</code> - Word character (a-z, A-Z, 0-9, _)
+                </div>
+                <div>
+                  <code>\s</code> - Whitespace
+                </div>
+                <div>
+                  <code>.</code> - Any character
+                </div>
+                <div>
+                  <code>\b</code> - Word boundary
+                </div>
+                <div>
+                  <code>^</code> - Start of string/line
+                </div>
+                <div>
+                  <code>$</code> - End of string/line
+                </div>
               </div>
             </div>
             <div>
               <h4 className="font-semibold mb-2">Quantifiers</h4>
               <div className="space-y-1 text-sm">
-                <div><code>*</code> - Zero or more</div>
-                <div><code>+</code> - One or more</div>
-                <div><code>?</code> - Zero or one</div>
-                <div><code>{'{n}'}</code> - Exactly n times</div>
-                <div><code>{'{n,}'}</code> - n or more times</div>
-                <div><code>{'{n,m}'}</code> - Between n and m times</div>
+                <div>
+                  <code>*</code> - Zero or more
+                </div>
+                <div>
+                  <code>+</code> - One or more
+                </div>
+                <div>
+                  <code>?</code> - Zero or one
+                </div>
+                <div>
+                  <code>{"{n}"}</code> - Exactly n times
+                </div>
+                <div>
+                  <code>{"{n,}"}</code> - n or more times
+                </div>
+                <div>
+                  <code>{"{n,m}"}</code> - Between n and m times
+                </div>
               </div>
             </div>
           </div>

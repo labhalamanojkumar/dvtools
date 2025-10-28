@@ -1,55 +1,55 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { BarChart3, TrendingUp, TrendingDown } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { BarChart3, TrendingUp, TrendingDown } from "lucide-react";
 
 export default function UsageStats() {
   // Mock data - in a real app, this would come from your database
   const stats = [
     {
-      tool: 'JSON Formatter',
+      tool: "JSON Formatter",
       calls: 45,
-      change: '+12%',
-      trend: 'up',
-      color: 'bg-blue-500'
+      change: "+12%",
+      trend: "up",
+      color: "bg-blue-500",
     },
     {
-      tool: 'Base64 Encoder',
+      tool: "Base64 Encoder",
       calls: 32,
-      change: '+8%',
-      trend: 'up',
-      color: 'bg-green-500'
+      change: "+8%",
+      trend: "up",
+      color: "bg-green-500",
     },
     {
-      tool: 'JWT Decoder',
+      tool: "JWT Decoder",
       calls: 28,
-      change: '-3%',
-      trend: 'down',
-      color: 'bg-purple-500'
+      change: "-3%",
+      trend: "down",
+      color: "bg-purple-500",
     },
     {
-      tool: 'RegExp Tester',
+      tool: "RegExp Tester",
       calls: 18,
-      change: '+15%',
-      trend: 'up',
-      color: 'bg-orange-500'
+      change: "+15%",
+      trend: "up",
+      color: "bg-orange-500",
     },
     {
-      tool: 'URL Encoder',
+      tool: "URL Encoder",
       calls: 15,
-      change: '+5%',
-      trend: 'up',
-      color: 'bg-red-500'
+      change: "+5%",
+      trend: "up",
+      color: "bg-red-500",
     },
     {
-      tool: 'Hash Generator',
+      tool: "Hash Generator",
       calls: 7,
-      change: '+2%',
-      trend: 'up',
-      color: 'bg-yellow-500'
-    }
+      change: "+2%",
+      trend: "up",
+      color: "bg-yellow-500",
+    },
   ];
 
   return (
@@ -68,15 +68,17 @@ export default function UsageStats() {
                 <div className={`w-3 h-3 rounded-full ${stat.color}`} />
                 <div>
                   <p className="text-sm font-medium">{stat.tool}</p>
-                  <p className="text-xs text-muted-foreground">{stat.calls} calls</p>
+                  <p className="text-xs text-muted-foreground">
+                    {stat.calls} calls
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge
-                  variant={stat.trend === 'up' ? 'default' : 'secondary'}
+                  variant={stat.trend === "up" ? "default" : "secondary"}
                   className="text-xs"
                 >
-                  {stat.trend === 'up' ? (
+                  {stat.trend === "up" ? (
                     <TrendingUp className="w-3 h-3 mr-1" />
                   ) : (
                     <TrendingDown className="w-3 h-3 mr-1" />

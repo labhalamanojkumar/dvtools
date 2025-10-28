@@ -1,8 +1,8 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { Metadata } from "next";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Shield,
   Lock,
@@ -15,44 +15,47 @@ import {
   AlertTriangle,
   CheckCircle,
   ArrowLeft,
-  Globe
-} from 'lucide-react';
+  Globe,
+} from "lucide-react";
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | DevTools Hub - Data Protection & Privacy',
-  description: 'Learn how DevTools Hub protects your privacy and handles your data. We are committed to transparency, security, and compliance with privacy regulations.',
+  title: "Privacy Policy | DevTools Hub - Data Protection & Privacy",
+  description:
+    "Learn how DevTools Hub protects your privacy and handles your data. We are committed to transparency, security, and compliance with privacy regulations.",
   keywords: [
-    'privacy policy',
-    'data protection',
-    'GDPR compliance',
-    'privacy rights',
-    'data security',
-    'developer tools privacy',
-    'data handling'
+    "privacy policy",
+    "data protection",
+    "GDPR compliance",
+    "privacy rights",
+    "data security",
+    "developer tools privacy",
+    "data handling",
   ],
   openGraph: {
-    title: 'Privacy Policy | DevTools Hub - Data Protection & Privacy',
-    description: 'Learn how DevTools Hub protects your privacy and handles your data.',
-    type: 'website',
-    url: '/privacy',
-    siteName: 'DevTools Hub',
+    title: "Privacy Policy | DevTools Hub - Data Protection & Privacy",
+    description:
+      "Learn how DevTools Hub protects your privacy and handles your data.",
+    type: "website",
+    url: "/privacy",
+    siteName: "DevTools Hub",
     images: [
       {
-        url: '/privacy-og.jpg',
+        url: "/privacy-og.jpg",
         width: 1200,
         height: 630,
-        alt: 'DevTools Hub Privacy Policy',
+        alt: "DevTools Hub Privacy Policy",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Privacy Policy | DevTools Hub - Data Protection & Privacy',
-    description: 'Learn how DevTools Hub protects your privacy and handles your data.',
-    images: ['/privacy-og.jpg'],
+    card: "summary_large_image",
+    title: "Privacy Policy | DevTools Hub - Data Protection & Privacy",
+    description:
+      "Learn how DevTools Hub protects your privacy and handles your data.",
+    images: ["/privacy-og.jpg"],
   },
   alternates: {
-    canonical: '/privacy',
+    canonical: "/privacy",
   },
   robots: {
     index: true,
@@ -60,17 +63,17 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
 
 const sections = [
   {
-    id: 'introduction',
-    title: 'Introduction',
+    id: "introduction",
+    title: "Introduction",
     icon: <Shield className="h-5 w-5" />,
     content: `
       <p>At DevTools Hub, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
@@ -86,11 +89,11 @@ const sections = [
           </div>
         </div>
       </div>
-    `
+    `,
   },
   {
-    id: 'information-we-collect',
-    title: 'Information We Collect',
+    id: "information-we-collect",
+    title: "Information We Collect",
     icon: <Database className="h-5 w-5" />,
     content: `
       <h3>What We Collect</h3>
@@ -117,11 +120,11 @@ const sections = [
           </div>
         </div>
       </div>
-    `
+    `,
   },
   {
-    id: 'how-we-use-information',
-    title: 'How We Use Your Information',
+    id: "how-we-use-information",
+    title: "How We Use Your Information",
     icon: <Eye className="h-5 w-5" />,
     content: `
       <p>We use the information we collect for the following purposes:</p>
@@ -148,11 +151,11 @@ const sections = [
         <li>To protect our rights and prevent fraud</li>
         <li>To enforce our Terms of Service</li>
       </ul>
-    `
+    `,
   },
   {
-    id: 'information-sharing',
-    title: 'Information Sharing and Disclosure',
+    id: "information-sharing",
+    title: "Information Sharing and Disclosure",
     icon: <Users className="h-5 w-5" />,
     content: `
       <p>We do not sell, trade, or rent your personal information to third parties. We may share your information only in the following circumstances:</p>
@@ -178,11 +181,11 @@ const sections = [
           </div>
         </div>
       </div>
-    `
+    `,
   },
   {
-    id: 'data-retention',
-    title: 'Data Retention',
+    id: "data-retention",
+    title: "Data Retention",
     icon: <Database className="h-5 w-5" />,
     content: `
       <p>We retain your personal information for as long as necessary to provide our services and fulfill the purposes outlined in this Privacy Policy, unless a longer retention period is required by law.</p>
@@ -195,11 +198,11 @@ const sections = [
 
       <h3>Legal Obligations</h3>
       <p>Certain information may be retained longer if required by applicable laws, regulations, or legal proceedings.</p>
-    `
+    `,
   },
   {
-    id: 'your-rights',
-    title: 'Your Rights and Choices',
+    id: "your-rights",
+    title: "Your Rights and Choices",
     icon: <FileText className="h-5 w-5" />,
     content: `
       <p>You have certain rights regarding your personal information. Depending on your location, these rights may include:</p>
@@ -220,11 +223,11 @@ const sections = [
 
       <h3>How to Exercise Your Rights</h3>
       <p>To exercise any of these rights, please contact us using the information provided in the "Contact Us" section below.</p>
-    `
+    `,
   },
   {
-    id: 'cookies',
-    title: 'Cookies and Tracking',
+    id: "cookies",
+    title: "Cookies and Tracking",
     icon: <Cookie className="h-5 w-5" />,
     content: `
       <p>We use cookies and similar technologies to enhance your experience on our website.</p>
@@ -241,11 +244,11 @@ const sections = [
       <p>You can control cookie settings through your browser preferences. However, disabling certain cookies may affect website functionality.</p>
 
       <p>For more detailed information about our cookie practices, please see our <a href="/cookies" class="text-primary hover:underline">Cookie Policy</a>.</p>
-    `
+    `,
   },
   {
-    id: 'international-transfers',
-    title: 'International Data Transfers',
+    id: "international-transfers",
+    title: "International Data Transfers",
     icon: <Globe className="h-5 w-5" />,
     content: `
       <p>Your information may be transferred to and processed in countries other than your own. We ensure that such transfers comply with applicable data protection laws.</p>
@@ -259,11 +262,11 @@ const sections = [
       </ul>
 
       <p>We implement appropriate safeguards to ensure the security and protection of your personal information during international transfers.</p>
-    `
+    `,
   },
   {
-    id: 'childrens-privacy',
-    title: 'Children\'s Privacy',
+    id: "childrens-privacy",
+    title: "Children's Privacy",
     icon: <Users className="h-5 w-5" />,
     content: `
       <p>Our services are not intended for children under 13 years of age. We do not knowingly collect personal information from children under 13.</p>
@@ -271,11 +274,11 @@ const sections = [
       <p>If we become aware that we have collected personal information from a child under 13, we will take steps to delete such information promptly.</p>
 
       <p>Parents and guardians who believe their child has provided us with personal information should contact us immediately.</p>
-    `
+    `,
   },
   {
-    id: 'changes-to-policy',
-    title: 'Changes to This Privacy Policy',
+    id: "changes-to-policy",
+    title: "Changes to This Privacy Policy",
     icon: <FileText className="h-5 w-5" />,
     content: `
       <p>We may update this Privacy Policy from time to time to reflect changes in our practices or legal requirements.</p>
@@ -288,11 +291,11 @@ const sections = [
       </ul>
 
       <p>Your continued use of our services after any changes indicates your acceptance of the updated Privacy Policy.</p>
-    `
+    `,
   },
   {
-    id: 'contact-us',
-    title: 'Contact Us',
+    id: "contact-us",
+    title: "Contact Us",
     icon: <Mail className="h-5 w-5" />,
     content: `
       <p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p>
@@ -307,8 +310,8 @@ const sections = [
       <p>We will respond to your inquiries within 30 days of receipt.</p>
 
       <p>If you are located in the EEA, you also have the right to lodge a complaint with your local data protection authority.</p>
-    `
-  }
+    `,
+  },
 ];
 
 export default function PrivacyPolicyPage() {
@@ -321,33 +324,40 @@ export default function PrivacyPolicyPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "Privacy Policy - DevTools Hub",
-            "description": "DevTools Hub privacy policy and data protection information",
-            "url": "https://devtoolshub.com/privacy",
-            "publisher": {
+            name: "Privacy Policy - DevTools Hub",
+            description:
+              "DevTools Hub privacy policy and data protection information",
+            url: "https://devtoolshub.com/privacy",
+            publisher: {
               "@type": "Organization",
-              "name": "DevTools Hub",
-              "contactPoint": {
+              name: "DevTools Hub",
+              contactPoint: {
                 "@type": "ContactPoint",
-                "email": "privacy@devtoolshub.com",
-                "contactType": "privacy policy"
-              }
-            }
-          })
+                email: "privacy@devtoolshub.com",
+                contactType: "privacy policy",
+              },
+            },
+          }),
         }}
       />
 
       {/* Header */}
       <div className="mb-8">
-        <Link href="/" className="inline-flex items-center text-muted-foreground hover:text-primary mb-4">
+        <Link
+          href="/"
+          className="inline-flex items-center text-muted-foreground hover:text-primary mb-4"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
         </Link>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">Privacy Policy</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+            Privacy Policy
+          </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Your privacy is important to us. This policy explains how we collect, use, and protect your information.
+            Your privacy is important to us. This policy explains how we
+            collect, use, and protect your information.
           </p>
           <div className="flex items-center justify-center gap-4 mt-4 text-sm text-muted-foreground">
             <span>Last updated: October 27, 2025</span>
@@ -386,9 +396,7 @@ export default function PrivacyPolicyPage() {
           <Card key={section.id} id={section.id}>
             <CardHeader>
               <CardTitle className="flex items-center gap-3">
-                <div className="text-primary">
-                  {section.icon}
-                </div>
+                <div className="text-primary">{section.icon}</div>
                 {section.title}
               </CardTitle>
             </CardHeader>
@@ -405,10 +413,12 @@ export default function PrivacyPolicyPage() {
       {/* Contact CTA */}
       <Card className="mt-12 bg-primary/5 border-primary/20">
         <CardContent className="p-8 text-center">
-          <h3 className="text-xl font-semibold mb-4">Questions About Your Privacy?</h3>
+          <h3 className="text-xl font-semibold mb-4">
+            Questions About Your Privacy?
+          </h3>
           <p className="text-muted-foreground mb-6">
-            If you have any questions about this Privacy Policy or how we handle your data,
-            please don&apos;t hesitate to contact us.
+            If you have any questions about this Privacy Policy or how we handle
+            your data, please don&apos;t hesitate to contact us.
           </p>
           <Button asChild>
             <Link href="mailto:privacy@devtoolshub.com">

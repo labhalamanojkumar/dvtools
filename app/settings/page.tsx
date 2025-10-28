@@ -1,10 +1,10 @@
-import { Metadata } from 'next';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import { redirect } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Metadata } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Key,
   Download,
@@ -12,29 +12,30 @@ import {
   Shield,
   Database,
   FileText,
-  BarChart3
-} from 'lucide-react';
-import Link from 'next/link';
-import ApiKeysManager from '@/components/profile/api-keys-manager';
-import ExportData from '@/components/settings/export-data';
-import AccountSettings from '@/components/profile/account-settings';
+  BarChart3,
+} from "lucide-react";
+import Link from "next/link";
+import ApiKeysManager from "@/components/profile/api-keys-manager";
+import ExportData from "@/components/settings/export-data";
+import AccountSettings from "@/components/profile/account-settings";
 
 export const metadata: Metadata = {
-  title: 'Settings | DevTools Hub - Manage Your Account',
-  description: 'Manage your API keys, export data, and configure your account settings.',
+  title: "Settings | DevTools Hub - Manage Your Account",
+  description:
+    "Manage your API keys, export data, and configure your account settings.",
   keywords: [
-    'settings',
-    'API keys',
-    'export data',
-    'account management',
-    'configuration'
+    "settings",
+    "API keys",
+    "export data",
+    "account management",
+    "configuration",
   ],
   openGraph: {
-    title: 'Settings | DevTools Hub - Manage Your Account',
-    description: 'Manage your API keys and account settings.',
-    type: 'website',
-    url: '/settings',
-    siteName: 'DevTools Hub',
+    title: "Settings | DevTools Hub - Manage Your Account",
+    description: "Manage your API keys and account settings.",
+    type: "website",
+    url: "/settings",
+    siteName: "DevTools Hub",
   },
   robots: {
     index: false,
@@ -46,10 +47,11 @@ export default async function SettingsPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect('/auth/signin');
+    redirect("/auth/signin");
   }
 
-  const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'SUPERADMIN';
+  const isAdmin =
+    session.user.role === "ADMIN" || session.user.role === "SUPERADMIN";
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -57,7 +59,8 @@ export default async function SettingsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Account Settings</h1>
         <p className="text-muted-foreground">
-          Manage your API keys, export data, and configure your account preferences.
+          Manage your API keys, export data, and configure your account
+          preferences.
         </p>
         {isAdmin && (
           <Badge variant="destructive" className="mt-2">
@@ -77,7 +80,9 @@ export default async function SettingsPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold">API Keys</h3>
-                  <p className="text-sm text-muted-foreground">Manage your keys</p>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your keys
+                  </p>
                 </div>
               </div>
             </Link>
@@ -93,7 +98,9 @@ export default async function SettingsPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold">Export Data</h3>
-                  <p className="text-sm text-muted-foreground">Download your data</p>
+                  <p className="text-sm text-muted-foreground">
+                    Download your data
+                  </p>
                 </div>
               </div>
             </Link>
@@ -109,7 +116,9 @@ export default async function SettingsPage() {
                 </div>
                 <div>
                   <h3 className="font-semibold">Profile</h3>
-                  <p className="text-sm text-muted-foreground">Edit your profile</p>
+                  <p className="text-sm text-muted-foreground">
+                    Edit your profile
+                  </p>
                 </div>
               </div>
             </Link>
@@ -188,7 +197,8 @@ export default async function SettingsPage() {
               </div>
               <div className="mt-4 p-4 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
                 <p className="text-sm text-green-800 dark:text-green-200">
-                  <strong>Administrator Access:</strong> You have 100% access to all features, unlimited API calls, and full system control.
+                  <strong>Administrator Access:</strong> You have 100% access to
+                  all features, unlimited API calls, and full system control.
                 </p>
               </div>
             </CardContent>

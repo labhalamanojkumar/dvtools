@@ -1,15 +1,30 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Activity, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Clock, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Activity,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  RefreshCw,
+} from "lucide-react";
 
 interface ApiRequest {
   id: string;
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   endpoint: string;
   status: number;
   responseTime: number;
@@ -34,16 +49,20 @@ export function ApiMonitoring() {
 
   const fetchMetrics = async () => {
     try {
-      const response = await fetch('/api/admin/api-metrics');
+      const response = await fetch("/api/admin/api-metrics");
       if (response.ok) {
         const data = await response.json();
         setMetrics(data);
       } else {
-        console.error('Failed to fetch API metrics:', response.status, response.statusText);
+        console.error(
+          "Failed to fetch API metrics:",
+          response.status,
+          response.statusText,
+        );
         setMetrics(null);
       }
     } catch (error) {
-      console.error('Failed to fetch API metrics:', error);
+      console.error("Failed to fetch API metrics:", error);
       setMetrics(null);
     } finally {
       setLoading(false);
@@ -61,30 +80,31 @@ export function ApiMonitoring() {
 
   const getMethodColor = (method: string) => {
     switch (method) {
-      case 'GET':
-        return 'bg-blue-100 text-blue-800';
-      case 'POST':
-        return 'bg-green-100 text-green-800';
-      case 'PUT':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'DELETE':
-        return 'bg-red-100 text-red-800';
-      case 'PATCH':
-        return 'bg-purple-100 text-purple-800';
+      case "GET":
+        return "bg-blue-100 text-blue-800";
+      case "POST":
+        return "bg-green-100 text-green-800";
+      case "PUT":
+        return "bg-yellow-100 text-yellow-800";
+      case "DELETE":
+        return "bg-red-100 text-red-800";
+      case "PATCH":
+        return "bg-purple-100 text-purple-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusColor = (status: number) => {
-    if (status >= 200 && status < 300) return 'text-green-600';
-    if (status >= 300 && status < 400) return 'text-yellow-600';
-    if (status >= 400 && status < 500) return 'text-orange-600';
-    return 'text-red-600';
+    if (status >= 200 && status < 300) return "text-green-600";
+    if (status >= 300 && status < 400) return "text-yellow-600";
+    if (status >= 400 && status < 500) return "text-orange-600";
+    return "text-red-600";
   };
 
   const getStatusIcon = (status: number) => {
-    if (status >= 200 && status < 300) return <CheckCircle className="h-4 w-4" />;
+    if (status >= 200 && status < 300)
+      return <CheckCircle className="h-4 w-4" />;
     if (status >= 400) return <AlertTriangle className="h-4 w-4" />;
     return <Clock className="h-4 w-4" />;
   };
@@ -148,10 +168,12 @@ export function ApiMonitoring() {
               variant="outline"
               size="sm"
               onClick={() => setAutoRefresh(!autoRefresh)}
-              className={autoRefresh ? 'bg-green-50 border-green-200' : ''}
+              className={autoRefresh ? "bg-green-50 border-green-200" : ""}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
-              Auto Refresh {autoRefresh ? 'ON' : 'OFF'}
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${autoRefresh ? "animate-spin" : ""}`}
+              />
+              Auto Refresh {autoRefresh ? "ON" : "OFF"}
             </Button>
             <Button variant="outline" size="sm" onClick={fetchMetrics}>
               <RefreshCw className="h-4 w-4 mr-2" />
@@ -168,7 +190,9 @@ export function ApiMonitoring() {
               <Activity className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Total Requests</span>
             </div>
-            <p className="text-2xl font-bold">{metrics.totalRequests.toLocaleString()}</p>
+            <p className="text-2xl font-bold">
+              {metrics.totalRequests.toLocaleString()}
+            </p>
           </div>
 
           <div className="p-4 bg-muted rounded-lg">
@@ -176,7 +200,9 @@ export function ApiMonitoring() {
               <Clock className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Avg Response Time</span>
             </div>
-            <p className="text-2xl font-bold">{formatResponseTime(metrics.avgResponseTime)}</p>
+            <p className="text-2xl font-bold">
+              {formatResponseTime(metrics.avgResponseTime)}
+            </p>
           </div>
 
           <div className="p-4 bg-muted rounded-lg">
@@ -184,7 +210,9 @@ export function ApiMonitoring() {
               <AlertTriangle className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">Error Rate</span>
             </div>
-            <p className="text-2xl font-bold text-red-600">{metrics.errorRate}%</p>
+            <p className="text-2xl font-bold text-red-600">
+              {metrics.errorRate}%
+            </p>
           </div>
 
           <div className="p-4 bg-muted rounded-lg">
@@ -201,18 +229,24 @@ export function ApiMonitoring() {
           <h4 className="font-semibold mb-4">Top Endpoints</h4>
           <div className="space-y-3">
             {metrics.topEndpoints.map((endpoint, index) => (
-              <div key={endpoint.endpoint} className="flex items-center justify-between p-3 border rounded-lg">
+              <div
+                key={endpoint.endpoint}
+                className="flex items-center justify-between p-3 border rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <Badge variant="outline">{index + 1}</Badge>
                   <div>
                     <p className="font-medium">{endpoint.endpoint}</p>
                     <p className="text-xs text-muted-foreground">
-                      {endpoint.count} requests • Avg: {formatResponseTime(endpoint.avgTime)}
+                      {endpoint.count} requests • Avg:{" "}
+                      {formatResponseTime(endpoint.avgTime)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold">{endpoint.count.toLocaleString()}</p>
+                  <p className="font-semibold">
+                    {endpoint.count.toLocaleString()}
+                  </p>
                   <p className="text-xs text-muted-foreground">requests</p>
                 </div>
               </div>
@@ -247,13 +281,23 @@ export function ApiMonitoring() {
                       {request.endpoint}
                     </TableCell>
                     <TableCell>
-                      <div className={`flex items-center gap-2 ${getStatusColor(request.status)}`}>
+                      <div
+                        className={`flex items-center gap-2 ${getStatusColor(request.status)}`}
+                      >
                         {getStatusIcon(request.status)}
                         <span className="font-semibold">{request.status}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className={request.responseTime > 1000 ? 'text-red-600' : request.responseTime > 500 ? 'text-yellow-600' : 'text-green-600'}>
+                      <span
+                        className={
+                          request.responseTime > 1000
+                            ? "text-red-600"
+                            : request.responseTime > 500
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                        }
+                      >
                         {formatResponseTime(request.responseTime)}
                       </span>
                     </TableCell>

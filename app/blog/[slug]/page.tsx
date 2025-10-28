@@ -1,19 +1,27 @@
-import { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar, Clock, User, ArrowLeft, Share2, Bookmark } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Calendar,
+  Clock,
+  User,
+  ArrowLeft,
+  Share2,
+  Bookmark,
+} from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 // This would typically come from your CMS or database
 const blogPosts = [
   {
-    id: '1',
-    title: 'Mastering JSON Formatting: Best Practices for Developers',
-    slug: 'mastering-json-formatting-best-practices',
-    excerpt: 'Learn the essential techniques and best practices for formatting, validating, and working with JSON data in your applications.',
+    id: "1",
+    title: "Mastering JSON Formatting: Best Practices for Developers",
+    slug: "mastering-json-formatting-best-practices",
+    excerpt:
+      "Learn the essential techniques and best practices for formatting, validating, and working with JSON data in your applications.",
     content: `# Mastering JSON Formatting: Best Practices for Developers
 
 JSON (JavaScript Object Notation) has become the de facto standard for data interchange in modern web applications. Whether you're building APIs, working with configuration files, or handling data storage, understanding JSON formatting best practices is crucial for any developer.
@@ -131,26 +139,35 @@ Integrate JSON formatting into your development workflow:
 
 Mastering JSON formatting is an essential skill for modern developers. By following these best practices, you'll create more maintainable, readable, and error-free JSON structures that will serve your applications well into the future.`,
     author: {
-      name: 'Sarah Johnson',
-      avatar: '/avatars/sarah.jpg'
+      name: "Sarah Johnson",
+      avatar: "/avatars/sarah.jpg",
     },
-    publishedAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-    tags: ['JSON', 'JavaScript', 'Best Practices', 'Development'],
+    publishedAt: "2024-01-15T10:00:00Z",
+    updatedAt: "2024-01-15T10:00:00Z",
+    tags: ["JSON", "JavaScript", "Best Practices", "Development"],
     readTime: 5,
     featured: true,
     seo: {
-      title: 'Mastering JSON Formatting: Best Practices for Developers | DevTools Hub',
-      description: 'Learn essential JSON formatting techniques, best practices, and tools for developers. Master JSON structure, validation, and formatting for better code quality.',
-      keywords: ['JSON formatting', 'JSON best practices', 'JavaScript', 'data interchange', 'API development'],
-      ogImage: '/blog/json-formatting-og.jpg'
-    }
+      title:
+        "Mastering JSON Formatting: Best Practices for Developers | DevTools Hub",
+      description:
+        "Learn essential JSON formatting techniques, best practices, and tools for developers. Master JSON structure, validation, and formatting for better code quality.",
+      keywords: [
+        "JSON formatting",
+        "JSON best practices",
+        "JavaScript",
+        "data interchange",
+        "API development",
+      ],
+      ogImage: "/blog/json-formatting-og.jpg",
+    },
   },
   {
-    id: '2',
-    title: 'The Complete Guide to JWT Authentication',
-    slug: 'complete-guide-jwt-authentication',
-    excerpt: 'Everything you need to know about JSON Web Tokens, from basic concepts to advanced security implementations.',
+    id: "2",
+    title: "The Complete Guide to JWT Authentication",
+    slug: "complete-guide-jwt-authentication",
+    excerpt:
+      "Everything you need to know about JSON Web Tokens, from basic concepts to advanced security implementations.",
     content: `# The Complete Guide to JWT Authentication
 
 JSON Web Tokens (JWT) have revolutionized authentication in modern web applications. This comprehensive guide covers everything from basic concepts to advanced security implementations.
@@ -199,26 +216,28 @@ Always verify JWT signatures on the server side before trusting the payload.
 
 JWT authentication, when implemented correctly, provides a robust and scalable solution for modern web applications.`,
     author: {
-      name: 'Mike Chen',
-      avatar: '/avatars/mike.jpg'
+      name: "Mike Chen",
+      avatar: "/avatars/mike.jpg",
     },
-    publishedAt: '2024-01-10T14:30:00Z',
-    updatedAt: '2024-01-10T14:30:00Z',
-    tags: ['JWT', 'Authentication', 'Security', 'API'],
+    publishedAt: "2024-01-10T14:30:00Z",
+    updatedAt: "2024-01-10T14:30:00Z",
+    tags: ["JWT", "Authentication", "Security", "API"],
     readTime: 8,
     featured: false,
     seo: {
-      title: 'Complete Guide to JWT Authentication | DevTools Hub',
-      description: 'Master JWT authentication with this comprehensive guide covering implementation, security best practices, and common pitfalls.',
-      keywords: ['JWT', 'authentication', 'security', 'tokens', 'API security'],
-      ogImage: '/blog/jwt-auth-og.jpg'
-    }
+      title: "Complete Guide to JWT Authentication | DevTools Hub",
+      description:
+        "Master JWT authentication with this comprehensive guide covering implementation, security best practices, and common pitfalls.",
+      keywords: ["JWT", "authentication", "security", "tokens", "API security"],
+      ogImage: "/blog/jwt-auth-og.jpg",
+    },
   },
   {
-    id: '3',
-    title: 'Regular Expressions: From Beginner to Expert',
-    slug: 'regular-expressions-beginner-to-expert',
-    excerpt: 'Master regular expressions with practical examples, advanced techniques, and real-world applications.',
+    id: "3",
+    title: "Regular Expressions: From Beginner to Expert",
+    slug: "regular-expressions-beginner-to-expert",
+    excerpt:
+      "Master regular expressions with practical examples, advanced techniques, and real-world applications.",
     content: `# Regular Expressions: From Beginner to Expert
 
 Regular expressions (regex) are powerful tools for pattern matching and text manipulation. This guide takes you from basic concepts to advanced techniques.
@@ -294,21 +313,33 @@ https?://(?:[-\\w.]|(?:%[\\da-fA-F]{2}))+
 
 Regular expressions are indispensable tools for text processing. With practice and the right techniques, you can solve complex text manipulation challenges efficiently.`,
     author: {
-      name: 'Alex Rodriguez',
-      avatar: '/avatars/alex.jpg'
+      name: "Alex Rodriguez",
+      avatar: "/avatars/alex.jpg",
     },
-    publishedAt: '2024-01-05T09:15:00Z',
-    updatedAt: '2024-01-05T09:15:00Z',
-    tags: ['Regex', 'Regular Expressions', 'Pattern Matching', 'Text Processing'],
+    publishedAt: "2024-01-05T09:15:00Z",
+    updatedAt: "2024-01-05T09:15:00Z",
+    tags: [
+      "Regex",
+      "Regular Expressions",
+      "Pattern Matching",
+      "Text Processing",
+    ],
     readTime: 12,
     featured: false,
     seo: {
-      title: 'Regular Expressions: From Beginner to Expert | DevTools Hub',
-      description: 'Master regular expressions with practical examples and advanced techniques for pattern matching and text processing.',
-      keywords: ['regular expressions', 'regex', 'pattern matching', 'text processing', 'programming'],
-      ogImage: '/blog/regex-guide-og.jpg'
-    }
-  }
+      title: "Regular Expressions: From Beginner to Expert | DevTools Hub",
+      description:
+        "Master regular expressions with practical examples and advanced techniques for pattern matching and text processing.",
+      keywords: [
+        "regular expressions",
+        "regex",
+        "pattern matching",
+        "text processing",
+        "programming",
+      ],
+      ogImage: "/blog/regex-guide-og.jpg",
+    },
+  },
 ];
 
 interface Props {
@@ -318,11 +349,11 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = blogPosts.find(p => p.slug === params.slug);
+  const post = blogPosts.find((p) => p.slug === params.slug);
 
   if (!post) {
     return {
-      title: 'Post Not Found | DevTools Hub Blog'
+      title: "Post Not Found | DevTools Hub Blog",
     };
   }
 
@@ -333,9 +364,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: post.seo.title,
       description: post.seo.description,
-      type: 'article',
+      type: "article",
       url: `/blog/${post.slug}`,
-      siteName: 'DevTools Hub',
+      siteName: "DevTools Hub",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: [post.author.name],
@@ -350,7 +381,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: post.seo.title,
       description: post.seo.description,
       images: [post.seo.ogImage],
@@ -364,26 +395,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       googleBot: {
         index: true,
         follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
       },
     },
   };
 }
 
 export default function BlogPostPage({ params }: Props) {
-  const post = blogPosts.find(p => p.slug === params.slug);
+  const post = blogPosts.find((p) => p.slug === params.slug);
 
   if (!post) {
     notFound();
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -396,30 +427,30 @@ export default function BlogPostPage({ params }: Props) {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            "headline": post.title,
-            "description": post.excerpt,
-            "author": {
+            headline: post.title,
+            description: post.excerpt,
+            author: {
               "@type": "Person",
-              "name": post.author.name
+              name: post.author.name,
             },
-            "publisher": {
+            publisher: {
               "@type": "Organization",
-              "name": "DevTools Hub",
-              "logo": {
+              name: "DevTools Hub",
+              logo: {
                 "@type": "ImageObject",
-                "url": "https://devtoolshub.com/logo.png"
-              }
+                url: "https://devtoolshub.com/logo.png",
+              },
             },
-            "datePublished": post.publishedAt,
-            "dateModified": post.updatedAt,
-            "mainEntityOfPage": {
+            datePublished: post.publishedAt,
+            dateModified: post.updatedAt,
+            mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://devtoolshub.com/blog/${post.slug}`
+              "@id": `https://devtoolshub.com/blog/${post.slug}`,
             },
-            "keywords": post.tags.join(", "),
-            "articleSection": post.tags[0],
-            "image": post.seo.ogImage
-          })
+            keywords: post.tags.join(", "),
+            articleSection: post.tags[0],
+            image: post.seo.ogImage,
+          }),
         }}
       />
 
@@ -453,9 +484,7 @@ export default function BlogPostPage({ params }: Props) {
           {post.title}
         </h1>
 
-        <p className="text-xl text-muted-foreground mb-6">
-          {post.excerpt}
-        </p>
+        <p className="text-xl text-muted-foreground mb-6">{post.excerpt}</p>
 
         {/* Author Info */}
         <div className="flex items-center justify-between">
@@ -485,7 +514,10 @@ export default function BlogPostPage({ params }: Props) {
         <div className="flex flex-wrap gap-2 mt-6">
           {post.tags.map((tag) => (
             <Link key={tag} href={`/blog?tag=${tag.toLowerCase()}`}>
-              <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors">
+              <Badge
+                variant="outline"
+                className="hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
                 {tag}
               </Badge>
             </Link>
@@ -497,12 +529,24 @@ export default function BlogPostPage({ params }: Props) {
       <article className="prose prose-lg max-w-none dark:prose-invert">
         <ReactMarkdown
           components={{
-            h1: ({ children }) => <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>,
-            h2: ({ children }) => <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>,
-            h3: ({ children }) => <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>,
-            p: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
-            ul: ({ children }) => <ul className="mb-4 ml-6 list-disc">{children}</ul>,
-            ol: ({ children }) => <ol className="mb-4 ml-6 list-decimal">{children}</ol>,
+            h1: ({ children }) => (
+              <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>
+            ),
+            h2: ({ children }) => (
+              <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>
+            ),
+            h3: ({ children }) => (
+              <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>
+            ),
+            p: ({ children }) => (
+              <p className="mb-4 leading-relaxed">{children}</p>
+            ),
+            ul: ({ children }) => (
+              <ul className="mb-4 ml-6 list-disc">{children}</ul>
+            ),
+            ol: ({ children }) => (
+              <ol className="mb-4 ml-6 list-decimal">{children}</ol>
+            ),
             li: ({ children }) => <li className="mb-2">{children}</li>,
             blockquote: ({ children }) => (
               <blockquote className="border-l-4 border-primary pl-4 italic my-4">
@@ -545,10 +589,13 @@ export default function BlogPostPage({ params }: Props) {
         <h3 className="text-2xl font-bold mb-6">Related Articles</h3>
         <div className="grid md:grid-cols-2 gap-6">
           {blogPosts
-            .filter(p => p.id !== post.id)
+            .filter((p) => p.id !== post.id)
             .slice(0, 2)
             .map((relatedPost) => (
-              <Card key={relatedPost.id} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={relatedPost.id}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardContent className="p-6">
                   <Link href={`/blog/${relatedPost.slug}`}>
                     <h4 className="font-semibold mb-2 hover:text-primary transition-colors">

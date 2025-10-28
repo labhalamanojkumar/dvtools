@@ -1,57 +1,59 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
-import { Card, CardContent } from '../ui/card';
-import { copyToClipboard, downloadFile } from '../../lib/utils';
-import { useToast } from '../ui/toaster';
-import { 
-  Copy, 
-  Download, 
-  CheckCircle2, 
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Card, CardContent } from "../ui/card";
+import { copyToClipboard, downloadFile } from "../../lib/utils";
+import { useToast } from "../ui/toaster";
+import {
+  Copy,
+  Download,
+  CheckCircle2,
   AlertCircle,
   Minimize2,
-  Maximize2
-} from 'lucide-react';
-import Ajv from 'ajv';
-import addFormats from 'ajv-formats';
+  Maximize2,
+} from "lucide-react";
+import Ajv from "ajv";
+import addFormats from "ajv-formats";
 
 const ajv = new Ajv({ allErrors: true, verbose: true });
 addFormats(ajv);
 
 export function JsonFormatterClient() {
-  const [input, setInput] = useState('');
-  const [output, setOutput] = useState('');
-  const [error, setError] = useState('');
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const { toast } = useToast();
 
   const formatJson = (minify = false) => {
     try {
       const parsed = JSON.parse(input);
-      const formatted = minify 
+      const formatted = minify
         ? JSON.stringify(parsed)
         : JSON.stringify(parsed, null, 2);
-      
+
       setOutput(formatted);
-      setError('');
+      setError("");
       setIsValid(true);
-      
+
       toast({
-        title: 'Success',
-        description: minify ? 'JSON minified successfully' : 'JSON formatted successfully',
+        title: "Success",
+        description: minify
+          ? "JSON minified successfully"
+          : "JSON formatted successfully",
       });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Invalid JSON';
+      const errorMessage = err instanceof Error ? err.message : "Invalid JSON";
       setError(errorMessage);
-      setOutput('');
+      setOutput("");
       setIsValid(false);
-      
+
       toast({
-        title: 'Error',
+        title: "Error",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
     }
   };
@@ -59,16 +61,16 @@ export function JsonFormatterClient() {
   const handleCopy = async () => {
     await copyToClipboard(output);
     toast({
-      title: 'Copied',
-      description: 'JSON copied to clipboard',
+      title: "Copied",
+      description: "JSON copied to clipboard",
     });
   };
 
   const handleDownload = () => {
-    downloadFile(output, 'formatted.json', 'application/json');
+    downloadFile(output, "formatted.json", "application/json");
     toast({
-      title: 'Downloaded',
-      description: 'JSON file downloaded',
+      title: "Downloaded",
+      description: "JSON file downloaded",
     });
   };
 
@@ -96,14 +98,14 @@ export function JsonFormatterClient() {
                 </div>
               )}
             </div>
-            
+
             <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder='{"name": "John", "age": 30}'
               className="code-editor min-h-[400px]"
             />
-            
+
             <div className="mt-4 flex flex-wrap gap-2">
               <Button onClick={() => formatJson(false)}>
                 <Maximize2 className="mr-2 h-4 w-4" />
@@ -133,7 +135,7 @@ export function JsonFormatterClient() {
                 </div>
               )}
             </div>
-            
+
             {error ? (
               <div className="rounded-md border border-destructive bg-destructive/10 p-4">
                 <p className="text-sm text-destructive">{error}</p>
@@ -161,14 +163,20 @@ export function JsonFormatterClient() {
             <Button
               variant="outline"
               className="justify-start text-left"
-              onClick={() => setInput('{"name":"John Doe","age":30,"city":"New York","isActive":true}')}
+              onClick={() =>
+                setInput(
+                  '{"name":"John Doe","age":30,"city":"New York","isActive":true}',
+                )
+              }
             >
               Simple Object
             </Button>
             <Button
               variant="outline"
               className="justify-start text-left"
-              onClick={() => setInput('[{"id":1,"name":"Item 1"},{"id":2,"name":"Item 2"}]')}
+              onClick={() =>
+                setInput('[{"id":1,"name":"Item 1"},{"id":2,"name":"Item 2"}]')
+              }
             >
               Array of Objects
             </Button>

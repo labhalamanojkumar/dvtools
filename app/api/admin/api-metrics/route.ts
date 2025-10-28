@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
 
 export async function GET() {
   try {
@@ -7,7 +7,7 @@ export async function GET() {
     const recentSessions = await prisma.toolSession.findMany({
       take: 20,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       include: {
         user: {
@@ -42,7 +42,7 @@ export async function GET() {
 
     // Top endpoints (tools)
     const topTools = await prisma.toolSession.groupBy({
-      by: ['toolType'],
+      by: ["toolType"],
       _count: {
         toolType: true,
       },
@@ -51,28 +51,28 @@ export async function GET() {
       },
       orderBy: {
         _count: {
-          toolType: 'desc',
+          toolType: "desc",
         },
       },
       take: 5,
     });
 
-    const topEndpoints = topTools.map(tool => ({
-      endpoint: `/api/tools/${tool.toolType.toLowerCase().replace('_', '-')}`,
+    const topEndpoints = topTools.map((tool) => ({
+      endpoint: `/api/tools/${tool.toolType.toLowerCase().replace("_", "-")}`,
       count: tool._count.toolType,
       avgTime: Math.round(tool._avg.duration || 0),
     }));
 
     // Recent requests
-    const recentRequests = recentSessions.map(session => ({
+    const recentRequests = recentSessions.map((session) => ({
       id: session.id,
-      method: 'POST' as const,
-      endpoint: `/api/tools/${session.toolType.toLowerCase().replace('_', '-')}`,
+      method: "POST" as const,
+      endpoint: `/api/tools/${session.toolType.toLowerCase().replace("_", "-")}`,
       status: session.success ? 200 : 500,
       responseTime: session.duration || 100,
       timestamp: session.createdAt.toISOString(),
-      userAgent: session.userAgent || 'Unknown',
-      ip: session.ipAddress || 'Unknown',
+      userAgent: session.userAgent || "Unknown",
+      ip: session.ipAddress || "Unknown",
     }));
 
     const metrics = {
@@ -86,10 +86,10 @@ export async function GET() {
 
     return NextResponse.json(metrics);
   } catch (error) {
-    console.error('Error fetching API metrics:', error);
+    console.error("Error fetching API metrics:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch API metrics' },
-      { status: 500 }
+      { error: "Failed to fetch API metrics" },
+      { status: 500 },
     );
   }
 }

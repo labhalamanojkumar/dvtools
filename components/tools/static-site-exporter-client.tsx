@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Download,
   FileText,
@@ -22,12 +28,12 @@ import {
   AlertTriangle,
   FolderOpen,
   Globe,
-  Package
-} from 'lucide-react';
-import { useToast } from '@/components/ui/toaster';
+  Package,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
 
 interface ExportOptions {
-  format: 'html' | 'zip' | 'single-file';
+  format: "html" | "zip" | "single-file";
   includeAssets: boolean;
   minify: boolean;
   base64Images: boolean;
@@ -172,13 +178,13 @@ const sampleHTML = `<!DOCTYPE html>
 export default function StaticSiteExporterClient() {
   const [html, setHtml] = useState(sampleHTML);
   const [options, setOptions] = useState<ExportOptions>({
-    format: 'single-file',
+    format: "single-file",
     includeAssets: true,
     minify: false,
     base64Images: true,
     removeScripts: false,
-    customCSS: '',
-    title: 'Exported Site'
+    customCSS: "",
+    title: "Exported Site",
   });
   const [result, setResult] = useState<ExportResult | null>(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -190,7 +196,7 @@ export default function StaticSiteExporterClient() {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (!file.name.toLowerCase().endsWith('.html')) {
+    if (!file.name.toLowerCase().endsWith(".html")) {
       toast({
         title: "Invalid file type",
         description: "Please select an HTML file",
@@ -213,34 +219,36 @@ export default function StaticSiteExporterClient() {
 
   const minifyHTML = (html: string): string => {
     return html
-      .replace(/\s+/g, ' ')
-      .replace(/>\s+</g, '><')
-      .replace(/\s*=\s*/g, '=')
+      .replace(/\s+/g, " ")
+      .replace(/>\s+</g, "><")
+      .replace(/\s*=\s*/g, "=")
       .trim();
   };
 
   const minifyCSS = (css: string): string => {
     return css
-      .replace(/\/\*[\s\S]*?\*\//g, '')
-      .replace(/\s+/g, ' ')
-      .replace(/;\s*}/g, '}')
-      .replace(/{\s*/g, '{')
-      .replace(/;\s*/g, ';')
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\s+/g, " ")
+      .replace(/;\s*}/g, "}")
+      .replace(/{\s*/g, "{")
+      .replace(/;\s*/g, ";")
       .trim();
   };
 
-  const extractAssets = (html: string): Array<{ name: string; content: string; type: string }> => {
+  const extractAssets = (
+    html: string,
+  ): Array<{ name: string; content: string; type: string }> => {
     const assets: Array<{ name: string; content: string; type: string }> = [];
 
     // Extract CSS from style tags
     const styleMatches = html.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
     if (styleMatches) {
       styleMatches.forEach((match, index) => {
-        const css = match.replace(/<\/?style[^>]*>/gi, '');
+        const css = match.replace(/<\/?style[^>]*>/gi, "");
         assets.push({
           name: `style-${index + 1}.css`,
           content: options.minify ? minifyCSS(css) : css,
-          type: 'text/css'
+          type: "text/css",
         });
       });
     }
@@ -250,11 +258,11 @@ export default function StaticSiteExporterClient() {
       const scriptMatches = html.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
       if (scriptMatches) {
         scriptMatches.forEach((match, index) => {
-          const js = match.replace(/<\/?script[^>]*>/gi, '');
+          const js = match.replace(/<\/?script[^>]*>/gi, "");
           assets.push({
             name: `script-${index + 1}.js`,
             content: js,
-            type: 'application/javascript'
+            type: "application/javascript",
           });
         });
       }
@@ -267,18 +275,26 @@ export default function StaticSiteExporterClient() {
     let processedHTML = html;
 
     // Extract and inline CSS
-    const styleMatches = processedHTML.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
+    const styleMatches = processedHTML.match(
+      /<style[^>]*>([\s\S]*?)<\/style>/gi,
+    );
     if (styleMatches) {
-      styleMatches.forEach(match => {
-        const css = match.replace(/<\/?style[^>]*>/gi, '');
+      styleMatches.forEach((match) => {
+        const css = match.replace(/<\/?style[^>]*>/gi, "");
         const minifiedCSS = options.minify ? minifyCSS(css) : css;
-        processedHTML = processedHTML.replace(match, `<style>${minifiedCSS}</style>`);
+        processedHTML = processedHTML.replace(
+          match,
+          `<style>${minifiedCSS}</style>`,
+        );
       });
     }
 
     // Remove scripts if requested
     if (options.removeScripts) {
-      processedHTML = processedHTML.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+      processedHTML = processedHTML.replace(
+        /<script[^>]*>[\s\S]*?<\/script>/gi,
+        "",
+      );
     }
 
     // Add custom CSS if provided
@@ -286,13 +302,19 @@ export default function StaticSiteExporterClient() {
       const headEndMatch = processedHTML.match(/<\/head>/i);
       if (headEndMatch) {
         const customStyleTag = `<style>${options.customCSS}</style>`;
-        processedHTML = processedHTML.replace(headEndMatch[0], customStyleTag + headEndMatch[0]);
+        processedHTML = processedHTML.replace(
+          headEndMatch[0],
+          customStyleTag + headEndMatch[0],
+        );
       }
     }
 
     // Update title if provided
     if (options.title.trim()) {
-      processedHTML = processedHTML.replace(/<title[^>]*>[\s\S]*?<\/title>/i, `<title>${options.title}</title>`);
+      processedHTML = processedHTML.replace(
+        /<title[^>]*>[\s\S]*?<\/title>/i,
+        `<title>${options.title}</title>`,
+      );
     }
 
     // Minify HTML if requested
@@ -308,26 +330,26 @@ export default function StaticSiteExporterClient() {
     const files: Array<{ name: string; size: number; type: string }> = [];
 
     if (!html.trim()) {
-      throw new Error('No HTML content provided');
+      throw new Error("No HTML content provided");
     }
 
     let processedHTML = html;
 
     // Process based on format
-    if (options.format === 'single-file') {
+    if (options.format === "single-file") {
       processedHTML = createSingleFileHTML(html);
-      const blob = new Blob([processedHTML], { type: 'text/html' });
+      const blob = new Blob([processedHTML], { type: "text/html" });
       files.push({
-        name: 'index.html',
+        name: "index.html",
         size: blob.size,
-        type: 'text/html'
+        type: "text/html",
       });
 
       return {
         files,
         totalSize: blob.size,
         downloadUrl: URL.createObjectURL(blob),
-        warnings
+        warnings,
       };
     }
 
@@ -336,20 +358,20 @@ export default function StaticSiteExporterClient() {
     processedHTML = createSingleFileHTML(html);
 
     // Create index.html
-    const indexBlob = new Blob([processedHTML], { type: 'text/html' });
+    const indexBlob = new Blob([processedHTML], { type: "text/html" });
     files.push({
-      name: 'index.html',
+      name: "index.html",
       size: indexBlob.size,
-      type: 'text/html'
+      type: "text/html",
     });
 
     // Add asset files
-    assets.forEach(asset => {
+    assets.forEach((asset) => {
       const blob = new Blob([asset.content], { type: asset.type });
       files.push({
         name: asset.name,
         size: blob.size,
-        type: asset.type
+        type: asset.type,
       });
     });
 
@@ -359,16 +381,16 @@ export default function StaticSiteExporterClient() {
     // For demo purposes, we'll create a single file
     const allContent = [
       processedHTML,
-      ...assets.map(asset => `/* ${asset.name} */\n${asset.content}`)
-    ].join('\n\n---\n\n');
+      ...assets.map((asset) => `/* ${asset.name} */\n${asset.content}`),
+    ].join("\n\n---\n\n");
 
-    const zipBlob = new Blob([allContent], { type: 'application/zip' });
+    const zipBlob = new Blob([allContent], { type: "application/zip" });
 
     return {
       files,
       totalSize,
       downloadUrl: URL.createObjectURL(zipBlob),
-      warnings
+      warnings,
     };
   };
 
@@ -388,7 +410,7 @@ export default function StaticSiteExporterClient() {
     try {
       // Simulate progress
       const progressInterval = setInterval(() => {
-        setProgress(prev => {
+        setProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return prev;
@@ -410,7 +432,8 @@ export default function StaticSiteExporterClient() {
     } catch (error) {
       toast({
         title: "Export failed",
-        description: error instanceof Error ? error.message : "Failed to export site",
+        description:
+          error instanceof Error ? error.message : "Failed to export site",
         variant: "destructive",
       });
     } finally {
@@ -422,9 +445,9 @@ export default function StaticSiteExporterClient() {
   const downloadFile = () => {
     if (!result?.downloadUrl) return;
 
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = result.downloadUrl;
-    link.download = options.format === 'zip' ? 'static-site.zip' : 'index.html';
+    link.download = options.format === "zip" ? "static-site.zip" : "index.html";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -436,11 +459,11 @@ export default function StaticSiteExporterClient() {
   };
 
   const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 B';
+    if (bytes === 0) return "0 B";
     const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const sizes = ["B", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
   return (
@@ -497,7 +520,12 @@ export default function StaticSiteExporterClient() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="format">Export Format</Label>
-              <Select value={options.format} onValueChange={(value) => setOptions(prev => ({ ...prev, format: value as any }))}>
+              <Select
+                value={options.format}
+                onValueChange={(value) =>
+                  setOptions((prev) => ({ ...prev, format: value as any }))
+                }
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -514,7 +542,9 @@ export default function StaticSiteExporterClient() {
                 id="title"
                 placeholder="Exported Site"
                 value={options.title}
-                onChange={(e) => setOptions(prev => ({ ...prev, title: e.target.value }))}
+                onChange={(e) =>
+                  setOptions((prev) => ({ ...prev, title: e.target.value }))
+                }
               />
             </div>
 
@@ -523,7 +553,9 @@ export default function StaticSiteExporterClient() {
                 type="checkbox"
                 id="minify"
                 checked={options.minify}
-                onChange={(e) => setOptions(prev => ({ ...prev, minify: e.target.checked }))}
+                onChange={(e) =>
+                  setOptions((prev) => ({ ...prev, minify: e.target.checked }))
+                }
                 className="rounded"
               />
               <Label htmlFor="minify">Minify HTML/CSS</Label>
@@ -534,7 +566,12 @@ export default function StaticSiteExporterClient() {
                 type="checkbox"
                 id="include-assets"
                 checked={options.includeAssets}
-                onChange={(e) => setOptions(prev => ({ ...prev, includeAssets: e.target.checked }))}
+                onChange={(e) =>
+                  setOptions((prev) => ({
+                    ...prev,
+                    includeAssets: e.target.checked,
+                  }))
+                }
                 className="rounded"
               />
               <Label htmlFor="include-assets">Extract Assets</Label>
@@ -545,7 +582,12 @@ export default function StaticSiteExporterClient() {
                 type="checkbox"
                 id="base64-images"
                 checked={options.base64Images}
-                onChange={(e) => setOptions(prev => ({ ...prev, base64Images: e.target.checked }))}
+                onChange={(e) =>
+                  setOptions((prev) => ({
+                    ...prev,
+                    base64Images: e.target.checked,
+                  }))
+                }
                 className="rounded"
               />
               <Label htmlFor="base64-images">Base64 Images</Label>
@@ -556,7 +598,12 @@ export default function StaticSiteExporterClient() {
                 type="checkbox"
                 id="remove-scripts"
                 checked={options.removeScripts}
-                onChange={(e) => setOptions(prev => ({ ...prev, removeScripts: e.target.checked }))}
+                onChange={(e) =>
+                  setOptions((prev) => ({
+                    ...prev,
+                    removeScripts: e.target.checked,
+                  }))
+                }
                 className="rounded"
               />
               <Label htmlFor="remove-scripts">Remove Scripts</Label>
@@ -569,7 +616,9 @@ export default function StaticSiteExporterClient() {
               id="custom-css"
               placeholder="Add custom CSS that will be injected into the exported site..."
               value={options.customCSS}
-              onChange={(e) => setOptions(prev => ({ ...prev, customCSS: e.target.value }))}
+              onChange={(e) =>
+                setOptions((prev) => ({ ...prev, customCSS: e.target.value }))
+              }
               className="min-h-[100px] font-mono text-sm"
             />
           </div>
@@ -615,7 +664,7 @@ export default function StaticSiteExporterClient() {
               </span>
               <Button onClick={downloadFile}>
                 <Download className="mr-2 h-4 w-4" />
-                Download {options.format === 'zip' ? 'ZIP' : 'HTML'}
+                Download {options.format === "zip" ? "ZIP" : "HTML"}
               </Button>
             </CardTitle>
           </CardHeader>
@@ -623,14 +672,20 @@ export default function StaticSiteExporterClient() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="text-center">
                 <div className="text-2xl font-bold">{result.files.length}</div>
-                <div className="text-sm text-muted-foreground">Files Generated</div>
+                <div className="text-sm text-muted-foreground">
+                  Files Generated
+                </div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{formatBytes(result.totalSize)}</div>
+                <div className="text-2xl font-bold">
+                  {formatBytes(result.totalSize)}
+                </div>
                 <div className="text-sm text-muted-foreground">Total Size</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold">{result.warnings.length}</div>
+                <div className="text-2xl font-bold">
+                  {result.warnings.length}
+                </div>
                 <div className="text-sm text-muted-foreground">Warnings</div>
               </div>
             </div>
@@ -640,13 +695,18 @@ export default function StaticSiteExporterClient() {
               <ScrollArea className="h-[200px] w-full">
                 <div className="space-y-2">
                   {result.files.map((file, index) => (
-                    <div key={index} className="flex items-center justify-between p-2 border rounded">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-2 border rounded"
+                    >
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
                         <span className="font-medium">{file.name}</span>
                         <Badge variant="outline">{file.type}</Badge>
                       </div>
-                      <span className="text-sm text-muted-foreground">{formatBytes(file.size)}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {formatBytes(file.size)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -658,7 +718,10 @@ export default function StaticSiteExporterClient() {
                 <h4 className="font-semibold mb-3 text-yellow-600">Warnings</h4>
                 <div className="space-y-2">
                   {result.warnings.map((warning, index) => (
-                    <div key={index} className="flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                    <div
+                      key={index}
+                      className="flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded"
+                    >
                       <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5" />
                       <span className="text-sm text-yellow-800">{warning}</span>
                     </div>

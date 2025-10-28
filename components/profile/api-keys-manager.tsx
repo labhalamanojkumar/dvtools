@@ -1,14 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useToast } from '@/components/ui/toaster';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/toaster";
 import {
   Key,
   Plus,
@@ -18,8 +24,8 @@ import {
   EyeOff,
   AlertTriangle,
   CheckCircle,
-  Loader2
-} from 'lucide-react';
+  Loader2,
+} from "lucide-react";
 
 interface ApiKey {
   id: string;
@@ -32,7 +38,7 @@ interface ApiKey {
 
 export default function ApiKeysManager() {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const [newKeyName, setNewKeyName] = useState('');
+  const [newKeyName, setNewKeyName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set());
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -47,23 +53,23 @@ export default function ApiKeysManager() {
 
   const fetchApiKeys = async () => {
     try {
-      const response = await fetch('/api/api-keys');
+      const response = await fetch("/api/api-keys");
       if (response.ok) {
         const data = await response.json();
         setApiKeys(data.apiKeys || []);
       } else {
         toast({
-          title: 'Error',
-          description: 'Failed to load API keys',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to load API keys",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error fetching API keys:', error);
+      console.error("Error fetching API keys:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to load API keys',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to load API keys",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -75,10 +81,10 @@ export default function ApiKeysManager() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch('/api/api-keys', {
-        method: 'POST',
+      const response = await fetch("/api/api-keys", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: newKeyName.trim() }),
       });
@@ -86,27 +92,27 @@ export default function ApiKeysManager() {
       if (response.ok) {
         const data = await response.json();
         // Add the new key to the list (it will be masked)
-        setApiKeys(prev => [data.apiKey, ...prev]);
-        setNewKeyName('');
+        setApiKeys((prev) => [data.apiKey, ...prev]);
+        setNewKeyName("");
         setIsCreating(false);
         toast({
-          title: 'Success',
+          title: "Success",
           description: data.message,
         });
       } else {
         const error = await response.json();
         toast({
-          title: 'Error',
-          description: error.error || 'Failed to create API key',
-          variant: 'destructive',
+          title: "Error",
+          description: error.error || "Failed to create API key",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error creating API key:', error);
+      console.error("Error creating API key:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to create API key',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to create API key",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -116,35 +122,35 @@ export default function ApiKeysManager() {
   const handleDeleteKey = async (keyId: string) => {
     try {
       const response = await fetch(`/api/api-keys/${keyId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setApiKeys(prev => prev.filter(key => key.id !== keyId));
+        setApiKeys((prev) => prev.filter((key) => key.id !== keyId));
         toast({
-          title: 'Success',
-          description: 'API key revoked successfully',
+          title: "Success",
+          description: "API key revoked successfully",
         });
       } else {
         const error = await response.json();
         toast({
-          title: 'Error',
-          description: error.error || 'Failed to revoke API key',
-          variant: 'destructive',
+          title: "Error",
+          description: error.error || "Failed to revoke API key",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error revoking API key:', error);
+      console.error("Error revoking API key:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to revoke API key',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to revoke API key",
+        variant: "destructive",
       });
     }
   };
 
   const toggleKeyVisibility = (keyId: string) => {
-    setVisibleKeys(prev => {
+    setVisibleKeys((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(keyId)) {
         newSet.delete(keyId);
@@ -160,22 +166,22 @@ export default function ApiKeysManager() {
       await navigator.clipboard.writeText(key);
       setCopiedKey(keyId);
       toast({
-        title: 'Copied',
-        description: 'API key copied to clipboard',
+        title: "Copied",
+        description: "API key copied to clipboard",
       });
       setTimeout(() => setCopiedKey(null), 2000);
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      console.error("Failed to copy to clipboard:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to copy to clipboard',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        variant: "destructive",
       });
     }
   };
 
   const maskApiKey = (key: string) => {
-    return `${key.substring(0, 8)}${'•'.repeat(key.length - 16)}${key.substring(key.length - 8)}`;
+    return `${key.substring(0, 8)}${"•".repeat(key.length - 16)}${key.substring(key.length - 8)}`;
   };
 
   if (isLoading) {
@@ -221,14 +227,21 @@ export default function ApiKeysManager() {
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    Make sure to copy your API key now. You won&apos;t be able to see it again!
+                    Make sure to copy your API key now. You won&apos;t be able
+                    to see it again!
                   </AlertDescription>
                 </Alert>
                 <div className="flex gap-3">
-                  <Button onClick={handleCreateKey} disabled={!newKeyName.trim()}>
+                  <Button
+                    onClick={handleCreateKey}
+                    disabled={!newKeyName.trim()}
+                  >
                     Create Key
                   </Button>
-                  <Button variant="outline" onClick={() => setIsCreating(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsCreating(false)}
+                  >
                     Cancel
                   </Button>
                 </div>
@@ -259,7 +272,9 @@ export default function ApiKeysManager() {
                     <h4 className="font-medium">{apiKey.name}</h4>
                     <p className="text-sm text-muted-foreground">
                       Created {apiKey.createdAt}
-                      {apiKey.lastUsedAt ? ` • Last used ${apiKey.lastUsedAt}` : ''}
+                      {apiKey.lastUsedAt
+                        ? ` • Last used ${apiKey.lastUsedAt}`
+                        : ""}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -273,7 +288,9 @@ export default function ApiKeysManager() {
 
                 <div className="flex items-center gap-2 mb-3">
                   <div className="flex-1 font-mono text-sm bg-muted p-2 rounded">
-                    {visibleKeys.has(apiKey.id) ? apiKey.key : maskApiKey(apiKey.key)}
+                    {visibleKeys.has(apiKey.id)
+                      ? apiKey.key
+                      : maskApiKey(apiKey.key)}
                   </div>
                   <Button
                     variant="outline"
@@ -315,7 +332,9 @@ export default function ApiKeysManager() {
           <h4 className="font-medium mb-2">API Key Security</h4>
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Keep your API keys secure and never share them publicly</li>
-            <li>• Regenerate keys if you suspect they&apos;ve been compromised</li>
+            <li>
+              • Regenerate keys if you suspect they&apos;ve been compromised
+            </li>
             <li>• Use different keys for development and production</li>
             <li>• Monitor your API usage regularly</li>
           </ul>

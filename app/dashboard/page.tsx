@@ -1,11 +1,11 @@
-import { Metadata } from 'next';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import { redirect } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Metadata } from "next";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
   BarChart3,
   Zap,
@@ -14,29 +14,31 @@ import {
   Settings,
   Key,
   Users,
-  Activity
-} from 'lucide-react';
-import Link from 'next/link';
-import UsageStats from '@/components/dashboard/usage-stats';
-import RecentActivity from '@/components/dashboard/recent-activity';
-import QuickActions from '@/components/dashboard/quick-actions';
+  Activity,
+} from "lucide-react";
+import Link from "next/link";
+import UsageStats from "@/components/dashboard/usage-stats";
+import RecentActivity from "@/components/dashboard/recent-activity";
+import QuickActions from "@/components/dashboard/quick-actions";
 
 export const metadata: Metadata = {
-  title: 'Dashboard | DevTools Hub - Your Developer Workspace',
-  description: 'Access your personal dashboard, track usage, manage API keys, and monitor your development activities.',
+  title: "Dashboard | DevTools Hub - Your Developer Workspace",
+  description:
+    "Access your personal dashboard, track usage, manage API keys, and monitor your development activities.",
   keywords: [
-    'dashboard',
-    'developer tools',
-    'usage analytics',
-    'API keys',
-    'activity tracking'
+    "dashboard",
+    "developer tools",
+    "usage analytics",
+    "API keys",
+    "activity tracking",
   ],
   openGraph: {
-    title: 'Dashboard | DevTools Hub - Your Developer Workspace',
-    description: 'Access your personal dashboard and manage your development activities.',
-    type: 'website',
-    url: '/dashboard',
-    siteName: 'DevTools Hub',
+    title: "Dashboard | DevTools Hub - Your Developer Workspace",
+    description:
+      "Access your personal dashboard and manage your development activities.",
+    type: "website",
+    url: "/dashboard",
+    siteName: "DevTools Hub",
   },
   robots: {
     index: false,
@@ -48,39 +50,49 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    redirect('/auth/signin');
+    redirect("/auth/signin");
   }
 
-  const isAdmin = session.user.role === 'ADMIN' || session.user.role === 'SUPERADMIN';
+  const isAdmin =
+    session.user.role === "ADMIN" || session.user.role === "SUPERADMIN";
 
   // Mock data - in a real app, this would come from your database
-  const userStats = isAdmin ? {
-    totalApiCalls: 9999,
-    monthlyLimit: -1, // unlimited
-    storageUsed: 0.2,
-    storageLimit: -1, // unlimited
-    toolsUsed: 8,
-    lastActivity: new Date().toISOString(),
-  } : {
-    totalApiCalls: 145,
-    monthlyLimit: 300,
-    storageUsed: 0.2,
-    storageLimit: 1,
-    toolsUsed: 8,
-    lastActivity: new Date().toISOString(),
-  };
+  const userStats = isAdmin
+    ? {
+        totalApiCalls: 9999,
+        monthlyLimit: -1, // unlimited
+        storageUsed: 0.2,
+        storageLimit: -1, // unlimited
+        toolsUsed: 8,
+        lastActivity: new Date().toISOString(),
+      }
+    : {
+        totalApiCalls: 145,
+        monthlyLimit: 300,
+        storageUsed: 0.2,
+        storageLimit: 1,
+        toolsUsed: 8,
+        lastActivity: new Date().toISOString(),
+      };
 
-  const usagePercentage = isAdmin ? 0 : (userStats.totalApiCalls / userStats.monthlyLimit) * 100;
-  const storagePercentage = isAdmin ? 0 : (userStats.storageUsed / userStats.storageLimit) * 100;
+  const usagePercentage = isAdmin
+    ? 0
+    : (userStats.totalApiCalls / userStats.monthlyLimit) * 100;
+  const storagePercentage = isAdmin
+    ? 0
+    : (userStats.storageUsed / userStats.storageLimit) * 100;
 
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Welcome back, {session.user.name}!</h1>
+        <h1 className="text-3xl font-bold mb-2">
+          Welcome back, {session.user.name}!
+        </h1>
         <p className="text-muted-foreground">
-        Here&apos;s an overview of your development activities and usage statistics.
-      </p>
+          Here&apos;s an overview of your development activities and usage
+          statistics.
+        </p>
         {isAdmin && (
           <Badge variant="secondary" className="mt-2">
             Administrator Access
@@ -96,9 +108,13 @@ export default async function DashboardPage() {
             <Zap className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{isAdmin ? 'Unlimited' : userStats.totalApiCalls}</div>
+            <div className="text-2xl font-bold">
+              {isAdmin ? "Unlimited" : userStats.totalApiCalls}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {isAdmin ? 'No API call limits' : `of ${userStats.monthlyLimit} this month`}
+              {isAdmin
+                ? "No API call limits"
+                : `of ${userStats.monthlyLimit} this month`}
             </p>
             {!isAdmin && <Progress value={usagePercentage} className="mt-2" />}
           </CardContent>
@@ -112,9 +128,13 @@ export default async function DashboardPage() {
           <CardContent>
             <div className="text-2xl font-bold">{userStats.storageUsed}GB</div>
             <p className="text-xs text-muted-foreground">
-              {isAdmin ? 'Unlimited storage' : `of ${userStats.storageLimit}GB limit`}
+              {isAdmin
+                ? "Unlimited storage"
+                : `of ${userStats.storageLimit}GB limit`}
             </p>
-            {!isAdmin && <Progress value={storagePercentage} className="mt-2" />}
+            {!isAdmin && (
+              <Progress value={storagePercentage} className="mt-2" />
+            )}
           </CardContent>
         </Card>
 
@@ -138,9 +158,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">Today</div>
-            <p className="text-xs text-muted-foreground">
-              Active user
-            </p>
+            <p className="text-xs text-muted-foreground">Active user</p>
           </CardContent>
         </Card>
       </div>
@@ -165,7 +183,11 @@ export default async function DashboardPage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Plan</span>
-                <Badge variant="secondary">{isAdmin ? 'Administrator (Unlimited)' : 'Free (Limited Time)'}</Badge>
+                <Badge variant="secondary">
+                  {isAdmin
+                    ? "Administrator (Unlimited)"
+                    : "Free (Limited Time)"}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Status</span>
@@ -174,24 +196,36 @@ export default async function DashboardPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Role</span>
                 <Badge variant={isAdmin ? "destructive" : "outline"}>
-                  {isAdmin ? 'Administrator' : 'User'}
+                  {isAdmin ? "Administrator" : "User"}
                 </Badge>
               </div>
               <div className="pt-4 space-y-2">
-                <Button asChild variant="outline" className="w-full justify-start">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full justify-start"
+                >
                   <Link href="/profile">
                     <Settings className="mr-2 h-4 w-4" />
                     Edit Profile
                   </Link>
                 </Button>
-                <Button asChild variant="outline" className="w-full justify-start">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full justify-start"
+                >
                   <Link href="/settings">
                     <Key className="mr-2 h-4 w-4" />
                     API Keys
                   </Link>
                 </Button>
                 {isAdmin && (
-                  <Button asChild variant="outline" className="w-full justify-start">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
                     <Link href="/admin">
                       <BarChart3 className="mr-2 h-4 w-4" />
                       Admin Panel

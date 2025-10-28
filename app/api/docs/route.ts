@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 interface DocSection {
   id: string;
@@ -20,15 +20,15 @@ interface DocCategory {
 
 const documentation: DocCategory[] = [
   {
-    id: 'getting-started',
-    name: 'Getting Started',
-    description: 'Learn the basics and get up and running quickly',
-    icon: '🚀',
+    id: "getting-started",
+    name: "Getting Started",
+    description: "Learn the basics and get up and running quickly",
+    icon: "🚀",
     sections: [
       {
-        id: 'introduction',
-        title: 'Introduction',
-        slug: 'introduction',
+        id: "introduction",
+        title: "Introduction",
+        slug: "introduction",
         content: `# Welcome to DevTools Hub
 
 DevTools Hub is a comprehensive suite of developer tools designed to streamline your development workflow. Whether you're working with JSON, JWT tokens, regular expressions, or need to encode/decode data, we have you covered.
@@ -78,13 +78,13 @@ DevTools Hub works in all modern browsers:
 - Browse our [API documentation](/docs/api) for integration details
 - Contact [support](/contact) for technical assistance`,
         order: 1,
-        category: 'getting-started',
-        lastUpdated: '2024-01-15T10:00:00Z'
+        category: "getting-started",
+        lastUpdated: "2024-01-15T10:00:00Z",
       },
       {
-        id: 'quick-start',
-        title: 'Quick Start Guide',
-        slug: 'quick-start',
+        id: "quick-start",
+        title: "Quick Start Guide",
+        slug: "quick-start",
         content: `# Quick Start Guide
 
 Get up and running with DevTools Hub in minutes.
@@ -134,21 +134,21 @@ Paste JWT token → Click "Decode" → See header, payload, and signature.
 - Learn about [API integration](/docs/api)
 - Check out [examples and use cases](/docs/examples)`,
         order: 2,
-        category: 'getting-started',
-        lastUpdated: '2024-01-14T15:30:00Z'
-      }
-    ]
+        category: "getting-started",
+        lastUpdated: "2024-01-14T15:30:00Z",
+      },
+    ],
   },
   {
-    id: 'tools',
-    name: 'Tools Documentation',
-    description: 'Detailed guides for each tool and feature',
-    icon: '🛠️',
+    id: "tools",
+    name: "Tools Documentation",
+    description: "Detailed guides for each tool and feature",
+    icon: "🛠️",
     sections: [
       {
-        id: 'json-tools',
-        title: 'JSON Tools',
-        slug: 'json-tools',
+        id: "json-tools",
+        title: "JSON Tools",
+        slug: "json-tools",
         content: `# JSON Tools Documentation
 
 Comprehensive guide to our JSON formatting and validation tools.
@@ -207,13 +207,13 @@ Clear, actionable error messages help you fix issues quickly.
 3. Consider minification for production APIs
 4. Use schema validation for critical data`,
         order: 1,
-        category: 'tools',
-        lastUpdated: '2024-01-13T12:00:00Z'
+        category: "tools",
+        lastUpdated: "2024-01-13T12:00:00Z",
       },
       {
-        id: 'encoding-tools',
-        title: 'Encoding Tools',
-        slug: 'encoding-tools',
+        id: "encoding-tools",
+        title: "Encoding Tools",
+        slug: "encoding-tools",
         content: `# Encoding Tools Documentation
 
 Learn how to use our encoding and decoding tools effectively.
@@ -271,21 +271,21 @@ Support for multiple character encodings:
 - Be aware of encoding attacks
 - Use appropriate encoding for your use case`,
         order: 2,
-        category: 'tools',
-        lastUpdated: '2024-01-12T14:20:00Z'
-      }
-    ]
+        category: "tools",
+        lastUpdated: "2024-01-12T14:20:00Z",
+      },
+    ],
   },
   {
-    id: 'api',
-    name: 'API Documentation',
-    description: 'Integrate DevTools Hub into your applications',
-    icon: '🔌',
+    id: "api",
+    name: "API Documentation",
+    description: "Integrate DevTools Hub into your applications",
+    icon: "🔌",
     sections: [
       {
-        id: 'api-overview',
-        title: 'API Overview',
-        slug: 'api-overview',
+        id: "api-overview",
+        title: "API Overview",
+        slug: "api-overview",
         content: `# API Documentation
 
 Integrate DevTools Hub functionality into your applications.
@@ -347,24 +347,24 @@ We provide official SDKs for:
 
 Set up webhooks for real-time notifications and integrations.`,
         order: 1,
-        category: 'api',
-        lastUpdated: '2024-01-11T16:45:00Z'
-      }
-    ]
-  }
+        category: "api",
+        lastUpdated: "2024-01-11T16:45:00Z",
+      },
+    ],
+  },
 ];
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
+    const category = searchParams.get("category");
 
     if (category) {
-      const categoryData = documentation.find(cat => cat.id === category);
+      const categoryData = documentation.find((cat) => cat.id === category);
       if (!categoryData) {
         return NextResponse.json(
-          { error: 'Category not found' },
-          { status: 404 }
+          { error: "Category not found" },
+          { status: 404 },
         );
       }
       return NextResponse.json(categoryData);
@@ -372,10 +372,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(documentation);
   } catch (error) {
-    console.error('Error fetching documentation:', error);
+    console.error("Error fetching documentation:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch documentation' },
-      { status: 500 }
+      { error: "Failed to fetch documentation" },
+      { status: 500 },
     );
   }
 }

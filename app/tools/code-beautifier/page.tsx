@@ -1,26 +1,35 @@
-import { Metadata } from 'next';
-import { CodeBeautifierClient } from '@/components/tools/code-beautifier-client';
+import { Metadata } from "next";
+import { CodeBeautifierClient } from "@/components/tools/code-beautifier-client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: 'Code Beautifier - Format HTML, CSS, and JavaScript Code',
-  description: 'Free online code beautifier and formatter. Format HTML, CSS, JavaScript, and JSON code with proper indentation and syntax highlighting.',
-  keywords: ['code beautifier', 'code formatter', 'HTML formatter', 'CSS formatter', 'JavaScript formatter', 'code indenter'],
-  alternates: { canonical: '/tools/code-beautifier' },
+  title: "Code Beautifier - Format HTML, CSS, and JavaScript Code",
+  description:
+    "Free online code beautifier and formatter. Format HTML, CSS, JavaScript, and JSON code with proper indentation and syntax highlighting.",
+  keywords: [
+    "code beautifier",
+    "code formatter",
+    "HTML formatter",
+    "CSS formatter",
+    "JavaScript formatter",
+    "code indenter",
+  ],
+  alternates: { canonical: "/tools/code-beautifier" },
 };
 
 const jsonLdSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Code Beautifier',
-  applicationCategory: 'DeveloperApplication',
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Code Beautifier",
+  applicationCategory: "DeveloperApplication",
   offers: {
-    '@type': 'Offer',
-    price: '0',
-    priceCurrency: 'USD',
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
   },
-  description: 'Free online code beautifier and formatter for HTML, CSS, JavaScript, and JSON',
+  description:
+    "Free online code beautifier and formatter for HTML, CSS, JavaScript, and JSON",
 };
 
 export default function CodeBeautifierPage() {

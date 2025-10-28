@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   FileText,
   Code,
@@ -12,85 +12,85 @@ import {
   Zap,
   Database,
   TestTube,
-  Hash
-} from 'lucide-react';
-import Link from 'next/link';
+  Hash,
+} from "lucide-react";
+import Link from "next/link";
 
 export default function QuickActions() {
   const quickActions = [
     {
-      title: 'Format JSON',
-      description: 'Validate and format JSON data',
+      title: "Format JSON",
+      description: "Validate and format JSON data",
       icon: FileText,
-      href: '/tools/json-formatter',
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50 dark:bg-blue-950'
+      href: "/tools/json-formatter",
+      color: "text-blue-500",
+      bgColor: "bg-blue-50 dark:bg-blue-950",
     },
     {
-      title: 'Encode Base64',
-      description: 'Convert text to Base64 encoding',
+      title: "Encode Base64",
+      description: "Convert text to Base64 encoding",
       icon: Code,
-      href: '/tools/base64-encoder',
-      color: 'text-green-500',
-      bgColor: 'bg-green-50 dark:bg-green-950'
+      href: "/tools/base64-encoder",
+      color: "text-green-500",
+      bgColor: "bg-green-50 dark:bg-green-950",
     },
     {
-      title: 'Decode JWT',
-      description: 'Decode and verify JWT tokens',
+      title: "Decode JWT",
+      description: "Decode and verify JWT tokens",
       icon: Key,
-      href: '/tools/jwt-decoder',
-      color: 'text-purple-500',
-      bgColor: 'bg-purple-50 dark:bg-purple-950'
+      href: "/tools/jwt-decoder",
+      color: "text-purple-500",
+      bgColor: "bg-purple-50 dark:bg-purple-950",
     },
     {
-      title: 'Test RegExp',
-      description: 'Test and debug regular expressions',
+      title: "Test RegExp",
+      description: "Test and debug regular expressions",
       icon: TestTube,
-      href: '/tools/regexp-tester',
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-50 dark:bg-orange-950'
+      href: "/tools/regexp-tester",
+      color: "text-orange-500",
+      bgColor: "bg-orange-50 dark:bg-orange-950",
     },
     {
-      title: 'Generate Hash',
-      description: 'Create MD5, SHA-256, and other hashes',
+      title: "Generate Hash",
+      description: "Create MD5, SHA-256, and other hashes",
       icon: Hash,
-      href: '/tools/hash-generator',
-      color: 'text-red-500',
-      bgColor: 'bg-red-50 dark:bg-red-950'
+      href: "/tools/hash-generator",
+      color: "text-red-500",
+      bgColor: "bg-red-50 dark:bg-red-950",
     },
     {
-      title: 'Encode URL',
-      description: 'URL encode and decode strings',
+      title: "Encode URL",
+      description: "URL encode and decode strings",
       icon: Link,
-      href: '/tools/url-encoder',
-      color: 'text-yellow-500',
-      bgColor: 'bg-yellow-50 dark:bg-yellow-950'
-    }
+      href: "/tools/url-encoder",
+      color: "text-yellow-500",
+      bgColor: "bg-yellow-50 dark:bg-yellow-950",
+    },
   ];
 
   const accountActions = [
     {
-      title: 'Manage API Keys',
-      description: 'Create and manage your API keys',
+      title: "Manage API Keys",
+      description: "Create and manage your API keys",
       icon: Key,
       // Use anchored link to avoid 404; main settings page contains the section
-      href: '/settings#api-keys',
-      variant: 'outline' as const
+      href: "/settings#api-keys",
+      variant: "outline" as const,
     },
     {
-      title: 'Export Data',
-      description: 'Download your usage data',
+      title: "Export Data",
+      description: "Download your usage data",
       icon: Download,
-      href: '/settings#export',
-      variant: 'outline' as const
+      href: "/settings#export",
+      variant: "outline" as const,
     },
     {
-      title: 'Account Settings',
-      description: 'Update your profile and preferences',
+      title: "Account Settings",
+      description: "Update your profile and preferences",
       icon: Settings,
-      href: '/profile',
-      variant: 'outline' as const
-    }
+      href: "/profile",
+      variant: "outline" as const,
+    },
   ];
 
   return (

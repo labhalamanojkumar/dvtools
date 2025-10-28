@@ -1,47 +1,50 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar, Clock, User, ArrowRight, Tag } from 'lucide-react';
+import { Metadata } from "next";
+import Link from "next/link";
+import Image from "next/image";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, User, ArrowRight, Tag } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: 'Blog | DevTools Hub - Developer Insights & Tutorials',
-  description: 'Stay updated with the latest developer tools, tutorials, best practices, and insights. Learn about JSON formatting, JWT authentication, regex patterns, and more.',
+  title: "Blog | DevTools Hub - Developer Insights & Tutorials",
+  description:
+    "Stay updated with the latest developer tools, tutorials, best practices, and insights. Learn about JSON formatting, JWT authentication, regex patterns, and more.",
   keywords: [
-    'developer blog',
-    'programming tutorials',
-    'JSON best practices',
-    'JWT authentication',
-    'regular expressions',
-    'web development',
-    'coding tips',
-    'developer tools'
+    "developer blog",
+    "programming tutorials",
+    "JSON best practices",
+    "JWT authentication",
+    "regular expressions",
+    "web development",
+    "coding tips",
+    "developer tools",
   ],
   openGraph: {
-    title: 'Blog | DevTools Hub - Developer Insights & Tutorials',
-    description: 'Stay updated with the latest developer tools, tutorials, best practices, and insights.',
-    type: 'website',
-    url: '/blog',
-    siteName: 'DevTools Hub',
+    title: "Blog | DevTools Hub - Developer Insights & Tutorials",
+    description:
+      "Stay updated with the latest developer tools, tutorials, best practices, and insights.",
+    type: "website",
+    url: "/blog",
+    siteName: "DevTools Hub",
     images: [
       {
-        url: '/blog-og.jpg',
+        url: "/blog-og.jpg",
         width: 1200,
         height: 630,
-        alt: 'DevTools Hub Blog',
+        alt: "DevTools Hub Blog",
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'Blog | DevTools Hub - Developer Insights & Tutorials',
-    description: 'Stay updated with the latest developer tools, tutorials, best practices, and insights.',
-    images: ['/blog-og.jpg'],
+    card: "summary_large_image",
+    title: "Blog | DevTools Hub - Developer Insights & Tutorials",
+    description:
+      "Stay updated with the latest developer tools, tutorials, best practices, and insights.",
+    images: ["/blog-og.jpg"],
   },
   alternates: {
-    canonical: '/blog',
+    canonical: "/blog",
   },
   robots: {
     index: true,
@@ -49,9 +52,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
@@ -74,72 +77,83 @@ interface BlogPost {
 // This would typically come from your CMS or database
 const featuredPosts: BlogPost[] = [
   {
-    id: '1',
-    title: 'Mastering JSON Formatting: Best Practices for Developers',
-    slug: 'mastering-json-formatting-best-practices',
-    excerpt: 'Learn the essential techniques and best practices for formatting, validating, and working with JSON data in your applications.',
+    id: "1",
+    title: "Mastering JSON Formatting: Best Practices for Developers",
+    slug: "mastering-json-formatting-best-practices",
+    excerpt:
+      "Learn the essential techniques and best practices for formatting, validating, and working with JSON data in your applications.",
     author: {
-      name: 'Sarah Johnson',
-      avatar: '/avatars/sarah.jpg'
+      name: "Sarah Johnson",
+      avatar: "/avatars/sarah.jpg",
     },
-    publishedAt: '2024-01-15T10:00:00Z',
-    tags: ['JSON', 'JavaScript', 'Best Practices'],
+    publishedAt: "2024-01-15T10:00:00Z",
+    tags: ["JSON", "JavaScript", "Best Practices"],
     readTime: 5,
-    featured: true
-  }
+    featured: true,
+  },
 ];
 
 const recentPosts: BlogPost[] = [
   {
-    id: '2',
-    title: 'The Complete Guide to JWT Authentication',
-    slug: 'complete-guide-jwt-authentication',
-    excerpt: 'Everything you need to know about JSON Web Tokens, from basic concepts to advanced security implementations.',
+    id: "2",
+    title: "The Complete Guide to JWT Authentication",
+    slug: "complete-guide-jwt-authentication",
+    excerpt:
+      "Everything you need to know about JSON Web Tokens, from basic concepts to advanced security implementations.",
     author: {
-      name: 'Mike Chen',
-      avatar: '/avatars/mike.jpg'
+      name: "Mike Chen",
+      avatar: "/avatars/mike.jpg",
     },
-    publishedAt: '2024-01-10T14:30:00Z',
-    tags: ['JWT', 'Authentication', 'Security'],
+    publishedAt: "2024-01-10T14:30:00Z",
+    tags: ["JWT", "Authentication", "Security"],
     readTime: 8,
-    featured: false
+    featured: false,
   },
   {
-    id: '3',
-    title: 'Regular Expressions: From Beginner to Expert',
-    slug: 'regular-expressions-beginner-to-expert',
-    excerpt: 'Master regular expressions with practical examples, advanced techniques, and real-world applications.',
+    id: "3",
+    title: "Regular Expressions: From Beginner to Expert",
+    slug: "regular-expressions-beginner-to-expert",
+    excerpt:
+      "Master regular expressions with practical examples, advanced techniques, and real-world applications.",
     author: {
-      name: 'Alex Rodriguez',
-      avatar: '/avatars/alex.jpg'
+      name: "Alex Rodriguez",
+      avatar: "/avatars/alex.jpg",
     },
-    publishedAt: '2024-01-05T09:15:00Z',
-    tags: ['Regex', 'Pattern Matching', 'Text Processing'],
+    publishedAt: "2024-01-05T09:15:00Z",
+    tags: ["Regex", "Pattern Matching", "Text Processing"],
     readTime: 12,
-    featured: false
-  }
+    featured: false,
+  },
 ];
 
 const categories = [
-  { name: 'All Posts', count: 15, active: true },
-  { name: 'JSON', count: 5, active: false },
-  { name: 'Authentication', count: 3, active: false },
-  { name: 'Security', count: 4, active: false },
-  { name: 'Tools', count: 6, active: false },
-  { name: 'Best Practices', count: 8, active: false },
+  { name: "All Posts", count: 15, active: true },
+  { name: "JSON", count: 5, active: false },
+  { name: "Authentication", count: 3, active: false },
+  { name: "Security", count: 4, active: false },
+  { name: "Tools", count: 6, active: false },
+  { name: "Best Practices", count: 8, active: false },
 ];
 
 function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  return new Date(dateString).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
-function BlogPostCard({ post, featured = false }: { post: BlogPost; featured?: boolean }) {
+function BlogPostCard({
+  post,
+  featured = false,
+}: {
+  post: BlogPost;
+  featured?: boolean;
+}) {
   return (
-    <Card className={`group hover:shadow-lg transition-all duration-300 ${featured ? 'border-primary/50 bg-primary/5' : ''}`}>
+    <Card
+      className={`group hover:shadow-lg transition-all duration-300 ${featured ? "border-primary/50 bg-primary/5" : ""}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
           <Calendar className="h-4 w-4" />
@@ -150,12 +164,16 @@ function BlogPostCard({ post, featured = false }: { post: BlogPost; featured?: b
           {featured && (
             <>
               <span>•</span>
-              <Badge variant="secondary" className="text-xs">Featured</Badge>
+              <Badge variant="secondary" className="text-xs">
+                Featured
+              </Badge>
             </>
           )}
         </div>
         <Link href={`/blog/${post.slug}`}>
-          <h3 className={`font-semibold leading-tight group-hover:text-primary transition-colors ${featured ? 'text-xl' : 'text-lg'}`}>
+          <h3
+            className={`font-semibold leading-tight group-hover:text-primary transition-colors ${featured ? "text-xl" : "text-lg"}`}
+          >
             {post.title}
           </h3>
         </Link>
@@ -180,14 +198,19 @@ function BlogPostCard({ post, featured = false }: { post: BlogPost; featured?: b
               </Badge>
             ))}
             {post.tags.length > 2 && (
-              <span className="text-xs text-muted-foreground">+{post.tags.length - 2}</span>
+              <span className="text-xs text-muted-foreground">
+                +{post.tags.length - 2}
+              </span>
             )}
           </div>
         </div>
 
         <div className="mt-4 pt-4 border-t">
           <Link href={`/blog/${post.slug}`}>
-            <Button variant="ghost" className="p-0 h-auto font-medium text-primary hover:text-primary/80">
+            <Button
+              variant="ghost"
+              className="p-0 h-auto font-medium text-primary hover:text-primary/80"
+            >
               Read more
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
@@ -198,10 +221,14 @@ function BlogPostCard({ post, featured = false }: { post: BlogPost; featured?: b
   );
 }
 
-export default function BlogPage({ searchParams }: { searchParams?: { tag?: string; category?: string; page?: string } }) {
+export default function BlogPage({
+  searchParams,
+}: {
+  searchParams?: { tag?: string; category?: string; page?: string };
+}) {
   const tagFilter = searchParams?.tag;
   const categoryFilter = searchParams?.category;
-  const page = parseInt(searchParams?.page || '1', 10) || 1;
+  const page = parseInt(searchParams?.page || "1", 10) || 1;
   const PAGE_SIZE = 6;
 
   // Combine featured + recent as the source of truth for now
@@ -210,11 +237,15 @@ export default function BlogPage({ searchParams }: { searchParams?: { tag?: stri
   // Helper to filter by category/tag
   const matchesFilter = (post: BlogPost) => {
     if (tagFilter) {
-      return post.tags.map(t => t.toLowerCase()).includes(tagFilter.toLowerCase());
+      return post.tags
+        .map((t) => t.toLowerCase())
+        .includes(tagFilter.toLowerCase());
     }
     if (categoryFilter) {
       // category names are simple strings like 'JSON' or 'Authentication'
-      return post.tags.map(t => t.toLowerCase()).includes(categoryFilter.toLowerCase());
+      return post.tags
+        .map((t) => t.toLowerCase())
+        .includes(categoryFilter.toLowerCase());
     }
     return true;
   };
@@ -231,30 +262,31 @@ export default function BlogPage({ searchParams }: { searchParams?: { tag?: stri
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Blog",
-            "name": "DevTools Hub Blog",
-            "description": "Developer insights, tutorials, and best practices for modern web development",
-            "url": "https://devtoolshub.com/blog",
-            "publisher": {
+            name: "DevTools Hub Blog",
+            description:
+              "Developer insights, tutorials, and best practices for modern web development",
+            url: "https://devtoolshub.com/blog",
+            publisher: {
               "@type": "Organization",
-              "name": "DevTools Hub",
-              "logo": {
+              name: "DevTools Hub",
+              logo: {
                 "@type": "ImageObject",
-                "url": "https://devtoolshub.com/logo.png"
-              }
-            },
-            "blogPost": featuredPosts.concat(recentPosts).map(post => ({
-              "@type": "BlogPosting",
-              "headline": post.title,
-              "description": post.excerpt,
-              "author": {
-                "@type": "Person",
-                "name": post.author.name
+                url: "https://devtoolshub.com/logo.png",
               },
-              "datePublished": post.publishedAt,
-              "url": `https://devtoolshub.com/blog/${post.slug}`,
-              "keywords": post.tags.join(", ")
-            }))
-          })
+            },
+            blogPost: featuredPosts.concat(recentPosts).map((post) => ({
+              "@type": "BlogPosting",
+              headline: post.title,
+              description: post.excerpt,
+              author: {
+                "@type": "Person",
+                name: post.author.name,
+              },
+              datePublished: post.publishedAt,
+              url: `https://devtoolshub.com/blog/${post.slug}`,
+              keywords: post.tags.join(", "),
+            })),
+          }),
         }}
       />
 
@@ -264,8 +296,8 @@ export default function BlogPage({ searchParams }: { searchParams?: { tag?: stri
           Developer <span className="text-primary">Insights</span> & Tutorials
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
-          Stay updated with the latest developer tools, best practices, tutorials,
-          and insights to enhance your development workflow.
+          Stay updated with the latest developer tools, best practices,
+          tutorials, and insights to enhance your development workflow.
         </p>
 
         {/* Newsletter Signup */}
@@ -326,7 +358,11 @@ export default function BlogPage({ searchParams }: { searchParams?: { tag?: stri
       <section>
         <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
           <span className="w-1 h-6 bg-primary rounded-full"></span>
-          {tagFilter ? `Articles tagged "${tagFilter}"` : categoryFilter ? `${categoryFilter} Articles` : 'Recent Articles'}
+          {tagFilter
+            ? `Articles tagged "${tagFilter}"`
+            : categoryFilter
+              ? `${categoryFilter} Articles`
+              : "Recent Articles"}
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {paginatedPosts.map((post) => (
@@ -337,7 +373,9 @@ export default function BlogPage({ searchParams }: { searchParams?: { tag?: stri
         {/* Load More */}
         <div className="text-center mt-12">
           {start + PAGE_SIZE < filteredPosts.length ? (
-            <Link href={`/blog?${tagFilter ? `tag=${encodeURIComponent(tagFilter)}` : categoryFilter ? `category=${encodeURIComponent(categoryFilter)}` : ''}${(tagFilter || categoryFilter) ? '&' : ''}page=${page + 1}`}>
+            <Link
+              href={`/blog?${tagFilter ? `tag=${encodeURIComponent(tagFilter)}` : categoryFilter ? `category=${encodeURIComponent(categoryFilter)}` : ""}${tagFilter || categoryFilter ? "&" : ""}page=${page + 1}`}
+            >
               <Button variant="outline" size="lg">
                 Load More Articles
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -353,11 +391,27 @@ export default function BlogPage({ searchParams }: { searchParams?: { tag?: stri
 
       {/* Popular Tags */}
       <section className="mt-16 pt-12 border-t">
-        <h3 className="text-xl font-semibold mb-6 text-center">Popular Topics</h3>
+        <h3 className="text-xl font-semibold mb-6 text-center">
+          Popular Topics
+        </h3>
         <div className="flex flex-wrap gap-2 justify-center">
-          {['JSON', 'JavaScript', 'Authentication', 'Security', 'API', 'React', 'Node.js', 'TypeScript', 'Best Practices', 'Tools'].map((tag) => (
+          {[
+            "JSON",
+            "JavaScript",
+            "Authentication",
+            "Security",
+            "API",
+            "React",
+            "Node.js",
+            "TypeScript",
+            "Best Practices",
+            "Tools",
+          ].map((tag) => (
             <Link key={tag} href={`/blog?tag=${tag.toLowerCase()}`}>
-              <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer">
+              <Badge
+                variant="outline"
+                className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+              >
                 <Tag className="h-3 w-3 mr-1" />
                 {tag}
               </Badge>

@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Palette,
   Download,
@@ -25,9 +31,9 @@ import {
   Moon,
   Shuffle,
   CheckCircle,
-  AlertTriangle
-} from 'lucide-react';
-import { useToast } from '@/components/ui/toaster';
+  AlertTriangle,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
 
 interface ColorPalette {
   primary: string;
@@ -51,8 +57,8 @@ interface TypographySettings {
     base: string;
     lg: string;
     xl: string;
-    '2xl': string;
-    '3xl': string;
+    "2xl": string;
+    "3xl": string;
   };
   fontWeight: {
     light: number;
@@ -70,7 +76,7 @@ interface TypographySettings {
 
 interface ThemeSettings {
   name: string;
-  mode: 'light' | 'dark' | 'auto';
+  mode: "light" | "dark" | "auto";
   colors: ColorPalette;
   typography: TypographySettings;
   spacing: {
@@ -79,7 +85,7 @@ interface ThemeSettings {
     md: string;
     lg: string;
     xl: string;
-    '2xl': string;
+    "2xl": string;
   };
   borderRadius: {
     none: string;
@@ -98,138 +104,143 @@ interface ThemeSettings {
 }
 
 const defaultTheme: ThemeSettings = {
-  name: 'Custom Theme',
-  mode: 'light',
+  name: "Custom Theme",
+  mode: "light",
   colors: {
-    primary: '#3b82f6',
-    secondary: '#64748b',
-    accent: '#f59e0b',
-    background: '#ffffff',
-    surface: '#f8fafc',
-    text: '#1e293b',
-    textSecondary: '#64748b',
-    border: '#e2e8f0',
-    error: '#ef4444',
-    success: '#10b981',
-    warning: '#f59e0b'
+    primary: "#3b82f6",
+    secondary: "#64748b",
+    accent: "#f59e0b",
+    background: "#ffffff",
+    surface: "#f8fafc",
+    text: "#1e293b",
+    textSecondary: "#64748b",
+    border: "#e2e8f0",
+    error: "#ef4444",
+    success: "#10b981",
+    warning: "#f59e0b",
   },
   typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: "Inter, system-ui, sans-serif",
     fontSize: {
-      xs: '0.75rem',
-      sm: '0.875rem',
-      base: '1rem',
-      lg: '1.125rem',
-      xl: '1.25rem',
-      '2xl': '1.5rem',
-      '3xl': '1.875rem'
+      xs: "0.75rem",
+      sm: "0.875rem",
+      base: "1rem",
+      lg: "1.125rem",
+      xl: "1.25rem",
+      "2xl": "1.5rem",
+      "3xl": "1.875rem",
     },
     fontWeight: {
       light: 300,
       normal: 400,
       medium: 500,
       semibold: 600,
-      bold: 700
+      bold: 700,
     },
     lineHeight: {
       tight: 1.25,
       normal: 1.5,
-      relaxed: 1.625
-    }
+      relaxed: 1.625,
+    },
   },
   spacing: {
-    xs: '0.25rem',
-    sm: '0.5rem',
-    md: '1rem',
-    lg: '1.5rem',
-    xl: '2rem',
-    '2xl': '3rem'
+    xs: "0.25rem",
+    sm: "0.5rem",
+    md: "1rem",
+    lg: "1.5rem",
+    xl: "2rem",
+    "2xl": "3rem",
   },
   borderRadius: {
-    none: '0',
-    sm: '0.125rem',
-    md: '0.375rem',
-    lg: '0.5rem',
-    xl: '0.75rem',
-    full: '9999px'
+    none: "0",
+    sm: "0.125rem",
+    md: "0.375rem",
+    lg: "0.5rem",
+    xl: "0.75rem",
+    full: "9999px",
   },
   shadows: {
-    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
-    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
-    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
-    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
-  }
+    sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+    md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)",
+    lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+    xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+  },
 };
 
 const predefinedPalettes = {
   blue: {
-    primary: '#3b82f6',
-    secondary: '#64748b',
-    accent: '#f59e0b',
-    background: '#ffffff',
-    surface: '#f8fafc',
-    text: '#1e293b',
-    textSecondary: '#64748b',
-    border: '#e2e8f0',
-    error: '#ef4444',
-    success: '#10b981',
-    warning: '#f59e0b'
+    primary: "#3b82f6",
+    secondary: "#64748b",
+    accent: "#f59e0b",
+    background: "#ffffff",
+    surface: "#f8fafc",
+    text: "#1e293b",
+    textSecondary: "#64748b",
+    border: "#e2e8f0",
+    error: "#ef4444",
+    success: "#10b981",
+    warning: "#f59e0b",
   },
   green: {
-    primary: '#10b981',
-    secondary: '#64748b',
-    accent: '#f59e0b',
-    background: '#ffffff',
-    surface: '#f0fdf4',
-    text: '#14532d',
-    textSecondary: '#64748b',
-    border: '#dcfce7',
-    error: '#ef4444',
-    success: '#10b981',
-    warning: '#f59e0b'
+    primary: "#10b981",
+    secondary: "#64748b",
+    accent: "#f59e0b",
+    background: "#ffffff",
+    surface: "#f0fdf4",
+    text: "#14532d",
+    textSecondary: "#64748b",
+    border: "#dcfce7",
+    error: "#ef4444",
+    success: "#10b981",
+    warning: "#f59e0b",
   },
   purple: {
-    primary: '#8b5cf6',
-    secondary: '#64748b',
-    accent: '#f59e0b',
-    background: '#ffffff',
-    surface: '#faf5ff',
-    text: '#581c87',
-    textSecondary: '#64748b',
-    border: '#e9d5ff',
-    error: '#ef4444',
-    success: '#10b981',
-    warning: '#f59e0b'
+    primary: "#8b5cf6",
+    secondary: "#64748b",
+    accent: "#f59e0b",
+    background: "#ffffff",
+    surface: "#faf5ff",
+    text: "#581c87",
+    textSecondary: "#64748b",
+    border: "#e9d5ff",
+    error: "#ef4444",
+    success: "#10b981",
+    warning: "#f59e0b",
   },
   dark: {
-    primary: '#60a5fa',
-    secondary: '#94a3b8',
-    accent: '#fbbf24',
-    background: '#0f172a',
-    surface: '#1e293b',
-    text: '#f8fafc',
-    textSecondary: '#cbd5e1',
-    border: '#334155',
-    error: '#f87171',
-    success: '#34d399',
-    warning: '#fbbf24'
-  }
+    primary: "#60a5fa",
+    secondary: "#94a3b8",
+    accent: "#fbbf24",
+    background: "#0f172a",
+    surface: "#1e293b",
+    text: "#f8fafc",
+    textSecondary: "#cbd5e1",
+    border: "#334155",
+    error: "#f87171",
+    success: "#34d399",
+    warning: "#fbbf24",
+  },
 };
 
 export default function ThemeBuilderClient() {
   const [theme, setTheme] = useState<ThemeSettings>(defaultTheme);
-  const [previewMode, setPreviewMode] = useState<'light' | 'dark'>('light');
+  const [previewMode, setPreviewMode] = useState<"light" | "dark">("light");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedCSS, setGeneratedCSS] = useState('');
+  const [generatedCSS, setGeneratedCSS] = useState("");
   const { toast } = useToast();
 
   const generateRandomColor = (): string => {
-    return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+    return (
+      "#" +
+      Math.floor(Math.random() * 16777215)
+        .toString(16)
+        .padStart(6, "0")
+    );
   };
 
   const generateComplementaryPalette = (baseColor: string): ColorPalette => {
     // Simple color manipulation for complementary colors
-    const color = baseColor.replace('#', '');
+    const color = baseColor.replace("#", "");
     const r = parseInt(color.substr(0, 2), 16);
     const g = parseInt(color.substr(2, 2), 16);
     const b = parseInt(color.substr(4, 2), 16);
@@ -238,21 +249,21 @@ export default function ThemeBuilderClient() {
       primary: baseColor,
       secondary: `hsl(${Math.random() * 360}, 20%, 50%)`,
       accent: `hsl(${Math.random() * 360}, 70%, 60%)`,
-      background: '#ffffff',
-      surface: '#f8fafc',
-      text: '#1e293b',
-      textSecondary: '#64748b',
-      border: '#e2e8f0',
-      error: '#ef4444',
-      success: '#10b981',
-      warning: '#f59e0b'
+      background: "#ffffff",
+      surface: "#f8fafc",
+      text: "#1e293b",
+      textSecondary: "#64748b",
+      border: "#e2e8f0",
+      error: "#ef4444",
+      success: "#10b981",
+      warning: "#f59e0b",
     };
   };
 
   const applyPalette = (palette: ColorPalette) => {
-    setTheme(prev => ({
+    setTheme((prev) => ({
       ...prev,
-      colors: palette
+      colors: palette,
     }));
     toast({
       title: "Palette applied",
@@ -302,7 +313,7 @@ export default function ThemeBuilderClient() {
     });
 
     const css = `:root {
-${cssVars.join('\n')}
+${cssVars.join("\n")}
 }
 
 /* Dark mode overrides */
@@ -393,7 +404,7 @@ body {
     setIsGenerating(true);
 
     // Simulate processing time
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const css = generateCSS();
     setGeneratedCSS(css);
@@ -422,11 +433,11 @@ body {
   };
 
   const downloadCSS = () => {
-    const blob = new Blob([generatedCSS], { type: 'text/css' });
+    const blob = new Blob([generatedCSS], { type: "text/css" });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}.css`;
+    link.download = `${theme.name.toLowerCase().replace(/\s+/g, "-")}.css`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -439,24 +450,28 @@ body {
   };
 
   const updateColor = (key: keyof ColorPalette, value: string) => {
-    setTheme(prev => ({
+    setTheme((prev) => ({
       ...prev,
       colors: {
         ...prev.colors,
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   };
 
-  const updateTypography = (category: keyof TypographySettings, key: string, value: string | number) => {
-    setTheme(prev => {
-      if (category === 'fontFamily') {
+  const updateTypography = (
+    category: keyof TypographySettings,
+    key: string,
+    value: string | number,
+  ) => {
+    setTheme((prev) => {
+      if (category === "fontFamily") {
         return {
           ...prev,
           typography: {
             ...prev.typography,
-            fontFamily: value as string
-          }
+            fontFamily: value as string,
+          },
         };
       } else {
         return {
@@ -465,9 +480,9 @@ body {
             ...prev.typography,
             [category]: {
               ...(prev.typography[category] as any),
-              [key]: value
-            }
-          }
+              [key]: value,
+            },
+          },
         };
       }
     });
@@ -479,7 +494,9 @@ body {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Theme Builder</h2>
-          <p className="text-muted-foreground">Create beautiful, consistent design systems</p>
+          <p className="text-muted-foreground">
+            Create beautiful, consistent design systems
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={randomizePalette}>
@@ -524,12 +541,16 @@ body {
                     <Input
                       type="color"
                       value={value}
-                      onChange={(e) => updateColor(key as keyof ColorPalette, e.target.value)}
+                      onChange={(e) =>
+                        updateColor(key as keyof ColorPalette, e.target.value)
+                      }
                       className="w-16 h-8 p-1 border rounded"
                     />
                     <Input
                       value={value}
-                      onChange={(e) => updateColor(key as keyof ColorPalette, e.target.value)}
+                      onChange={(e) =>
+                        updateColor(key as keyof ColorPalette, e.target.value)
+                      }
                       className="w-24 text-sm font-mono"
                       placeholder="#000000"
                     />
@@ -557,13 +578,15 @@ body {
                       </Button>
                     </div>
                     <div className="flex gap-1">
-                      {Object.values(palette).slice(0, 5).map((color, index) => (
-                        <div
-                          key={index}
-                          className="w-6 h-6 rounded"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
+                      {Object.values(palette)
+                        .slice(0, 5)
+                        .map((color, index) => (
+                          <div
+                            key={index}
+                            className="w-6 h-6 rounded"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
                     </div>
                   </div>
                 ))}
@@ -585,68 +608,96 @@ body {
                 <Input
                   id="font-family"
                   value={theme.typography.fontFamily}
-                  onChange={(e) => setTheme(prev => ({
-                    ...prev,
-                    typography: {
-                      ...prev.typography,
-                      fontFamily: e.target.value
-                    }
-                  }))}
+                  onChange={(e) =>
+                    setTheme((prev) => ({
+                      ...prev,
+                      typography: {
+                        ...prev.typography,
+                        fontFamily: e.target.value,
+                      },
+                    }))
+                  }
                   placeholder="Inter, system-ui, sans-serif"
                 />
               </div>
 
               {/* Font Sizes */}
               <div>
-                <Label className="text-base font-semibold mb-3 block">Font Sizes</Label>
+                <Label className="text-base font-semibold mb-3 block">
+                  Font Sizes
+                </Label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {Object.entries(theme.typography.fontSize).map(([key, value]) => (
-                    <div key={key}>
-                      <Label className="text-sm capitalize">{key}</Label>
-                      <Input
-                        value={value}
-                        onChange={(e) => updateTypography('fontSize', key, e.target.value)}
-                        className="text-sm"
-                      />
-                    </div>
-                  ))}
+                  {Object.entries(theme.typography.fontSize).map(
+                    ([key, value]) => (
+                      <div key={key}>
+                        <Label className="text-sm capitalize">{key}</Label>
+                        <Input
+                          value={value}
+                          onChange={(e) =>
+                            updateTypography("fontSize", key, e.target.value)
+                          }
+                          className="text-sm"
+                        />
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
 
               {/* Font Weights */}
               <div>
-                <Label className="text-base font-semibold mb-3 block">Font Weights</Label>
+                <Label className="text-base font-semibold mb-3 block">
+                  Font Weights
+                </Label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {Object.entries(theme.typography.fontWeight).map(([key, value]) => (
-                    <div key={key}>
-                      <Label className="text-sm capitalize">{key}</Label>
-                      <Input
-                        type="number"
-                        value={value}
-                        onChange={(e) => updateTypography('fontWeight', key, parseInt(e.target.value))}
-                        className="text-sm"
-                      />
-                    </div>
-                  ))}
+                  {Object.entries(theme.typography.fontWeight).map(
+                    ([key, value]) => (
+                      <div key={key}>
+                        <Label className="text-sm capitalize">{key}</Label>
+                        <Input
+                          type="number"
+                          value={value}
+                          onChange={(e) =>
+                            updateTypography(
+                              "fontWeight",
+                              key,
+                              parseInt(e.target.value),
+                            )
+                          }
+                          className="text-sm"
+                        />
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
 
               {/* Line Heights */}
               <div>
-                <Label className="text-base font-semibold mb-3 block">Line Heights</Label>
+                <Label className="text-base font-semibold mb-3 block">
+                  Line Heights
+                </Label>
                 <div className="grid grid-cols-3 gap-4">
-                  {Object.entries(theme.typography.lineHeight).map(([key, value]) => (
-                    <div key={key}>
-                      <Label className="text-sm capitalize">{key}</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={value}
-                        onChange={(e) => updateTypography('lineHeight', key, parseFloat(e.target.value))}
-                        className="text-sm"
-                      />
-                    </div>
-                  ))}
+                  {Object.entries(theme.typography.lineHeight).map(
+                    ([key, value]) => (
+                      <div key={key}>
+                        <Label className="text-sm capitalize">{key}</Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={value}
+                          onChange={(e) =>
+                            updateTypography(
+                              "lineHeight",
+                              key,
+                              parseFloat(e.target.value),
+                            )
+                          }
+                          className="text-sm"
+                        />
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -666,13 +717,15 @@ body {
                     <Label className="w-12 capitalize">{key}</Label>
                     <Input
                       value={value}
-                      onChange={(e) => setTheme(prev => ({
-                        ...prev,
-                        spacing: {
-                          ...prev.spacing,
-                          [key]: e.target.value
-                        }
-                      }))}
+                      onChange={(e) =>
+                        setTheme((prev) => ({
+                          ...prev,
+                          spacing: {
+                            ...prev.spacing,
+                            [key]: e.target.value,
+                          },
+                        }))
+                      }
                       className="flex-1"
                     />
                     <div
@@ -694,13 +747,15 @@ body {
                     <Label className="w-16 capitalize">{key}</Label>
                     <Input
                       value={value}
-                      onChange={(e) => setTheme(prev => ({
-                        ...prev,
-                        borderRadius: {
-                          ...prev.borderRadius,
-                          [key]: e.target.value
-                        }
-                      }))}
+                      onChange={(e) =>
+                        setTheme((prev) => ({
+                          ...prev,
+                          borderRadius: {
+                            ...prev.borderRadius,
+                            [key]: e.target.value,
+                          },
+                        }))
+                      }
                       className="flex-1"
                     />
                     <div
@@ -729,7 +784,7 @@ body {
                 style={{
                   backgroundColor: theme.colors.background,
                   color: theme.colors.text,
-                  fontFamily: theme.typography.fontFamily
+                  fontFamily: theme.typography.fontFamily,
                 }}
               >
                 <h1
@@ -745,7 +800,7 @@ body {
                     style={{
                       backgroundColor: theme.colors.surface,
                       border: `1px solid ${theme.colors.border}`,
-                      borderRadius: theme.borderRadius.md
+                      borderRadius: theme.borderRadius.md,
                     }}
                   >
                     <h3
@@ -764,8 +819,8 @@ body {
                       className="px-4 py-2 rounded font-medium mr-2"
                       style={{
                         backgroundColor: theme.colors.primary,
-                        color: 'white',
-                        borderRadius: theme.borderRadius.md
+                        color: "white",
+                        borderRadius: theme.borderRadius.md,
                       }}
                     >
                       Primary Button
@@ -773,10 +828,10 @@ body {
                     <button
                       className="px-4 py-2 rounded font-medium border"
                       style={{
-                        backgroundColor: 'transparent',
+                        backgroundColor: "transparent",
                         color: theme.colors.primary,
                         border: `1px solid ${theme.colors.primary}`,
-                        borderRadius: theme.borderRadius.md
+                        borderRadius: theme.borderRadius.md,
                       }}
                     >
                       Secondary Button
@@ -789,7 +844,7 @@ body {
                     className="px-2 py-1 rounded text-sm"
                     style={{
                       backgroundColor: theme.colors.success,
-                      color: 'white'
+                      color: "white",
                     }}
                   >
                     Success
@@ -798,7 +853,7 @@ body {
                     className="px-2 py-1 rounded text-sm"
                     style={{
                       backgroundColor: theme.colors.warning,
-                      color: 'white'
+                      color: "white",
                     }}
                   >
                     Warning
@@ -807,7 +862,7 @@ body {
                     className="px-2 py-1 rounded text-sm"
                     style={{
                       backgroundColor: theme.colors.error,
-                      color: 'white'
+                      color: "white",
                     }}
                   >
                     Error
@@ -829,7 +884,10 @@ body {
                 Generated CSS
               </span>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => copyToClipboard(generatedCSS)}>
+                <Button
+                  variant="outline"
+                  onClick={() => copyToClipboard(generatedCSS)}
+                >
                   <Copy className="mr-2 h-4 w-4" />
                   Copy
                 </Button>

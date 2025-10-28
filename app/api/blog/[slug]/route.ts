@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 
 // Mock blog posts data - in production, this would come from a CMS or database
 const blogPosts = [
   {
-    id: '1',
-    title: 'Mastering JSON Formatting: Best Practices for Developers',
-    slug: 'mastering-json-formatting-best-practices',
-    excerpt: 'Learn the essential techniques and best practices for formatting, validating, and working with JSON data in your applications.',
+    id: "1",
+    title: "Mastering JSON Formatting: Best Practices for Developers",
+    slug: "mastering-json-formatting-best-practices",
+    excerpt:
+      "Learn the essential techniques and best practices for formatting, validating, and working with JSON data in your applications.",
     content: `# Mastering JSON Formatting: Best Practices for Developers
 
 JSON (JavaScript Object Notation) has become the de facto standard for data interchange in modern web applications. Whether you're building APIs, working with configuration files, or handling data storage, understanding JSON formatting best practices is crucial for any developer.
@@ -124,26 +125,35 @@ Integrate JSON formatting into your development workflow:
 
 Mastering JSON formatting is an essential skill for modern developers. By following these best practices, you'll create more maintainable, readable, and error-free JSON structures that will serve your applications well into the future.`,
     author: {
-      name: 'Sarah Johnson',
-      avatar: '/avatars/sarah.jpg'
+      name: "Sarah Johnson",
+      avatar: "/avatars/sarah.jpg",
     },
-    publishedAt: '2024-01-15T10:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-    tags: ['JSON', 'JavaScript', 'Best Practices', 'Development'],
+    publishedAt: "2024-01-15T10:00:00Z",
+    updatedAt: "2024-01-15T10:00:00Z",
+    tags: ["JSON", "JavaScript", "Best Practices", "Development"],
     readTime: 5,
     featured: true,
     seo: {
-      title: 'Mastering JSON Formatting: Best Practices for Developers | DevTools Hub',
-      description: 'Learn essential JSON formatting techniques, best practices, and tools for developers. Master JSON structure, validation, and formatting for better code quality.',
-      keywords: ['JSON formatting', 'JSON best practices', 'JavaScript', 'data interchange', 'API development'],
-      ogImage: '/blog/json-formatting-og.jpg'
-    }
+      title:
+        "Mastering JSON Formatting: Best Practices for Developers | DevTools Hub",
+      description:
+        "Learn essential JSON formatting techniques, best practices, and tools for developers. Master JSON structure, validation, and formatting for better code quality.",
+      keywords: [
+        "JSON formatting",
+        "JSON best practices",
+        "JavaScript",
+        "data interchange",
+        "API development",
+      ],
+      ogImage: "/blog/json-formatting-og.jpg",
+    },
   },
   {
-    id: '2',
-    title: 'The Complete Guide to JWT Authentication',
-    slug: 'complete-guide-jwt-authentication',
-    excerpt: 'Everything you need to know about JSON Web Tokens, from basic concepts to advanced security implementations.',
+    id: "2",
+    title: "The Complete Guide to JWT Authentication",
+    slug: "complete-guide-jwt-authentication",
+    excerpt:
+      "Everything you need to know about JSON Web Tokens, from basic concepts to advanced security implementations.",
     content: `# The Complete Guide to JWT Authentication
 
 JSON Web Tokens (JWT) have revolutionized authentication in modern web applications. This comprehensive guide covers everything from basic concepts to advanced security implementations.
@@ -192,26 +202,28 @@ Always verify JWT signatures on the server side before trusting the payload.
 
 JWT authentication, when implemented correctly, provides a robust and scalable solution for modern web applications.`,
     author: {
-      name: 'Mike Chen',
-      avatar: '/avatars/mike.jpg'
+      name: "Mike Chen",
+      avatar: "/avatars/mike.jpg",
     },
-    publishedAt: '2024-01-10T14:30:00Z',
-    updatedAt: '2024-01-10T14:30:00Z',
-    tags: ['JWT', 'Authentication', 'Security', 'API'],
+    publishedAt: "2024-01-10T14:30:00Z",
+    updatedAt: "2024-01-10T14:30:00Z",
+    tags: ["JWT", "Authentication", "Security", "API"],
     readTime: 8,
     featured: false,
     seo: {
-      title: 'Complete Guide to JWT Authentication | DevTools Hub',
-      description: 'Master JWT authentication with this comprehensive guide covering implementation, security best practices, and common pitfalls.',
-      keywords: ['JWT', 'authentication', 'security', 'tokens', 'API security'],
-      ogImage: '/blog/jwt-auth-og.jpg'
-    }
+      title: "Complete Guide to JWT Authentication | DevTools Hub",
+      description:
+        "Master JWT authentication with this comprehensive guide covering implementation, security best practices, and common pitfalls.",
+      keywords: ["JWT", "authentication", "security", "tokens", "API security"],
+      ogImage: "/blog/jwt-auth-og.jpg",
+    },
   },
   {
-    id: '3',
-    title: 'Regular Expressions: From Beginner to Expert',
-    slug: 'regular-expressions-beginner-to-expert',
-    excerpt: 'Master regular expressions with practical examples, advanced techniques, and real-world applications.',
+    id: "3",
+    title: "Regular Expressions: From Beginner to Expert",
+    slug: "regular-expressions-beginner-to-expert",
+    excerpt:
+      "Master regular expressions with practical examples, advanced techniques, and real-world applications.",
     content: `# Regular Expressions: From Beginner to Expert
 
 Regular expressions (regex) are powerful tools for pattern matching and text manipulation. This guide takes you from basic concepts to advanced techniques.
@@ -287,43 +299,55 @@ https?://(?:[-\\w.]|(?:%[\\da-fA-F]{2}))+
 
 Regular expressions are indispensable tools for text processing. With practice and the right techniques, you can solve complex text manipulation challenges efficiently.`,
     author: {
-      name: 'Alex Rodriguez',
-      avatar: '/avatars/alex.jpg'
+      name: "Alex Rodriguez",
+      avatar: "/avatars/alex.jpg",
     },
-    publishedAt: '2024-01-05T09:15:00Z',
-    updatedAt: '2024-01-05T09:15:00Z',
-    tags: ['Regex', 'Regular Expressions', 'Pattern Matching', 'Text Processing'],
+    publishedAt: "2024-01-05T09:15:00Z",
+    updatedAt: "2024-01-05T09:15:00Z",
+    tags: [
+      "Regex",
+      "Regular Expressions",
+      "Pattern Matching",
+      "Text Processing",
+    ],
     readTime: 12,
     featured: false,
     seo: {
-      title: 'Regular Expressions: From Beginner to Expert | DevTools Hub',
-      description: 'Master regular expressions with practical examples and advanced techniques for pattern matching and text processing.',
-      keywords: ['regular expressions', 'regex', 'pattern matching', 'text processing', 'programming'],
-      ogImage: '/blog/regex-guide-og.jpg'
-    }
-  }
+      title: "Regular Expressions: From Beginner to Expert | DevTools Hub",
+      description:
+        "Master regular expressions with practical examples and advanced techniques for pattern matching and text processing.",
+      keywords: [
+        "regular expressions",
+        "regex",
+        "pattern matching",
+        "text processing",
+        "programming",
+      ],
+      ogImage: "/blog/regex-guide-og.jpg",
+    },
+  },
 ];
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { slug: string } },
 ) {
   try {
-    const post = blogPosts.find(p => p.slug === params.slug);
+    const post = blogPosts.find((p) => p.slug === params.slug);
 
     if (!post) {
       return NextResponse.json(
-        { error: 'Blog post not found' },
-        { status: 404 }
+        { error: "Blog post not found" },
+        { status: 404 },
       );
     }
 
     return NextResponse.json(post);
   } catch (error) {
-    console.error('Error fetching blog post:', error);
+    console.error("Error fetching blog post:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch blog post' },
-      { status: 500 }
+      { error: "Failed to fetch blog post" },
+      { status: 500 },
     );
   }
 }

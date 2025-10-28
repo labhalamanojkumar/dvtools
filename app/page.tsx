@@ -1,18 +1,18 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { 
-  Code2, 
-  FileJson, 
-  Lock, 
-  Regex, 
-  Link2, 
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Code2,
+  FileJson,
+  Lock,
+  Regex,
+  Link2,
   Binary,
   ArrowRight,
   CheckCircle2,
   Zap,
   Shield,
-  Smartphone
-} from 'lucide-react';
+  Smartphone,
+} from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -22,11 +22,13 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              Professional <span className="text-primary">Developer Tools</span> Platform
+              Professional <span className="text-primary">Developer Tools</span>{" "}
+              Platform
             </h1>
             <p className="mb-8 text-lg text-muted-foreground sm:text-xl md:text-2xl">
-              Fast, secure, and privacy-focused tools for JSON formatting, Base64 encoding, 
-              JWT decoding, code beautification, and more. All processing happens in your browser.
+              Fast, secure, and privacy-focused tools for JSON formatting,
+              Base64 encoding, JWT decoding, code beautification, and more. All
+              processing happens in your browser.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" asChild>
@@ -50,7 +52,8 @@ export default function HomePage() {
               Popular Developer Tools
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Professional-grade tools designed for developers, with powerful features and intuitive interfaces
+              Professional-grade tools designed for developers, with powerful
+              features and intuitive interfaces
             </p>
           </div>
 
@@ -136,7 +139,7 @@ export default function HomePage() {
             <h2 className="mb-12 text-center text-3xl font-bold tracking-tight sm:text-4xl">
               Frequently Asked Questions
             </h2>
-            
+
             <div className="space-y-6">
               <FAQItem
                 question="Are these tools free to use?"
@@ -179,15 +182,15 @@ export default function HomePage() {
   );
 }
 
-function ToolCard({ 
-  icon, 
-  title, 
-  description, 
-  href 
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
-  description: string; 
+function ToolCard({
+  icon,
+  title,
+  description,
+  href,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
   href: string;
 }) {
   return (
@@ -206,13 +209,13 @@ function ToolCard({
   );
 }
 
-function FeatureCard({ 
-  icon, 
-  title, 
-  description 
-}: { 
-  icon: React.ReactNode; 
-  title: string; 
+function FeatureCard({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
   description: string;
 }) {
   return (
@@ -226,13 +229,7 @@ function FeatureCard({
   );
 }
 
-function FAQItem({ 
-  question, 
-  answer 
-}: { 
-  question: string; 
-  answer: string;
-}) {
+function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
     <div className="rounded-lg border bg-card p-6">
       <h3 className="mb-2 text-lg font-semibold">{question}</h3>
