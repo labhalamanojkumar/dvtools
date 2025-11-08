@@ -18,9 +18,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | DevTools Hub - Usage Agreement",
+  title: "Terms of Service | DvTools - Usage Agreement",
   description:
-    "Read DevTools Hub's Terms of Service. Understand your rights and responsibilities when using our developer tools and services.",
+    "Read DvTools's Terms of Service. Understand your rights and responsibilities when using our developer tools and services.",
   keywords: [
     "terms of service",
     "terms and conditions",
@@ -30,26 +30,26 @@ export const metadata: Metadata = {
     "legal terms",
   ],
   openGraph: {
-    title: "Terms of Service | DevTools Hub - Usage Agreement",
+    title: "Terms of Service | DvTools - Usage Agreement",
     description:
-      "Read DevTools Hub's Terms of Service and understand your rights and responsibilities.",
+      "Read DvTools's Terms of Service and understand your rights and responsibilities.",
     type: "website",
     url: "/terms",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
     images: [
       {
         url: "/terms-og.jpg",
         width: 1200,
         height: 630,
-        alt: "DevTools Hub Terms of Service",
+        alt: "DvTools Terms of Service",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Terms of Service | DevTools Hub - Usage Agreement",
+    title: "Terms of Service | DvTools - Usage Agreement",
     description:
-      "Read DevTools Hub's Terms of Service and understand your rights and responsibilities.",
+      "Read DvTools's Terms of Service and understand your rights and responsibilities.",
     images: ["/terms-og.jpg"],
   },
   alternates: {
@@ -74,7 +74,7 @@ const sections = [
     title: "Acceptance of Terms",
     icon: <CheckCircle className="h-5 w-5" />,
     content: `
-      <p>By accessing and using DevTools Hub ("the Service"), you accept and agree to be bound by the terms and provision of this agreement.</p>
+      <p>By accessing and using DvTools ("the Service"), you accept and agree to be bound by the terms and provision of this agreement.</p>
 
       <p>If you do not agree to abide by the above, please do not use this service. These Terms of Service apply to all users of the site, including without limitation users who are browsers, vendors, customers, merchants, and/or contributors of content.</p>
 
@@ -83,7 +83,7 @@ const sections = [
           <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
           <div>
             <h4 class="font-semibold text-blue-900 dark:text-blue-100">Agreement</h4>
-            <p class="text-blue-800 dark:text-blue-200 text-sm mt-1">By using DevTools Hub, you acknowledge that you have read, understood, and agree to be bound by these terms.</p>
+            <p class="text-blue-800 dark:text-blue-200 text-sm mt-1">By using DvTools, you acknowledge that you have read, understood, and agree to be bound by these terms.</p>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@ const sections = [
     title: "Description of Service",
     icon: <FileText className="h-5 w-5" />,
     content: `
-      <p>DevTools Hub provides a comprehensive suite of developer tools and utilities designed to assist developers in their work.</p>
+      <p>DvTools provides a comprehensive suite of developer tools and utilities designed to assist developers in their work.</p>
 
       <h3>Service Features</h3>
       <ul>
@@ -134,7 +134,7 @@ const sections = [
     title: "Acceptable Use Policy",
     icon: <Shield className="h-5 w-5" />,
     content: `
-      <p>You agree to use DevTools Hub only for lawful purposes and in accordance with these terms.</p>
+      <p>You agree to use DvTools only for lawful purposes and in accordance with these terms.</p>
 
       <h3>Permitted Use</h3>
       <ul>
@@ -171,7 +171,7 @@ const sections = [
     icon: <Lock className="h-5 w-5" />,
     content: `
       <h3>Our Intellectual Property</h3>
-      <p>The Service and its original content, features, and functionality are owned by DevTools Hub and are protected by copyright, trademark, and other intellectual property laws.</p>
+      <p>The Service and its original content, features, and functionality are owned by DvTools and are protected by copyright, trademark, and other intellectual property laws.</p>
 
       <h3>User Content</h3>
       <p>You retain ownership of content you submit to the Service. By submitting content, you grant us a license to use, display, and distribute your content in connection with the Service.</p>
@@ -227,7 +227,7 @@ const sections = [
       <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. We make no warranties, expressed or implied, regarding the service's operation or availability.</p>
 
       <h3>Limitation of Liability</h3>
-      <p>To the maximum extent permitted by law, DevTools Hub shall not be liable for any indirect, incidental, special, consequential, or punitive damages.</p>
+      <p>To the maximum extent permitted by law, DvTools shall not be liable for any indirect, incidental, special, consequential, or punitive damages.</p>
 
       <h3>Service Interruptions</h3>
       <p>We do not guarantee uninterrupted or error-free service. We may perform maintenance or updates that temporarily disrupt service availability.</p>
@@ -287,9 +287,9 @@ const sections = [
       <p>If you have questions about these Terms of Service, please contact us:</p>
 
       <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg my-6">
-        <h4 class="font-semibold mb-2">DevTools Hub Support</h4>
+        <h4 class="font-semibold mb-2">DvTools Support</h4>
         <p><strong>Email:</strong> legal@devtoolshub.com</p>
-        <p><strong>Support:</strong> support@devtoolshub.com</p>
+        <p><strong>Support:</strong> connect@dvtools.in</p>
         <p><strong>Address:</strong> [Company Address]</p>
       </div>
 
@@ -308,12 +308,12 @@ export default function TermsOfServicePage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            name: "Terms of Service - DevTools Hub",
-            description: "DevTools Hub terms of service and usage agreement",
+            name: "Terms of Service - DvTools",
+            description: "DvTools terms of service and usage agreement",
             url: "https://devtoolshub.com/terms",
             publisher: {
               "@type": "Organization",
-              name: "DevTools Hub",
+              name: "DvTools",
               contactPoint: {
                 "@type": "ContactPoint",
                 email: "legal@devtoolshub.com",
@@ -339,7 +339,7 @@ export default function TermsOfServicePage() {
             Terms of Service
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Please read these terms carefully before using DevTools Hub
+            Please read these terms carefully before using DvTools
             services.
           </p>
           <div className="flex items-center justify-center gap-4 mt-4 text-sm text-muted-foreground">

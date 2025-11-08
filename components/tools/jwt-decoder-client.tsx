@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { copyToClipboard, downloadFile } from "../../lib/utils";
 import { useToast } from "../ui/toaster";
+import { Input } from "../ui/input";
 import {
   Copy,
   Download,
@@ -15,6 +16,7 @@ import {
   XCircle,
   AlertCircle,
   CheckCircle2,
+  Upload,
 } from "lucide-react";
 
 export function JwtDecoderClient() {
@@ -64,6 +66,50 @@ export function JwtDecoderClient() {
             placeholder="Paste your JWT token here..."
             className="code-editor min-h-[100px]"
           />
+          <div className="flex items-center space-x-2 mt-2">
+            <Input
+              type="file"
+              accept=".txt,.jwt,.token"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (e) => {
+                    const content = e.target?.result as string;
+                    setToken(content.trim());
+                    toast({ title: "Success", description: `Loaded ${file.name}` });
+                  };
+                  reader.readAsText(file);
+                }
+              }}
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.txt,.jwt,.token';
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                      const content = e.target?.result as string;
+                      setToken(content.trim());
+                      toast({ title: "Success", description: `Loaded ${file.name}` });
+                    };
+                    reader.readAsText(file);
+                  }
+                };
+                input.click();
+              }}
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Upload JWT File
+            </Button>
+          </div>
           <Button onClick={decodeJwt} className="mt-4">
             Decode JWT
           </Button>

@@ -1,0 +1,61 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="optimizerBgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0d9488;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="optimizerAccentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34d399;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6ee7b7;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#optimizerBgGradient)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="200" cy="150" r="60" fill="url(#optimizerAccentGradient)" opacity="0.3"/>
+  <circle cx="1000" cy="400" r="90" fill="url(#optimizerAccentGradient)" opacity="0.2"/>
+  <rect x="800" y="80" width="250" height="180" fill="url(#optimizerAccentGradient)" opacity="0.15" rx="20"/>
+  
+  <!-- Main content -->
+  <g transform="translate(100, 120)">
+    <!-- Image optimizer icon -->
+    <rect x="0" y="0" width="100" height="100" fill="white" opacity="0.9" rx="15"/>
+    
+    <!-- Optimize icon (compression/optimization symbol) -->
+    <g transform="translate(25, 25)" fill="#059669">
+      <rect x="0" y="0" width="50" height="50" rx="8" fill="none" stroke="currentColor" stroke-width="2"/>
+      <path d="M10 20 L20 30 L35 15" fill="none" stroke="currentColor" stroke-width="3"/>
+      <circle cx="15" cy="15" r="3" fill="currentColor"/>
+      <circle cx="35" cy="35" r="3" fill="currentColor"/>
+    </g>
+    
+    <!-- Title -->
+    <text x="120" y="35" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="white">
+      Image Optimizer
+    </text>
+    <text x="120" y="65" font-family="Arial, sans-serif" font-size="18" fill="white" opacity="0.8">
+      Compress • Convert • Enhance
+    </text>
+    
+    <!-- Features -->
+    <text x="120" y="105" font-family="Arial, sans-serif" font-size="20" fill="white" opacity="0.9">
+      Batch Processing & Quality Preservation
+    </text>
+    
+    <!-- Feature list -->
+    <g transform="translate(120, 135)" fill="white" opacity="0.8" font-family="Arial, sans-serif" font-size="14">
+      <text y="0">• WebP, AVIF, JPEG, PNG Format Conversion</text>
+      <text y="22">• Lossless & Lossy Compression</text>
+      <text y="44">• Smart Quality Optimization</text>
+      <text y="66">• Batch Processing Support</text>
+      <text y="88">• Fast Loading Websites</text>
+    </g>
+  </g>
+  
+  <!-- Footer -->
+  <text x="600" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white" opacity="0.7">
+    DvTools Image Optimization Suite
+  </text>
+</svg>

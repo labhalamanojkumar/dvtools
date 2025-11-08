@@ -1,0 +1,148 @@
+---
+title: "Decode and Inspect JWTs: A Guide to Our JWT Decoder"
+description: "Learn how to use our free online JWT decoder to instantly decode and inspect the header, payload, and signature of JSON Web Tokens. Verify claims, check expiration, and debug with ease."
+date: "2025-11-24"
+keywords: [
+  "jwt decoder", "json web token", "jwt inspector", "decode jwt", "jwt claims",
+  "jwt debugger", "authentication", "security tools", "developer tools"
+]
+authors:
+  - name: "DvTools Team"
+    url: "https://dvtools.in"
+category: "Security & Authentication"
+slug: "jwt-decoder-guide"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Key, ShieldCheck, Clock, FileJson, Zap } from "lucide-react";
+import Link from "next/link";
+
+<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Decode and Inspect JWTs: A Guide to Our JWT Decoder",
+  "description": "A comprehensive guide to using our free online JWT decoder for inspecting and debugging JSON Web Tokens.",
+  "image": "https://dvtools.in/og-image-jwt-decoder.png",
+  "author": {
+    "@type": "Organization",
+    "name": "DvTools"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "DvTools",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://dvtools.in/logo.png"
+    }
+  },
+  "datePublished": "2025-11-24",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://dvtools.in/blog/jwt-decoder-guide"
+  }
+}
+` }} />
+
+## The Mystery of the Long, Encoded String
+
+JSON Web Tokens (JWTs) are the backbone of modern authentication. They are compact, URL-safe strings that represent claims to be transferred between two parties. But when you're debugging, a JWT just looks like a long, meaningless jumble of characters separated by dots. How do you know what's inside? Is the user ID correct? Has the token expired?
+
+Our **JWT Decoder** is a simple, secure, and powerful tool that lets you instantly peek inside any JWT, making debugging authentication flows a breeze.
+
+## Anatomy of a JWT
+
+A JWT consists of three parts, separated by dots (`.`):
+
+1.  **Header:** Contains metadata about the token, such as the signing algorithm used (`alg`) and the token type (`typ`).
+2.  **Payload:** Contains the "claims" or data about the user, such as their ID (`sub`), roles, and the token's expiration time (`exp`).
+3.  **Signature:** A cryptographic signature used to verify that the token hasn't been tampered with.
+
+Our JWT Decoder takes an encoded token and clearly separates and decodes the Header and Payload for easy inspection.
+
+<Card className="my-8">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Key className="h-5 w-5 text-primary" />
+      Key Features of the JWT Decoder
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="space-y-4">
+      <li className="flex items-start gap-3">
+        <FileJson className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Instant Decoding</h4>
+          <span>Paste any JWT into the tool, and it will immediately decode the header and payload, displaying them as easy-to-read JSON objects.</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <Clock className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Automatic Date Conversion</h4>
+          <span>The tool automatically converts standard timestamp claims like `iat` (issued at) and `exp` (expiration time) from Unix timestamps into human-readable dates and times, telling you exactly when a token expires.</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <ShieldCheck className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Signature Verification (Optional)</h4>
+          <span>If you provide the secret key (for HS256) or the public key (for RS256), the tool can verify the token's signature, confirming its authenticity. **Note: All processing is done client-side. Your secrets are never sent to our servers.**</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <FileJson className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Color-Coded Output</h4>
+          <span>The header, payload, and signature parts of the token are color-coded, making it easy to see how the encoded string maps to the decoded data.</span>
+        </div>
+      </li>
+    </ul>
+  </CardContent>
+</Card>
+
+## Debugging Authentication in Seconds
+
+Imagine a user is reporting they can't access a protected route. Here's how you'd use the JWT Decoder:
+
+1.  **Get the Token:** Ask the user to provide the JWT they are using (usually found in local storage or an HTTP header).
+2.  **Paste and Decode:** Paste the token into the decoder.
+3.  **Inspect the Claims:**
+    *   **Check the Expiration (`exp`):** The tool will tell you if the token has expired. This is the most common cause of access issues.
+    *   **Verify User Info (`sub`, `email`, etc.):** Check that the user ID and other claims in the payload are correct.
+    *   **Check Scopes/Roles:** If your application uses roles or permissions, verify that the token contains the correct ones for the route the user is trying to access.
+4.  **Verify Signature (if needed):** If you suspect the token might be malformed or tampered with, you can paste your secret key to verify its integrity.
+
+<div className="grid md:grid-cols-2 gap-6 my-8">
+  <Card>
+    <CardHeader>
+      <CardTitle>For API Developers</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p>When building and testing protected endpoints, use the decoder to quickly inspect the tokens you're generating and receiving. Ensure all necessary claims are present and correct.</p>
+    </CardContent>
+  </Card>
+  <Card>
+    <CardHeader>
+      <CardTitle>For Frontend Developers</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p>Debug login flows and protected routes by examining the token stored in the browser. See exactly what data your backend is sending and why a token might be considered invalid.</p>
+    </CardContent>
+  </Card>
+</div>
+
+## An Essential Tool for Secure Development
+
+Working with authentication can be tricky, but it doesn't have to be a black box. Our JWT Decoder demystifies JSON Web Tokens, giving you the visibility you need to build, test, and debug secure applications with confidence.
+
+<div className="text-center my-10">
+  <Button asChild size="lg">
+    <Link href="/tools/jwt-decoder">
+      <Zap className="mr-2 h-5 w-5" /> Decode Your JWT Now
+    </Link>
+  </Button>
+</div>
+
+Stop guessing what's in your tokens. Decode, inspect, and verify them in seconds.

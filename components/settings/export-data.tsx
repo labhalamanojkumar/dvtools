@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +15,8 @@ import {
   AlertTriangle,
   CheckCircle,
   RefreshCw,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toaster";
 
@@ -41,6 +43,11 @@ export default function ExportData() {
   );
   const [availableExports, setAvailableExports] = useState<ExportOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isPageVisibleRef = useRef(true);
   const { toast } = useToast();
 
   const defaultExportOptions: ExportOption[] = [
@@ -78,26 +85,42 @@ export default function ExportData() {
     },
   ];
 
-  useEffect(() => {
-    fetchAvailableExports();
-  }, []);
-
-  const fetchAvailableExports = async () => {
+  const fetchAvailableExports = useCallback(async (showLoadingState = false) => {
     try {
-      const response = await fetch("/api/export/status");
+      if (showLoadingState) {
+        setIsRefreshing(true);
+      }
+
+      const response = await fetch("/api/export/status", {
+        cache: "no-cache",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+
       if (response.ok) {
         const data = await response.json();
         setAvailableExports(data.availableExports || defaultExportOptions);
+        setIsConnected(true);
       } else {
+        setIsConnected(false);
         setAvailableExports(defaultExportOptions);
       }
     } catch (error) {
       console.error("Failed to fetch available exports:", error);
+      setIsConnected(false);
       setAvailableExports(defaultExportOptions);
     } finally {
+      if (showLoadingState) {
+        setIsRefreshing(false);
+      }
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  const handleRefresh = useCallback(() => {
+    fetchAvailableExports(true);
+  }, [fetchAvailableExports]);
 
   const handleExport = async (exportId: string) => {
     setIsExporting(exportId);
@@ -118,6 +141,7 @@ export default function ExportData() {
 
       const result: ExportResult = await response.json();
       setExportedItems((prev) => new Map(prev.set(exportId, result)));
+      setLastUpdated(new Date());
 
       toast({
         title: "Export completed",
@@ -173,6 +197,37 @@ export default function ExportData() {
     await Promise.allSettled(exportPromises);
   };
 
+  useEffect(() => {
+    // Initial fetch
+    fetchAvailableExports();
+
+    // Set up auto-refresh every 2 minutes for export status
+    pollIntervalRef.current = setInterval(() => {
+      if (isPageVisibleRef.current) {
+        fetchAvailableExports();
+      }
+    }, 120000);
+
+    // Handle page visibility change
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden;
+      if (!document.hidden) {
+        // Refresh when page becomes visible
+        fetchAvailableExports();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [fetchAvailableExports]);
+
   if (isLoading) {
     return (
       <Card>
@@ -195,17 +250,41 @@ export default function ExportData() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Download className="h-5 w-5" />
-          Export Your Data
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <Download className="h-5 w-5" />
+            Export Your Data
+            {isConnected ? (
+              <Wifi className="h-4 w-4 text-green-500" />
+            ) : (
+              <WifiOff className="h-4 w-4 text-red-500" />
+            )}
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {lastUpdated && (
+              <span className="text-xs text-muted-foreground">
+                {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+            <Button
+              onClick={handleRefresh}
+              variant="ghost"
+              size="sm"
+              disabled={isRefreshing}
+            >
+              <RefreshCw 
+                className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} 
+              />
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
             Your data will be exported in JSON format. All exports are processed
-            securely and contain only your data.
+            securely and contain only your data. Auto-refreshing available options.
           </AlertDescription>
         </Alert>
 
@@ -318,6 +397,7 @@ export default function ExportData() {
               • You can delete your account and all associated data at any time
             </li>
             <li>• All exports are available for download for 30 days</li>
+            <li>• Export options refresh every 2 minutes for latest data</li>
           </ul>
         </div>
       </CardContent>

@@ -5,23 +5,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Shield,
-  Lock,
   Eye,
   Database,
   Users,
   Mail,
   Cookie,
   FileText,
-  AlertTriangle,
-  CheckCircle,
   ArrowLeft,
   Globe,
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | DevTools Hub - Data Protection & Privacy",
+  title: "Privacy Policy | DvTools - Data Protection & Privacy",
   description:
-    "Learn how DevTools Hub protects your privacy and handles your data. We are committed to transparency, security, and compliance with privacy regulations.",
+    "Learn how DvTools protects your privacy and handles your data. We are committed to transparency, security, and compliance with privacy regulations.",
   keywords: [
     "privacy policy",
     "data protection",
@@ -32,26 +29,26 @@ export const metadata: Metadata = {
     "data handling",
   ],
   openGraph: {
-    title: "Privacy Policy | DevTools Hub - Data Protection & Privacy",
+    title: "Privacy Policy | DvTools - Data Protection & Privacy",
     description:
-      "Learn how DevTools Hub protects your privacy and handles your data.",
+      "Learn how DvTools protects your privacy and handles your data.",
     type: "website",
     url: "/privacy",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
     images: [
       {
         url: "/privacy-og.jpg",
         width: 1200,
         height: 630,
-        alt: "DevTools Hub Privacy Policy",
+        alt: "DvTools Privacy Policy",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privacy Policy | DevTools Hub - Data Protection & Privacy",
+    title: "Privacy Policy | DvTools - Data Protection & Privacy",
     description:
-      "Learn how DevTools Hub protects your privacy and handles your data.",
+      "Learn how DvTools protects your privacy and handles your data.",
     images: ["/privacy-og.jpg"],
   },
   alternates: {
@@ -76,9 +73,9 @@ const sections = [
     title: "Introduction",
     icon: <Shield className="h-5 w-5" />,
     content: `
-      <p>At DevTools Hub, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
+      <p>At DvTools, we are committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our website and services.</p>
 
-      <p>This policy applies to all users of DevTools Hub, including visitors to our website and registered users of our services. By using our services, you agree to the collection and use of information in accordance with this policy.</p>
+      <p>This policy applies to all users of DvTools, including visitors to our website and registered users of our services. By using our services, you agree to the collection and use of information in accordance with this policy.</p>
 
       <div class="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border-l-4 border-blue-500 my-6">
         <div class="flex items-start gap-3">
@@ -301,7 +298,7 @@ const sections = [
       <p>If you have any questions about this Privacy Policy or our data practices, please contact us:</p>
 
       <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg my-6">
-        <h4 class="font-semibold mb-2">DevTools Hub Privacy Team</h4>
+        <h4 class="font-semibold mb-2">DvTools Privacy Team</h4>
         <p><strong>Email:</strong> privacy@devtoolshub.com</p>
         <p><strong>Address:</strong> [Company Address]</p>
         <p><strong>Data Protection Officer:</strong> dpo@devtoolshub.com</p>
@@ -324,13 +321,13 @@ export default function PrivacyPolicyPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            name: "Privacy Policy - DevTools Hub",
+            name: "Privacy Policy - DvTools",
             description:
-              "DevTools Hub privacy policy and data protection information",
+              "DvTools privacy policy and data protection information",
             url: "https://devtoolshub.com/privacy",
             publisher: {
               "@type": "Organization",
-              name: "DevTools Hub",
+              name: "DvTools",
               contactPoint: {
                 "@type": "ContactPoint",
                 email: "privacy@devtoolshub.com",

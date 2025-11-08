@@ -10,8 +10,6 @@ import {
   Binary,
   Lock,
   Regex,
-  Link2,
-  Palette,
   ArrowRight,
   Search,
   Zap,
@@ -20,9 +18,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Documentation | DevTools Hub - Developer Tools Guide",
+  title: "Documentation | DvTools - Developer Tools Guide",
   description:
-    "Comprehensive documentation for DevTools Hub. Learn how to use JSON formatter, Base64 encoder, JWT decoder, RegExp tester, code beautifier, and more developer tools.",
+    "Comprehensive documentation for DvTools. Learn how to use JSON formatter, Base64 encoder, JWT decoder, RegExp tester, code beautifier, and more developer tools.",
   keywords: [
     "documentation",
     "developer tools",
@@ -34,26 +32,26 @@ export const metadata: Metadata = {
     "URL encoder guide",
   ],
   openGraph: {
-    title: "Documentation | DevTools Hub - Developer Tools Guide",
+    title: "Documentation | DvTools - Developer Tools Guide",
     description:
-      "Comprehensive documentation for DevTools Hub. Learn how to use our developer tools effectively.",
+      "Comprehensive documentation for DvTools. Learn how to use our developer tools effectively.",
     type: "website",
     url: "/docs",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
     images: [
       {
         url: "/docs-og.jpg",
         width: 1200,
         height: 630,
-        alt: "DevTools Hub Documentation",
+        alt: "DvTools Documentation",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Documentation | DevTools Hub - Developer Tools Guide",
+    title: "Documentation | DvTools - Developer Tools Guide",
     description:
-      "Comprehensive documentation for DevTools Hub. Learn how to use our developer tools effectively.",
+      "Comprehensive documentation for DvTools. Learn how to use our developer tools effectively.",
     images: ["/docs-og.jpg"],
   },
   alternates: {
@@ -84,7 +82,7 @@ const docCategories = [
       {
         title: "Introduction",
         href: "/docs/introduction",
-        description: "Overview of DevTools Hub",
+        description: "Overview of DvTools",
       },
       {
         title: "Quick Start Guide",
@@ -136,7 +134,7 @@ const docCategories = [
   {
     id: "api",
     title: "API Reference",
-    description: "Integrate DevTools Hub into your applications",
+    description: "Integrate DvTools into your applications",
     icon: <Zap className="h-8 w-8" />,
     color: "text-purple-600",
     bgColor: "bg-purple-50 dark:bg-purple-950",
@@ -249,13 +247,13 @@ export default function DocsPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "TechArticle",
-            name: "DevTools Hub Documentation",
+            name: "DvTools Documentation",
             description:
               "Comprehensive documentation for developer tools including JSON formatter, Base64 encoder, JWT decoder, and more",
             url: "https://devtoolshub.com/docs",
             publisher: {
               "@type": "Organization",
-              name: "DevTools Hub",
+              name: "DvTools",
               logo: {
                 "@type": "ImageObject",
                 url: "https://devtoolshub.com/logo.png",
@@ -282,7 +280,7 @@ export default function DocsPage() {
         </h1>
         <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
           Comprehensive guides, tutorials, and API references to help you make
-          the most of DevTools Hub. From basic usage to advanced integrations.
+          the most of DvTools. From basic usage to advanced integrations.
         </p>
 
         {/* Search Bar */}
@@ -480,7 +478,7 @@ export default function DocsPage() {
         <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
         <p className="text-lg opacity-90 mb-6 max-w-2xl mx-auto">
           Jump into our documentation and start building amazing things with
-          DevTools Hub.
+          DvTools.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button size="lg" variant="secondary" asChild>

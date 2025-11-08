@@ -4,6 +4,10 @@ import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/toaster";
+import { AdPlacement } from "@/components/ads/ad-placement";
+import { InstallBanner } from "@/components/install-banner";
+import { FloatingInstallButton } from "@/components/floating-install-button";
+import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -13,8 +17,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
   ),
   title: {
-    default: "DevTools Hub - Professional Developer Tools",
-    template: "%s | DevTools Hub",
+    default: "DvTools - Professional Developer Tools",
+    template: "%s | DvTools",
   },
   description:
     "Professional developer tools for JSON formatting, Base64 encoding, JWT decoding, RegExp testing, and more. Fast, secure, and privacy-focused.",
@@ -27,9 +31,9 @@ export const metadata: Metadata = {
     "developer tools",
     "online tools",
   ],
-  authors: [{ name: "DevTools Hub" }],
-  creator: "DevTools Hub",
-  publisher: "DevTools Hub",
+  authors: [{ name: "DvTools" }],
+  creator: "DvTools",
+  publisher: "DvTools",
   formatDetection: {
     email: false,
     address: false,
@@ -39,8 +43,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: process.env.NEXT_PUBLIC_APP_URL,
-    siteName: "DevTools Hub",
-    title: "DevTools Hub - Professional Developer Tools",
+    siteName: "DvTools",
+    title: "DvTools - Professional Developer Tools",
     description:
       "Professional developer tools for JSON formatting, Base64 encoding, JWT decoding, and more.",
     images: [
@@ -48,13 +52,13 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "DevTools Hub",
+        alt: "DvTools",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DevTools Hub - Professional Developer Tools",
+    title: "DvTools - Professional Developer Tools",
     description:
       "Professional developer tools for JSON formatting, Base64 encoding, JWT decoding, and more.",
     images: ["/og-image.png"],
@@ -96,12 +100,30 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <Providers>
+          <ServiceWorkerRegistration />
           <div className="flex min-h-screen flex-col">
             <Header />
+            <AdPlacement
+              placementKey="header_banner"
+              className="mb-4"
+            />
             <main className="flex-1">{children}</main>
+            <AdPlacement
+              placementKey="footer_banner"
+              className="mt-8"
+            />
             <Footer />
           </div>
           <Toaster />
+          <InstallBanner 
+            position="bottom" 
+            variant="default"
+            showDeviceInfo={true}
+          />
+          <FloatingInstallButton 
+            position="bottom-right"
+            showBadge={true}
+          />
         </Providers>
       </body>
     </html>

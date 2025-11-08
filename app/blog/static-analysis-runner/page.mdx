@@ -1,0 +1,162 @@
+---
+title: "Streamline Your Static Analysis with the Static Analysis Runner"
+description: "Run multiple linters and static analysis tools concurrently with a single command. Our Static Analysis Runner centralizes configuration and aggregates results for a cleaner codebase."
+date: "2025-12-11"
+keywords: [
+  "static analysis", "linter", "code quality", "eslint", "prettier", "sonarqube",
+  "devops", "code analysis"
+]
+authors:
+  - name: "DvTools Team"
+    url: "https://dvtools.in"
+category: "Code Quality & DevOps"
+slug: "static-analysis-runner-guide"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Play, BarChart, Settings, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+
+<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Streamline Your Static Analysis with the Static Analysis Runner",
+  "description": "A guide on using our Static Analysis Runner to consolidate your code quality tools, run them in parallel, and get a unified view of all issues.",
+  "image": "https://dvtools.in/og-image-static-analysis.png",
+  "author": {
+    "@type": "Organization",
+    "name": "DvTools"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "DvTools",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://dvtools.in/logo.png"
+    }
+  },
+  "datePublished": "2025-12-11",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://dvtools.in/blog/static-analysis-runner-guide"
+  }
+}
+` }} />
+
+## The Jungle of Code Quality Tools
+
+In a modern software project, you might be using ESLint for JavaScript style, Prettier for formatting, a security scanner for vulnerabilities, and a complexity checker for code metrics. Each tool has its own configuration file, its own command-line interface, and its own output format. Running them all becomes a chore, and integrating them into your CI/CD pipeline is a complex task.
+
+Our **Static Analysis Runner** is a unified interface for all your code quality tools. It allows you to configure, run, and view the results of multiple analyzers with a single, simple workflow.
+
+## What is a Static Analysis Runner?
+
+A Static Analysis Runner is a tool that orchestrates the execution of various static analysis tools. You define a single configuration file specifying which tools to run, on which files, and with which settings. The runner then executes them—often in parallel—and aggregates their output into a single, easy-to-read report. It simplifies your development workflow and your CI/CD setup.
+
+<Card className="my-8">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Play className="h-5 w-5 text-primary" />
+      Key Features of Our Static Analysis Runner
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="space-y-4">
+      <li className="flex items-start gap-3">
+        <Settings className="h-5 w-5 text-blue-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Centralized Configuration</h4>
+          <span>Manage all your linter settings in one place. Define tool versions, configuration paths, and file inclusions/exclusions in a single YAML file.</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <Play className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Parallel Execution</h4>
+          <span>Run all your analyzers concurrently to get feedback faster. The runner intelligently parallelizes tasks, significantly speeding up your CI builds.</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <BarChart className="h-5 w-5 text-purple-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Unified Reporting</h4>
+          <span>View all issues from all tools in a single, consolidated report. The output can be formatted as plain text, JSON, or a rich HTML dashboard for easy analysis.</span>
+        </div>
+      </li>
+    </ul>
+  </CardContent>
+</Card>
+
+## A Common Use Case: A Polyglot Monorepo
+
+You manage a large monorepo containing a React frontend, a Node.js backend, and some Python scripts for data processing.
+
+1.  **Configure the Runner:** You create a single `.analysis-runner.yml` file at the root of your repository.
+
+    ```yaml
+    tools:
+      - name: eslint
+        command: eslint
+        files: "packages/frontend/src/**/*.{js,ts,tsx}"
+      - name: prettier
+        command: prettier --check
+        files: "**/*.{js,ts,tsx,json,md}"
+      - name: bandit
+        command: bandit -r
+        files: "packages/data-scripts/"
+    ```
+
+2.  **Run Locally:** A developer makes some changes and wants to check for issues before committing. They run a single command:
+    *   `analysis-runner run`
+
+3.  **Automated Execution:**
+    *   The runner spins up three parallel processes.
+    *   It runs ESLint on the frontend code, Prettier on all relevant files, and Bandit (a Python security linter) on the scripts directory.
+    *   It collects the output from all three tools.
+
+4.  **Consolidated Output:** The developer sees a single report in their terminal:
+
+    ```
+    [eslint] packages/frontend/src/components/User.tsx:10:5: Unused variable 'user'
+    [prettier] packages/frontend/src/App.tsx: Code is not formatted
+    [bandit] packages/data-scripts/process.py: High-confidence issue: Use of subprocess without shell=True
+
+    Found 3 issues from 3 tools.
+    ```
+
+5.  **CI Integration:** In your CI pipeline (e.g., GitHub Actions), you have a single step: `analysis-runner run`. If any tool reports an error, the build fails, preventing low-quality code from being merged.
+
+<div className="grid md:grid-cols-2 gap-6 my-8">
+  <Card>
+    <CardHeader>
+      <CardTitle>Enforce Code Quality Standards</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p>By making it easy to run a comprehensive suite of analyzers, the runner helps you enforce consistent coding standards and best practices across your entire organization.</p>
+    </CardContent>
+  </Card>
+  <Card>
+    <CardHeader>
+      <CardTitle>Easy to Add New Tools</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p>Want to introduce a new linter? Just add a few lines to the central configuration file. There's no need to modify dozens of different CI scripts or developer guides.</p>
+    </CardContent>
+  </Card>
+</div>
+
+## One Command to Rule Them All
+
+Stop juggling multiple tools and configurations. The Static Analysis Runner brings order to the chaos of code quality, providing a single, streamlined workflow for developers and a simple, powerful integration point for your CI/CD pipeline.
+
+<div className="text-center my-10">
+  <Button asChild size="lg">
+    <Link href="/tools/static-analysis-runner">
+      <Play className="mr-2 h-5 w-5" /> Configure Your First Run
+    </Link>
+  </Button>
+</div>
+
+Write cleaner, safer, and more consistent code with less effort.

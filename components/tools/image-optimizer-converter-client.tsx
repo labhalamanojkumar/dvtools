@@ -96,8 +96,9 @@ export default function ImageOptimizerConverterClient() {
 
       if (files.length === 0) return;
 
-      // Check file types
+      // Check file types and basic validation
       const validFiles = files.filter((file) => {
+        // Check MIME type
         const isValidType = file.type.startsWith("image/");
         if (!isValidType) {
           toast({
@@ -105,19 +106,62 @@ export default function ImageOptimizerConverterClient() {
             description: `${file.name} is not a supported image format`,
             variant: "destructive",
           });
+          return false;
         }
-        return isValidType;
+
+        // Check file size (max 50MB)
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.size > maxSize) {
+          toast({
+            title: "File too large",
+            description: `${file.name} is too large (max 50MB)`,
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        // Check minimum file size (not empty)
+        if (file.size === 0) {
+          toast({
+            title: "Empty file",
+            description: `${file.name} appears to be empty`,
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        return true;
       });
 
       if (validFiles.length === 0) return;
 
       // Process each file sequentially to avoid race conditions
       for (const file of validFiles) {
-        try {
-          const preview = URL.createObjectURL(file);
+        console.log("Processing file:", file.name, "Type:", file.type, "Size:", file.size);
 
-          // Get image dimensions
+        // Additional validation - check if file can be read
+        try {
+          // Try to access file properties to ensure it's valid
+          if (!file || typeof file.arrayBuffer !== 'function') {
+            throw new Error('Invalid file object');
+          }
+        } catch (validationError) {
+          console.error("File validation failed for:", file.name, validationError);
+          toast({
+            title: "Invalid file",
+            description: `${file.name} appears to be corrupted or invalid`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        try {
+          // Get image dimensions first
           const dimensions = await getImageDimensions(file);
+          console.log("Successfully got dimensions for", file.name, ":", dimensions);
+
+          // Create preview URL after successful dimension loading using data URL for reliability
+          const preview = await fileToDataUrl(file);
 
           const newImage: ImageFile = {
             file,
@@ -130,11 +174,13 @@ export default function ImageOptimizerConverterClient() {
 
           setImages((prev) => [...prev, newImage]);
         } catch (error) {
+          console.error("Error processing file:", file.name, error);
           toast({
             title: "Error loading image",
-            description: `Failed to load ${file.name}`,
+            description: `Failed to load ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
             variant: "destructive",
           });
+          // Don't add the image to the list if dimension detection fails
         }
       }
 
@@ -145,15 +191,17 @@ export default function ImageOptimizerConverterClient() {
   );
 
   const handleDrop = useCallback(
-    async (e: React.DragEvent) => {
-      e.preventDefault();
+    async (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault();
       setIsDragOver(false);
 
-      const files = Array.from(e.dataTransfer.files);
+      const files = Array.from(event.dataTransfer.files);
+
       if (files.length === 0) return;
 
-      // Process files directly instead of creating synthetic event
+      // Check file types and basic validation
       const validFiles = files.filter((file) => {
+        // Check MIME type
         const isValidType = file.type.startsWith("image/");
         if (!isValidType) {
           toast({
@@ -161,19 +209,62 @@ export default function ImageOptimizerConverterClient() {
             description: `${file.name} is not a supported image format`,
             variant: "destructive",
           });
+          return false;
         }
-        return isValidType;
+
+        // Check file size (max 50MB)
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        if (file.size > maxSize) {
+          toast({
+            title: "File too large",
+            description: `${file.name} is too large (max 50MB)`,
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        // Check minimum file size (not empty)
+        if (file.size === 0) {
+          toast({
+            title: "Empty file",
+            description: `${file.name} appears to be empty`,
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        return true;
       });
 
       if (validFiles.length === 0) return;
 
       // Process each file sequentially to avoid race conditions
       for (const file of validFiles) {
-        try {
-          const preview = URL.createObjectURL(file);
+        console.log("Processing file:", file.name, "Type:", file.type, "Size:", file.size);
 
-          // Get image dimensions
+        // Additional validation - check if file can be read
+        try {
+          // Try to access file properties to ensure it's valid
+          if (!file || typeof file.arrayBuffer !== 'function') {
+            throw new Error('Invalid file object');
+          }
+        } catch (validationError) {
+          console.error("File validation failed for:", file.name, validationError);
+          toast({
+            title: "Invalid file",
+            description: `${file.name} appears to be corrupted or invalid`,
+            variant: "destructive",
+          });
+          continue;
+        }
+
+        try {
+          // Get image dimensions first
           const dimensions = await getImageDimensions(file);
+          console.log("Successfully got dimensions for", file.name, ":", dimensions);
+
+          // Create preview URL after successful dimension loading using data URL for reliability
+          const preview = await fileToDataUrl(file);
 
           const newImage: ImageFile = {
             file,
@@ -186,21 +277,22 @@ export default function ImageOptimizerConverterClient() {
 
           setImages((prev) => [...prev, newImage]);
         } catch (error) {
+          console.error("Error processing file:", file.name, error);
           toast({
             title: "Error loading image",
-            description: `Failed to load ${file.name}`,
+            description: `Failed to load ${file.name}: ${error instanceof Error ? error.message : 'Unknown error'}`,
             variant: "destructive",
           });
+          // Don't add the image to the list if dimension detection fails
         }
       }
     },
     [toast],
-  );
-
-  const removeImage = (index: number) => {
+  );  const removeImage = (index: number) => {
     setImages((prev) => {
       const newImages = [...prev];
-      URL.revokeObjectURL(newImages[index].preview);
+      // Data URLs don't need to be revoked like blob URLs
+      // URL.revokeObjectURL(newImages[index].preview);
       // We don't keep a persistent object URL for the optimized blob
       // (we create and revoke it on download). So don't create/revoke
       // a new temporary URL here — it is unnecessary.
@@ -209,13 +301,89 @@ export default function ImageOptimizerConverterClient() {
     });
   };
 
-  const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => {
+  const getImageDimensions = async (file: File): Promise<{ width: number; height: number }> => {
     return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve({ width: img.width, height: img.height });
-      img.onerror = () => reject(new Error("Failed to load image"));
-      img.src = URL.createObjectURL(file);
+      const timeout = setTimeout(() => {
+        reject(new Error(`Timeout loading image dimensions for: ${file.name}`));
+      }, 15000); // 15 second timeout
+
+      // Try createImageBitmap first (modern API, fastest)
+      if (typeof window.createImageBitmap === 'function' && file.type.startsWith('image/')) {
+        console.log("Trying createImageBitmap for:", file.name);
+        createImageBitmap(file).then((bitmap) => {
+          clearTimeout(timeout);
+          console.log("createImageBitmap success for:", file.name, bitmap.width, "x", bitmap.height);
+          resolve({ width: bitmap.width, height: bitmap.height });
+        }).catch((error) => {
+          console.log("createImageBitmap failed for:", file.name, error);
+          // Fall back to Image element
+          tryImageElement(file, resolve, reject, timeout);
+        });
+      } else {
+        console.log("createImageBitmap not available or not image type, trying Image element for:", file.name);
+        // Fall back to Image element for older browsers or non-image files
+        tryImageElement(file, resolve, reject, timeout);
+      }
     });
+  };
+
+  const tryImageElement = (file: File, resolve: (value: { width: number; height: number }) => void, reject: (reason: Error) => void, timeout: NodeJS.Timeout) => {
+    console.log("Trying Image element for:", file.name);
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      clearTimeout(timeout);
+      URL.revokeObjectURL(url);
+      const dimensions = { width: img.naturalWidth || img.width, height: img.naturalHeight || img.height };
+      console.log("Image element success for:", file.name, dimensions);
+      resolve(dimensions);
+    };
+
+    img.onerror = (error) => {
+      clearTimeout(timeout);
+      URL.revokeObjectURL(url);
+      console.error("Image element failed for:", file.name, error);
+
+      // Try one more fallback - FileReader approach
+      tryFileReaderFallback(file, resolve, reject, timeout);
+    };
+
+    // Set crossOrigin to handle potential CORS issues
+    img.crossOrigin = 'anonymous';
+    img.src = url;
+  };
+
+  const tryFileReaderFallback = (file: File, resolve: (value: { width: number; height: number }) => void, reject: (reason: Error) => void, timeout: NodeJS.Timeout) => {
+    console.log("Trying FileReader fallback for:", file.name);
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const img = new Image();
+
+      img.onload = () => {
+        clearTimeout(timeout);
+        const dimensions = { width: img.naturalWidth || img.width, height: img.naturalHeight || img.height };
+        console.log("FileReader fallback success for:", file.name, dimensions);
+        resolve(dimensions);
+      };
+
+      img.onerror = () => {
+        clearTimeout(timeout);
+        console.error("FileReader fallback failed for:", file.name);
+        reject(new Error(`All image loading methods failed for: ${file.name}`));
+      };
+
+      img.crossOrigin = 'anonymous';
+      img.src = e.target?.result as string;
+    };
+
+    reader.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error(`File reading failed for: ${file.name}`));
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const optimizeImage = async (
@@ -223,6 +391,14 @@ export default function ImageOptimizerConverterClient() {
     settings: OptimizationSettings,
   ): Promise<Blob> => {
     return new Promise((resolve, reject) => {
+      // Validate file before processing
+      if (!image.file || image.file.size === 0) {
+        reject(new Error(`Invalid or empty file: ${image.file.name}`));
+        return;
+      }
+
+      console.log("Starting optimization for:", image.file.name, "Size:", image.file.size, "Type:", image.file.type);
+
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
       if (!ctx) {
@@ -231,8 +407,20 @@ export default function ImageOptimizerConverterClient() {
       }
 
       const img = new Image();
+
+      // Add timeout to prevent hanging
+      const timeout = setTimeout(() => {
+        reject(new Error(`Timeout optimizing image: ${image.file.name}`));
+      }, 30000); // 30 second timeout for optimization
+
+      // Store the onload handler before setting src
+      const originalOnload = img.onload;
+
       img.onload = () => {
         try {
+          clearTimeout(timeout);
+          console.log("Image loaded for optimization:", image.file.name, img.naturalWidth, "x", img.naturalHeight);
+
           // Calculate new dimensions
           let { width, height } = img;
 
@@ -269,6 +457,7 @@ export default function ImageOptimizerConverterClient() {
             canvas.toBlob(
               (blob) => {
                 if (blob && blob.size > 0) {
+                  console.log("Successfully optimized:", image.file.name, "from", image.originalSize, "to", blob.size, "bytes");
                   // If we had to fallback (idx > 0), notify the user once.
                   if (idx > 0) {
                     try {
@@ -302,12 +491,36 @@ export default function ImageOptimizerConverterClient() {
 
           tryExport(mimeAttempts);
         } catch (error) {
-          reject(new Error("Failed to process image"));
+          clearTimeout(timeout);
+          console.error("Error during optimization:", image.file.name, error);
+          reject(new Error(`Failed to process image: ${error instanceof Error ? error.message : 'Unknown error'}`));
         }
       };
 
-      img.onerror = () => reject(new Error("Failed to load image"));
-      img.src = image.preview;
+      img.onerror = (error) => {
+        clearTimeout(timeout);
+        console.error("Failed to load image for optimization:", image.file.name, error);
+        reject(new Error(`Failed to load image for optimization: ${image.file.name}`));
+      };
+
+      // Set crossOrigin to handle potential CORS issues
+      img.crossOrigin = 'anonymous';
+
+      // Convert file to data URL instead of blob URL for more reliable loading
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        if (!dataUrl) {
+          reject(new Error(`Failed to read file as data URL: ${image.file.name}`));
+          return;
+        }
+        console.log("Converted file to data URL for optimization:", image.file.name);
+        img.src = dataUrl;
+      };
+      reader.onerror = () => {
+        reject(new Error(`Failed to read file: ${image.file.name}`));
+      };
+      reader.readAsDataURL(image.file);
     });
   };
 
@@ -434,7 +647,8 @@ export default function ImageOptimizerConverterClient() {
 
   const clearAll = () => {
     images.forEach((image) => {
-      URL.revokeObjectURL(image.preview);
+      // Data URLs don't need to be revoked like blob URLs
+      // URL.revokeObjectURL(image.preview);
       if (image.optimized) {
         URL.revokeObjectURL(URL.createObjectURL(image.optimized));
       }
@@ -704,6 +918,7 @@ export default function ImageOptimizerConverterClient() {
                             variant="ghost"
                             size="sm"
                             onClick={() => removeImage(index)}
+                            aria-label={`Remove image ${image.file.name}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>

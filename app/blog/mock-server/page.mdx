@@ -1,0 +1,157 @@
+---
+title: "Create a Mock Server for API Development and Testing"
+description: "Learn how to use our Mock Server tool to create a fake REST or GraphQL API in seconds. Define custom endpoints and responses to speed up frontend development and testing."
+date: "2025-12-09"
+keywords: [
+  "mock server", "api mocking", "fake api", "rest api mock", "graphql mock",
+  "api testing", "frontend development", "development tools"
+]
+authors:
+  - name: "DvTools Team"
+    url: "https://dvtools.in"
+category: "API Tools"
+slug: "mock-server-guide"
+---
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Server, Code, Zap, GitBranch, Settings } from "lucide-react";
+import Link from "next/link";
+
+<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Create a Mock Server for API Development and Testing",
+  "description": "A guide on using our Mock Server tool to quickly set up a fake API with custom endpoints and responses for faster development and testing cycles.",
+  "image": "https://dvtools.in/og-image-mock-server.png",
+  "author": {
+    "@type": "Organization",
+    "name": "DvTools"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "DvTools",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://dvtools.in/logo.png"
+    }
+  },
+  "datePublished": "2025-12-09",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://dvtools.in/blog/mock-server-guide"
+  }
+}
+` }} />
+
+## Don't Wait for the Backend to Be Ready
+
+One of the biggest bottlenecks in modern development is the dependency between frontend and backend teams. Frontend developers are often blocked, waiting for the backend API to be built and deployed before they can start working on UI components that fetch and display data.
+
+Our **Mock Server** is a tool designed to eliminate this bottleneck. It allows you to create a fully functional, fake API in minutes. You can define your own endpoints, specify the exact JSON responses they should return, and get a live URL to use in your frontend application for development and testing.
+
+## What is a Mock Server?
+
+A Mock Server is a simulated API server that returns pre-defined responses to HTTP requests. Instead of containing real business logic, it simply listens for requests on specific endpoints and sends back the data you've configured. This allows frontend developers to build and test their applications against a stable, predictable API without needing a live backend.
+
+<Card className="my-8">
+  <CardHeader>
+    <CardTitle className="flex items-center gap-2">
+      <Zap className="h-5 w-5 text-primary" />
+      Key Features of Our Mock Server
+    </CardTitle>
+  </CardHeader>
+  <CardContent>
+    <ul className="space-y-4">
+      <li className="flex items-start gap-3">
+        <Server className="h-5 w-5 text-blue-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Instant Setup, No Code Required</h4>
+          <span>Create a new mock API with a single click. Get a unique, shareable URL for your mock server instantly.</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <Settings className="h-5 w-5 text-purple-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Flexible Endpoint Configuration</h4>
+          <span>Define any number of REST endpoints. You can specify the path (including URL parameters like `/users/:id`), the HTTP method (GET, POST, PUT, DELETE), and the exact JSON body to return.</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <Code className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">Support for Different Status Codes and Delays</h4>
+          <span>Simulate real-world conditions. Configure endpoints to return different HTTP status codes (e.g., `200`, `404`, `500`) and add an artificial delay to test loading states in your UI.</span>
+        </div>
+      </li>
+      <li className="flex items-start gap-3">
+        <GitBranch className="h-5 w-5 text-red-500 mt-1 flex-shrink-0" />
+        <div>
+          <h4 className="font-semibold">GraphQL Support (Beta)</h4>
+          <span>In addition to REST, you can also set up a mock GraphQL server by providing a schema and defining mock responses for your queries and mutations.</span>
+        </div>
+      </li>
+    </ul>
+  </CardContent>
+</Card>
+
+## A Common Use Case: Building a User Profile Page
+
+You are a frontend developer tasked with building a user profile page in a React application. The backend team has given you the API contract, but the actual API won't be ready for another week.
+
+1.  **Create a Mock Server:** You open the Mock Server tool and create a new API. It gives you a base URL like `https://mock.maltitool.dev/xyz123`.
+2.  **Define the Endpoint:** The API contract says you need to fetch user data from `GET /users/:id`. You create a new endpoint in the mock server:
+    *   **Method:** `GET`
+    *   **Path:** `/users/:id`
+    *   **Response Body:** You paste the example JSON response from the API contract:
+        ```json
+        {
+          "id": "1",
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "avatarUrl": "https://i.pravatar.cc/150"
+        }
+        ```
+3.  **Develop the Frontend:** In your React code, you set your API base URL to `https://mock.maltitool.dev/xyz123`. You can now write your data-fetching logic and build the entire profile page component, using the mock API to get the data.
+4.  **Test Edge Cases:** You want to test how your UI handles a user not being found. You create another endpoint:
+    *   **Method:** `GET`
+    *   **Path:** `/users/notfound`
+    *   **Status Code:** `404`
+    *   **Response Body:** `{ "error": "User not found" }`
+    You can now test your error handling logic in the UI.
+
+When the real backend is ready, all you need to do is change the base URL in your application. The rest of your code works without any changes.
+
+<div className="grid md:grid-cols-2 gap-6 my-8">
+  <Card>
+    <CardHeader>
+      <CardTitle>For Writing Integration Tests</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p>Use the mock server in your CI/CD pipeline to run integration tests for your frontend. This provides fast and reliable tests that don't depend on a live backend environment.</p>
+    </CardContent>
+  </Card>
+  <Card>
+    <CardHeader>
+      <CardTitle>For Demos and Prototyping</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p>Quickly build a clickable prototype or a demo for stakeholders powered by a mock API. This allows you to gather feedback on a functional product early in the process.</p>
+    </CardContent>
+  </Card>
+</div>
+
+## Unblock Your Frontend Development
+
+Stop waiting and start building. A mock server is a simple but incredibly effective tool for enabling parallel work streams and accelerating your entire development lifecycle.
+
+<div className="text-center my-10">
+  <Button asChild size="lg">
+    <Link href="/tools/mock-server">
+      <Server className="mr-2 h-5 w-5" /> Create Your First Mock API
+    </Link>
+  </Button>
+</div>
+
+Set up your fake API in seconds and experience a more efficient and collaborative development process.

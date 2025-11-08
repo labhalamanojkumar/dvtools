@@ -5,6 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Shared metadata constants for tool pages
+export const SHARED_METADATA = {
+  authors: [{ name: "Multi Tool Platform" }],
+  creator: "Multi Tool Platform",
+  publisher: "Multi Tool Platform",
+};
+
 export function formatBytes(bytes: number, decimals = 2): string {
   if (bytes === 0) return "0 Bytes";
 
@@ -130,4 +137,39 @@ export function formatNumber(num: number): string {
   if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
   if (num >= 1000) return (num / 1000).toFixed(1) + "K";
   return num.toString();
+}
+
+export function getLanguageFromFileName(fileName: string): string {
+  const extension = fileName.split(".").pop()?.toLowerCase();
+  const languageMap: { [key: string]: string } = {
+    js: "javascript",
+    jsx: "javascript",
+    ts: "typescript",
+    tsx: "typescript",
+    py: "python",
+    java: "java",
+    cpp: "cpp",
+    cs: "csharp",
+    go: "go",
+    rs: "rust",
+    php: "php",
+    rb: "ruby",
+    swift: "swift",
+    kt: "kotlin",
+    dart: "dart",
+    scala: "scala",
+    html: "html",
+    css: "css",
+    scss: "scss",
+    sql: "sql",
+    sh: "bash",
+    ps1: "powershell",
+    yml: "yaml",
+    yaml: "yaml",
+    json: "json",
+    xml: "xml",
+    md: "markdown",
+  };
+
+  return extension ? (languageMap[extension] ?? "plaintext") : "plaintext";
 }

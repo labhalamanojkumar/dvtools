@@ -7,15 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   User,
-  Mail,
-  Key,
   Shield,
   Settings,
   Download,
-  Trash2,
-  Save,
-  Eye,
-  EyeOff,
 } from "lucide-react";
 import Link from "next/link";
 import ProfileForm from "@/components/profile/profile-form";
@@ -23,7 +17,7 @@ import ApiKeysManager from "@/components/profile/api-keys-manager";
 import AccountSettings from "@/components/profile/account-settings";
 
 export const metadata: Metadata = {
-  title: "Profile | DevTools Hub - Manage Your Account",
+  title: "Profile | DvTools - Manage Your Account",
   description:
     "Update your profile information, manage API keys, and configure your account settings.",
   keywords: [
@@ -34,11 +28,11 @@ export const metadata: Metadata = {
     "account configuration",
   ],
   openGraph: {
-    title: "Profile | DevTools Hub - Manage Your Account",
+    title: "Profile | DvTools - Manage Your Account",
     description: "Update your profile and manage your account settings.",
     type: "website",
     url: "/profile",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
   },
   robots: {
     index: false,

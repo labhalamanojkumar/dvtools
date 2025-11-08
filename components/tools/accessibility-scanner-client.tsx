@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -97,7 +97,10 @@ const accessibilityRules: AccessibilityRule[] = [
     description: "Text must have sufficient contrast with background",
     impact: "serious",
     wcag: "1.4.3",
-    check: () => Math.random() > 0.7, // Placeholder - would need actual color analysis
+    // Actual per-element contrast checks are performed in scanAccessibility
+    // using computeContrastForElement(). Keep this check as a noop placeholder
+    // so rule metadata is present but logic lives in the scanner implementation.
+    check: () => false,
   },
   {
     id: "button-label",
@@ -206,7 +209,8 @@ const sampleHTML = `<!DOCTYPE html>
                     <input type="email" id="email" name="email">
                 </div>
                 <div>
-                    <input type="text" placeholder="Phone (optional)">
+                    <label for="phone">Phone (optional):</label>
+                    <input type="text" id="phone" name="phone" placeholder="Phone (optional)">
                 </div>
                 <button type="submit">Send Message</button>
             </form>
@@ -222,6 +226,7 @@ const sampleHTML = `<!DOCTYPE html>
 export default function AccessibilityScannerClient() {
   const [url, setUrl] = useState("");
   const [html, setHtml] = useState(sampleHTML);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [isScanning, setIsScanning] = useState(false);
   const [inputMode, setInputMode] = useState<"url" | "html">("html");
@@ -233,9 +238,38 @@ export default function AccessibilityScannerClient() {
   ): Promise<ScanResult> => {
     const issues: AccessibilityIssue[] = [];
 
-    // Create a temporary DOM element to parse HTML
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(content, "text/html");
+    // Render the provided HTML into a hidden iframe using srcdoc so we can
+    // consult getComputedStyle for more accurate color/background values.
+    // This is best-effort: external resources may or may not load depending on
+    // the environment, but inline styles and <style> blocks will be applied.
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.left = "-9999px";
+    iframe.style.top = "-9999px";
+    iframe.style.width = "0px";
+    iframe.style.height = "0px";
+    iframe.style.opacity = "0";
+    iframe.srcdoc = content;
+    document.body.appendChild(iframe);
+
+    // Wait for the iframe to finish loading styles and content (timeout fallback)
+    await new Promise<void>((resolve) => {
+      let fired = false;
+      const onDone = () => {
+        if (fired) return;
+        fired = true;
+        resolve();
+      };
+      iframe.onload = onDone;
+      // Fallback in case onload doesn't fire quickly
+      setTimeout(onDone, 1000);
+    });
+
+  const doc = iframe.contentDocument ?? document.implementation.createHTMLDocument();
+  const win = iframe.contentWindow ?? window;
+
+  // Debug info: length of content
+  console.debug("scanAccessibility: content length", content.length);
 
     // Run each accessibility rule
     accessibilityRules.forEach((rule) => {
@@ -256,47 +290,77 @@ export default function AccessibilityScannerClient() {
           });
         }
       } else if (rule.id === "color-contrast") {
-        if ((rule.check as () => boolean)()) {
-          issues.push({
-            id: rule.id,
-            type: "warning",
-            title: rule.title,
-            description: rule.description,
-            impact: rule.impact as any,
-            wcag: rule.wcag,
-            suggestion: getSuggestionForRule(rule.id),
-          });
-        }
+        // Perform color contrast analysis on text-containing elements
+        const textElements = Array.from(
+          doc.querySelectorAll(
+            "p, span, a, li, button, label, h1, h2, h3, h4, h5, h6",
+          ),
+        );
+        textElements.forEach((el) => {
+          try {
+            const contrast = computeContrastForElement(el as HTMLElement, win);
+            if (contrast !== null && contrast < 4.5) {
+              issues.push({
+                id: rule.id,
+                type: "warning",
+                title: rule.title,
+                description: `${rule.description} (contrast ratio ${contrast.toFixed(2)})`,
+                impact: rule.impact as any,
+                wcag: rule.wcag,
+                element: el.tagName.toLowerCase() + (el.id ? `#${el.id}` : ""),
+                code: el.outerHTML.substring(0, 200) + (el.outerHTML.length > 200 ? "..." : ""),
+                suggestion: getSuggestionForRule(rule.id),
+              });
+            }
+          } catch (e) {
+            // ignore per-element errors
+          }
+        });
+        console.debug("scanAccessibility: textElements", textElements.length);
       } else {
         const elements = Array.from(doc.querySelectorAll("*"));
         elements.forEach((element) => {
-          if ((rule.check as (element: Element) => boolean)(element)) {
-            issues.push({
-              id: rule.id,
-              type:
-                rule.impact === "critical"
-                  ? "error"
-                  : rule.impact === "serious"
-                    ? "warning"
-                    : "info",
-              title: rule.title,
-              description: rule.description,
-              impact: rule.impact as any,
-              wcag: rule.wcag,
-              element:
-                element.tagName.toLowerCase() +
-                (element.id ? `#${element.id}` : ""),
-              code:
-                element.outerHTML.substring(0, 100) +
-                (element.outerHTML.length > 100 ? "..." : ""),
-              suggestion: getSuggestionForRule(rule.id),
-            });
+          try {
+            if ((rule.check as (element: Element) => boolean)(element)) {
+              issues.push({
+                id: rule.id,
+                type:
+                  rule.impact === "critical"
+                    ? "error"
+                    : rule.impact === "serious"
+                      ? "warning"
+                      : "info",
+                title: rule.title,
+                description: rule.description,
+                impact: rule.impact as any,
+                wcag: rule.wcag,
+                element:
+                  element.tagName.toLowerCase() +
+                  (element.id ? `#${element.id}` : ""),
+                code:
+                  element.outerHTML.substring(0, 100) +
+                  (element.outerHTML.length > 100 ? "..." : ""),
+                suggestion: getSuggestionForRule(rule.id),
+              });
+            }
+          } catch (err) {
+            // ignore element-level errors
           }
         });
       }
     });
 
-    // Calculate score (0-100, higher is better)
+    // Clean up iframe
+    try {
+      document.body.removeChild(iframe);
+    } catch (e) {
+      // ignore
+    }
+
+  // Debug: how many issues found
+  console.debug("scanAccessibility: issues", issues.length);
+
+  // Calculate score (0-100, higher is better)
     const totalChecks = accessibilityRules.length * 10; // Assume 10 elements per rule
     const score = Math.max(
       0,
@@ -341,6 +405,150 @@ export default function AccessibilityScannerClient() {
     );
   };
 
+  // --- Color parsing and contrast helpers ---
+  const parseColor = (color: string | null): [number, number, number] | null => {
+    if (!color) return null;
+    color = color.trim();
+    // hex
+    const hexMatch = color.match(/^#([0-9a-f]{3,8})$/i);
+    if (hexMatch) {
+      let hex = hexMatch[1];
+      if (hex.length === 3) {
+        hex = hex.split("").map((c) => c + c).join("");
+      }
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      return [r, g, b];
+    }
+    // rgb(a)
+    const rgbMatch = color.match(/rgba?\(([^)]+)\)/i);
+    if (rgbMatch) {
+      const parts = rgbMatch[1].split(",").map((p) => p.trim());
+      const r = parseInt(parts[0], 10);
+      const g = parseInt(parts[1], 10);
+      const b = parseInt(parts[2], 10);
+      if (!isNaN(r) && !isNaN(g) && !isNaN(b)) return [r, g, b];
+    }
+    return null;
+  };
+
+  const luminance = (rgb: [number, number, number]) => {
+    const srgb = rgb.map((v) => v / 255).map((c) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)));
+    return 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+  };
+
+  const contrastRatio = (rgb1: [number, number, number], rgb2: [number, number, number]) => {
+    const l1 = luminance(rgb1);
+    const l2 = luminance(rgb2);
+    const lighter = Math.max(l1, l2);
+    const darker = Math.min(l1, l2);
+    return (lighter + 0.05) / (darker + 0.05);
+  };
+
+  // Try to parse arbitrary CSS color strings (including named colors) using
+  // a temporary canvas 2D context. This leverages the browser's CSS parser
+  // to normalize color strings into a form our parseColor() function understands.
+  const parseCssColor = (color: string | null): [number, number, number] | null => {
+    if (!color) return null;
+    try {
+      const cvs = document.createElement("canvas");
+      const ctx = cvs.getContext("2d");
+      if (!ctx) return null;
+      ctx.fillStyle = color;
+      // ctx.fillStyle now contains a normalized color string (e.g., "rgb(r,g,b)" or "#rrggbb")
+      const normalized = ctx.fillStyle as string;
+      return parseColor(normalized);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  const computeContrastForElement = (el: HTMLElement, win: Window): number | null => {
+    try {
+      const cs = win.getComputedStyle(el);
+      const fgRaw = cs.color || "";
+      let bgRaw = cs.backgroundColor || "";
+
+      // If the element's background is transparent, walk up the ancestor chain
+      // inside the iframe/document and use the first non-transparent background.
+      let parent: HTMLElement | null = el;
+      while (parent && (!bgRaw || bgRaw === "transparent" || bgRaw === "rgba(0, 0, 0, 0)")) {
+        parent = parent.parentElement;
+        if (!parent) break;
+        bgRaw = win.getComputedStyle(parent).backgroundColor || bgRaw;
+      }
+
+      if (!bgRaw || bgRaw === "transparent" || bgRaw === "rgba(0, 0, 0, 0)") {
+        bgRaw = "rgb(255,255,255)"; // default to white
+      }
+
+      const fg = parseCssColor(fgRaw) ?? parseColor(fgRaw);
+      const bg = parseCssColor(bgRaw) ?? parseColor(bgRaw);
+      if (!fg || !bg) return null;
+      return contrastRatio(fg, bg);
+    } catch (e) {
+      return null;
+    }
+  };
+
+  // File upload handler and export helpers
+  const handleFileUpload = (file: File | null) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const text = String(e.target?.result || "");
+      if (file.name.endsWith(".json")) {
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed && parsed.issues) {
+            setResult(parsed as ScanResult);
+            toast({ title: "Report loaded", description: "Loaded JSON scan report." });
+            return;
+          }
+        } catch (err) {
+          toast({ title: "Invalid JSON", description: "Uploaded JSON could not be parsed.", variant: "destructive" });
+          return;
+        }
+      }
+      // Otherwise assume HTML
+      setHtml(text);
+      setResult(null);
+      setInputMode("html");
+      toast({ title: "File loaded", description: `Loaded ${file.name}` });
+    };
+    reader.onerror = () => {
+      toast({ title: "Read error", description: "Failed to read file", variant: "destructive" });
+    };
+    reader.readAsText(file);
+  };
+
+  const downloadJSON = (r: ScanResult) => {
+    const blob = new Blob([JSON.stringify(r, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `accessibility-report-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const downloadCSV = (r: ScanResult) => {
+    const header = ["id","type","title","impact","wcag","element","suggestion"].join(",");
+    const lines = r.issues.map(i => {
+      const safe = (s?: string) => `"${(s||"").replace(/"/g,'""')}"`;
+      return [i.id, i.type, safe(i.title), i.impact, i.wcag, safe(i.element), safe(i.suggestion)].join(",");
+    });
+    const csv = [header, ...lines].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `accessibility-report-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleScan = async () => {
     if (!url && !html.trim()) {
       toast({
@@ -351,6 +559,8 @@ export default function AccessibilityScannerClient() {
       return;
     }
 
+    // clear previous result so UI reflects current run
+    setResult(null);
     setIsScanning(true);
 
     try {
@@ -358,17 +568,37 @@ export default function AccessibilityScannerClient() {
       const sourceUrl = url;
 
       if (inputMode === "url" && url) {
-        // Note: In a real implementation, you'd need a backend proxy to fetch URLs
-        // For demo purposes, we'll show a message
-        toast({
-          title: "URL scanning",
-          description:
-            "URL scanning requires backend proxy. Using sample HTML instead.",
-        });
-        content = sampleHTML;
+        // Try to fetch the URL directly from the browser. This will succeed for
+        // sites that allow CORS. If fetch fails (CORS/network), fall back to
+        // sampleHTML and inform the user to use a server-side proxy for full
+        // URL scanning.
+        try {
+          const controller = new AbortController();
+          const timeoutId = window.setTimeout(() => controller.abort(), 5000);
+          const res = await fetch(url, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const ctype = res.headers.get("content-type") || "";
+          if (ctype.includes("text/html") || ctype.includes("application/xhtml+xml")) {
+            content = await res.text();
+          } else {
+            // Not HTML: fallback
+            toast({ title: "URL not HTML", description: "Fetched resource is not HTML. Using sample HTML instead.", variant: "destructive" });
+            content = sampleHTML;
+          }
+        } catch (err: any) {
+          console.debug("fetch error for url", url, err?.message || err);
+          toast({
+            title: "URL fetch failed",
+            description:
+              "Unable to fetch URL directly (CORS or network). Using sample HTML. For reliable URL scanning enable a server-side proxy.",
+            variant: "destructive",
+          });
+          content = sampleHTML;
+        }
       }
 
-      const scanResult = await scanAccessibility(content, sourceUrl);
+  const scanResult = await scanAccessibility(content, sourceUrl);
       setResult(scanResult);
 
       toast({
@@ -385,6 +615,70 @@ export default function AccessibilityScannerClient() {
       setIsScanning(false);
     }
   };
+
+  // Auto-scan when HTML content changes (debounced). This enables realtime
+  // feedback as the user edits the HTML in the textarea.
+  const autoScanTimerRef = useRef<number | null>(null);
+  useEffect(() => {
+    // Only auto-scan in HTML input mode
+    if (inputMode !== "html") return;
+
+    // Clear any existing timer
+    if (autoScanTimerRef.current) {
+      window.clearTimeout(autoScanTimerRef.current);
+      autoScanTimerRef.current = null;
+    }
+
+    // If there's no HTML, clear results
+    if (!html || !html.trim()) {
+      setResult(null);
+      return;
+    }
+
+    // Debounce scan by 700ms
+    autoScanTimerRef.current = window.setTimeout(() => {
+      // Kick off the scan but don't block the UI
+      handleScan();
+      autoScanTimerRef.current = null;
+    }, 700);
+
+    // Cleanup on unmount or html change
+    return () => {
+      if (autoScanTimerRef.current) {
+        window.clearTimeout(autoScanTimerRef.current);
+        autoScanTimerRef.current = null;
+      }
+    };
+  }, [html, inputMode]);
+
+  // Auto-scan when URL changes (debounced) so users get realtime URL scanning
+  // when possible (direct fetch will work if the target allows CORS).
+  const urlAutoScanRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (inputMode !== "url") return;
+
+    if (urlAutoScanRef.current) {
+      window.clearTimeout(urlAutoScanRef.current);
+      urlAutoScanRef.current = null;
+    }
+
+    if (!url || !url.trim()) {
+      setResult(null);
+      return;
+    }
+
+    urlAutoScanRef.current = window.setTimeout(() => {
+      handleScan();
+      urlAutoScanRef.current = null;
+    }, 700);
+
+    return () => {
+      if (urlAutoScanRef.current) {
+        window.clearTimeout(urlAutoScanRef.current);
+        urlAutoScanRef.current = null;
+      }
+    };
+  }, [url, inputMode]);
 
   const getImpactColor = (impact: string) => {
     switch (impact) {
@@ -475,6 +769,30 @@ export default function AccessibilityScannerClient() {
                   onChange={(e) => setHtml(e.target.value)}
                   className="w-full h-64 p-3 border border-input rounded-md text-sm font-mono resize-none"
                 />
+                {/* Live preview of the HTML we're scanning. This helps confirm the
+                    iframe rendering and computed styles used for contrast checks. */}
+                <div className="mt-3">
+                  <Label htmlFor="accessibility-preview" className="text-sm font-medium">Live Preview</Label>
+                  <iframe
+                    id="accessibility-preview"
+                    title="accessibility-preview"
+                    srcDoc={html}
+                    className="w-full h-64 border mt-2"
+                  />
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".html,.htm,.json"
+                    className="hidden"
+                    onChange={(e) => handleFileUpload(e.target.files?.[0] ?? null)}
+                  />
+                  <Button size="sm" variant="outline" onClick={() => fileInputRef.current?.click()}>
+                    Upload HTML / JSON
+                  </Button>
+                  <p className="text-sm text-muted-foreground">You can upload an .html/.htm file or a previously exported .json report.</p>
+                </div>
               </div>
             </TabsContent>
           </Tabs>
@@ -505,6 +823,15 @@ export default function AccessibilityScannerClient() {
             </TabsTrigger>
             <TabsTrigger value="details">Details</TabsTrigger>
           </TabsList>
+
+          <div className="flex gap-2 justify-end">
+            <Button size="sm" variant="outline" onClick={() => downloadCSV(result)}>
+              Export CSV
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => downloadJSON(result)}>
+              Export JSON
+            </Button>
+          </div>
 
           <TabsContent value="overview" className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

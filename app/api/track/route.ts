@@ -15,22 +15,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Log the usage (in a real app, save to database)
-    console.log("Tool usage tracked:", {
-      tool,
-      action,
-      userAgent: userAgent || request.headers.get("user-agent"),
-      timestamp: timestamp || new Date().toISOString(),
-      ip: request.ip || "unknown",
-    });
+    // In production this should save to a database or analytics pipeline.
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error tracking usage:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    // Avoid console statements; return generic error response
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

@@ -1,0 +1,63 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="blogBgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#db2777;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="blogAccentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#blogBgGradient)"/>
+  
+  <!-- Decorative elements -->
+  <rect x="50" y="50" width="200" height="150" fill="url(#blogAccentGradient)" opacity="0.2" rx="15"/>
+  <circle cx="950" cy="200" r="100" fill="url(#blogAccentGradient)" opacity="0.15"/>
+  <circle cx="300" cy="450" r="80" fill="url(#blogAccentGradient)" opacity="0.1"/>
+  
+  <!-- Main content -->
+  <g transform="translate(100, 120)">
+    <!-- Blog icon -->
+    <rect x="0" y="0" width="100" height="100" fill="white" opacity="0.9" rx="20"/>
+    
+    <!-- Blog/document icon -->
+    <g transform="translate(25, 25)" fill="#7c3aed">
+      <rect x="0" y="0" width="50" height="60" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+      <line x1="15" y1="15" x2="35" y2="15" stroke="currentColor" stroke-width="2"/>
+      <line x1="15" y1="25" x2="40" y2="25" stroke="currentColor" stroke-width="2"/>
+      <line x1="15" y1="35" x2="35" y2="35" stroke="currentColor" stroke-width="2"/>
+      <line x1="15" y1="45" x2="40" y2="45" stroke="currentColor" stroke-width="2"/>
+      <path d="M40 50 L45 45 L50 50" fill="none" stroke="currentColor" stroke-width="2"/>
+    </g>
+    
+    <!-- Title -->
+    <text x="120" y="40" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="white">
+      Developer Tools Blog
+    </text>
+    <text x="120" y="70" font-family="Arial, sans-serif" font-size="18" fill="white" opacity="0.8">
+      Insights, Guides & Updates
+    </text>
+    
+    <!-- Subtitle -->
+    <text x="120" y="110" font-family="Arial, sans-serif" font-size="20" fill="white" opacity="0.9">
+      Expert Tips for Modern Development
+    </text>
+    
+    <!-- Topics -->
+    <g transform="translate(120, 140)" fill="white" opacity="0.8" font-family="Arial, sans-serif" font-size="14">
+      <text y="0">• Performance Optimization</text>
+      <text y="22">• Security Best Practices</text>
+      <text y="44">• Tool Reviews & Comparisons</text>
+      <text y="66">• Development Workflow Tips</text>
+      <text y="88">• Industry Trends & Insights</text>
+    </g>
+  </g>
+  
+  <!-- Footer -->
+  <text x="600" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="white" opacity="0.7">
+    Malti Tool Platform Blog
+  </text>
+</svg>

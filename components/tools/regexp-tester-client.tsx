@@ -8,50 +8,183 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { copyToClipboard, downloadFile } from "../../lib/utils";
 import { useToast } from "../ui/toaster";
-import { Copy, Download, CheckCircle, XCircle } from "lucide-react";
+import { Copy, Download, CheckCircle, XCircle, Upload, FileText } from "lucide-react";
+
+// Utility function to escape HTML special characters
+const escapeHtml = (str: string): string => {
+  const htmlEscapes: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  };
+  return str.replace(/[&<>"']/g, match => htmlEscapes[match]);
+};
 
 export function RegexpTesterClient() {
+  // Application state
   const [pattern, setPattern] = useState("");
   const [testString, setTestString] = useState("");
   const [flags, setFlags] = useState("g");
   const [matches, setMatches] = useState<RegExpExecArray[]>([]);
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [highlightedText, setHighlightedText] = useState("");
+  const [hasError, setHasError] = useState(false);
   const { toast } = useToast();
 
+  // Generate highlighted HTML from text and matches with special character escaping
+  const generateHighlightedText = (text: string, matchArray: RegExpExecArray[]) => {
+    if (!text || matchArray.length === 0) {
+      return escapeHtml(text);
+    }
+
+    // Sort matches by position to handle overlapping matches
+    const sortedMatches = [...matchArray].sort((a, b) => a.index - b.index);
+
+    let result = "";
+    let lastIndex = 0;
+
+    sortedMatches.forEach((match, index) => {
+      // Add text before the match with HTML escaping
+      if (match.index > lastIndex) {
+        result += escapeHtml(text.slice(lastIndex, match.index));
+      }
+
+      // Add highlighted match with HTML escaping
+      const matchText = escapeHtml(match[0]);
+      const highlightClass = `bg-yellow-200 dark:bg-yellow-800 text-yellow-900 dark:text-yellow-100 px-1 rounded border border-yellow-300 dark:border-yellow-600 cursor-pointer hover:bg-yellow-300 dark:hover:bg-yellow-700 transition-colors`;
+      result += `<span class="${highlightClass}" data-match-index="${index}" onclick="handleMatchClick(${index})" onmouseover="handleMatchHover(${index}, true)" onmouseout="handleMatchHover(${index}, false)" title="Match ${index + 1}: ${matchText}">${matchText}</span>`;
+
+      lastIndex = match.index + match[0].length;
+    });
+
+    // Add remaining text with HTML escaping
+    if (lastIndex < text.length) {
+      result += escapeHtml(text.slice(lastIndex));
+    }
+
+    return result;
+  };
+
+  // Handle text input changes
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value;
+    setTestString(newText);
+  };
+
   useEffect(() => {
-    if (!pattern) {
+    // Set up global functions for match interaction
+    (window as any).handleMatchClick = (matchIndex: number) => {
+      const resultElement = document.querySelector(`[data-result-index="${matchIndex}"]`);
+      if (resultElement) {
+        resultElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Add temporary highlight
+        resultElement.classList.add('ring-2', 'ring-blue-500', 'ring-opacity-50');
+        setTimeout(() => {
+          resultElement.classList.remove('ring-2', 'ring-blue-500', 'ring-opacity-50');
+        }, 2000);
+      }
+    };
+
+    (window as any).handleMatchHover = (matchIndex: number, isHover: boolean) => {
+      const resultElement = document.querySelector(`[data-result-index="${matchIndex}"]`);
+      if (resultElement) {
+        if (isHover) {
+          resultElement.classList.add('bg-blue-50', 'dark:bg-blue-950', 'border-blue-200', 'dark:border-blue-800');
+        } else {
+          resultElement.classList.remove('bg-blue-50', 'dark:bg-blue-950', 'border-blue-200', 'dark:border-blue-800');
+        }
+      }
+    };
+
+    return () => {
+      // Cleanup
+      delete (window as any).handleMatchClick;
+      delete (window as any).handleMatchHover;
+    };
+  }, []);
+
+  // Error recovery
+  const resetError = () => {
+    setHasError(false);
+    setError("");
+  };
+
+  // Main regex processing effect
+  useEffect(() => {
+    resetError();
+
+    if (!pattern.trim()) {
       setMatches([]);
-      setError("");
       setIsValid(false);
+      setHighlightedText("");
       return;
     }
 
     try {
       const regex = new RegExp(pattern, flags);
       setIsValid(true);
-      setError("");
 
-      if (testString) {
-        const results: RegExpExecArray[] = [];
-        let match;
-        const regexCopy = new RegExp(regex);
+      if (!testString.trim()) {
+        setMatches([]);
+        setHighlightedText("");
+        return;
+      }
 
-        while ((match = regexCopy.exec(testString)) !== null) {
-          results.push(match);
-          if (!regex.global) break;
+      const matchesArray: RegExpExecArray[] = [];
+      let match;
+
+      // Timeout guard for catastrophic backtracking
+      const timeoutId = setTimeout(() => {
+        setError("Pattern execution timed out. Possible catastrophic backtracking.");
+        setHasError(true);
+        setMatches([]);
+        setHighlightedText(testString);
+      }, 1000);
+
+      try {
+        // Reset lastIndex for global regex
+        regex.lastIndex = 0;
+
+        // Find all matches
+        while ((match = regex.exec(testString)) !== null) {
+          matchesArray.push(match);
+
+          // Prevent infinite loop for zero-width matches
+          if (match.index === regex.lastIndex) {
+            regex.lastIndex++;
+          }
+
+          // Break if too many matches (performance safeguard)
+          if (matchesArray.length > 10000) {
+            setError("Too many matches (>10000). Try a more specific pattern.");
+            break;
+          }
         }
 
-        setMatches(results);
-      } else {
-        setMatches([]);
+        clearTimeout(timeoutId);
+        setMatches(matchesArray);
+        setHighlightedText(generateHighlightedText(testString, matchesArray));
+      } catch (innerErr) {
+        clearTimeout(timeoutId);
+        throw innerErr;
       }
     } catch (err) {
+      setError((err as Error).message);
+      setHasError(true);
       setIsValid(false);
-      setError(err instanceof Error ? err.message : "Invalid regex pattern");
       setMatches([]);
+      setHighlightedText(testString);
     }
-  }, [pattern, testString, flags]);
+  }, [pattern, flags, testString]);
+
+  // Update highlighted text when matches change
+  useEffect(() => {
+    setHighlightedText(generateHighlightedText(testString, matches));
+  }, [matches, testString]);
 
   const copyMatches = () => {
     const matchText = matches
@@ -80,6 +213,66 @@ export function RegexpTesterClient() {
     );
   };
 
+  const handleFileUpload = (file: File) => {
+    if (!file) return;
+
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "File size must be less than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      setTestString(content);
+      // Highlighted text will be updated by useEffect
+      toast({
+        title: "File Loaded",
+        description: `Successfully loaded ${file.name}`,
+      });
+    };
+    reader.onerror = () => {
+      toast({
+        title: "Error",
+        description: "Failed to read the file",
+        variant: "destructive",
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Pattern Input */}
@@ -102,6 +295,21 @@ export function RegexpTesterClient() {
               placeholder="Enter regex pattern (e.g., \w+@\w+\.\w+)"
               className="font-mono"
             />
+            {pattern && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setPattern("");
+                  setTestString("");
+                  setMatches([]);
+                  setHighlightedText("");
+                }}
+                title="Clear pattern and text"
+              >
+                Clear
+              </Button>
+            )}
           </div>
 
           {/* Flags */}
@@ -131,8 +339,21 @@ export function RegexpTesterClient() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm font-mono bg-red-50 p-2 rounded">
-              {error}
+            <div className="text-red-500 text-sm font-mono bg-red-50 dark:bg-red-950 p-2 rounded border border-red-200 dark:border-red-800">
+              <div className="flex items-center gap-2">
+                <XCircle className="h-4 w-4" />
+                <span>{error}</span>
+              </div>
+            </div>
+          )}
+
+          {isValid && pattern && (
+            <div className="text-green-600 text-sm font-mono bg-green-50 dark:bg-green-950 p-2 rounded border border-green-200 dark:border-green-800">
+              <div className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                <span>Valid regex pattern</span>
+                {flags && <span className="text-muted-foreground">with flags: {flags}</span>}
+              </div>
             </div>
           )}
         </CardContent>
@@ -144,12 +365,71 @@ export function RegexpTesterClient() {
           <CardTitle>Test String</CardTitle>
         </CardHeader>
         <CardContent>
-          <Textarea
-            value={testString}
-            onChange={(e) => setTestString(e.target.value)}
-            placeholder="Enter text to test against the regex pattern..."
-            className="code-editor min-h-[200px]"
-          />
+          {/* File Upload Section */}
+          <div className="mb-4">
+            <div
+              className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+                isDragOver
+                  ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                  : "border-gray-300 dark:border-gray-600"
+              }`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <FileText className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+              <p className="text-sm text-muted-foreground mb-2">
+                Drag & drop a text file here, or click to browse
+              </p>
+              <input
+                type="file"
+                accept=".txt,.log,.md,.json,.xml,.csv,.html,.css,.js,.ts,.py,.java,.cpp,.c,.php,.rb,.go,.rs,.sh,.yml,.yaml,text/*"
+                onChange={handleFileInputChange}
+                className="hidden"
+                id="text-file-input"
+              />
+              <label htmlFor="text-file-input">
+                <Button variant="outline" size="sm" asChild>
+                  <span className="cursor-pointer">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Choose File
+                  </span>
+                </Button>
+              </label>
+              <p className="text-xs text-muted-foreground mt-2">
+                Supports text files up to 10MB
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <Textarea
+              value={testString}
+              onChange={handleTextChange}
+              placeholder="Enter text to test against the regex pattern, or upload a file above..."
+              className="font-mono text-sm h-[200px]"
+            />
+
+            {pattern && testString && (
+              <div
+                className="p-3 border rounded-md bg-background text-foreground font-mono text-sm leading-relaxed whitespace-pre-wrap min-h-[100px]"
+                dangerouslySetInnerHTML={{ __html: highlightedText }}
+                style={{ wordWrap: 'break-word', overflowWrap: 'break-word' }}
+              />
+            )}
+          </div>
+          {testString && (
+            <div className="flex justify-between items-center text-xs text-muted-foreground mt-2 px-1">
+              <span>
+                {testString.length} characters, {testString.split('\n').length} lines
+              </span>
+              {matches.length > 0 && (
+                <span>
+                  {matches.length} match{matches.length !== 1 ? 'es' : ''} found
+                </span>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -157,13 +437,21 @@ export function RegexpTesterClient() {
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Matches ({matches.length})</CardTitle>
+            <div className="flex items-center gap-4">
+              <CardTitle>Matches ({matches.length})</CardTitle>
+              {matches.length > 0 && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Pattern: <code className="bg-muted px-1 rounded text-xs">{pattern}</code></span>
+                  <span>Flags: <code className="bg-muted px-1 rounded text-xs">{flags || 'none'}</code></span>
+                </div>
+              )}
+            </div>
             {matches.length > 0 && (
               <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={copyMatches}>
+                <Button size="sm" variant="ghost" onClick={copyMatches} aria-label="Copy matches">
                   <Copy className="h-4 w-4" />
                 </Button>
-                <Button size="sm" variant="ghost" onClick={downloadMatches}>
+                <Button size="sm" variant="ghost" onClick={downloadMatches} aria-label="Download matches">
                   <Download className="h-4 w-4" />
                 </Button>
               </div>
@@ -171,6 +459,37 @@ export function RegexpTesterClient() {
           </div>
         </CardHeader>
         <CardContent>
+          {matches.length > 0 && (
+            <div className="mb-4 p-3 bg-muted/50 rounded-lg">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <span className="font-medium text-muted-foreground">Total Matches:</span>
+                  <span className="ml-2 font-semibold text-green-600">{matches.length}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Match Rate:</span>
+                  <span className="ml-2 font-semibold">
+                    {testString ? ((matches.length / testString.length) * 100).toFixed(2) : 0}%
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Avg. Length:</span>
+                  <span className="ml-2 font-semibold">
+                    {matches.length > 0 ? (matches.reduce((sum, m) => sum + m[0].length, 0) / matches.length).toFixed(1) : 0} chars
+                  </span>
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Coverage:</span>
+                  <span className="ml-2 font-semibold">
+                    {testString && matches.length > 0
+                      ? ((matches.reduce((sum, m) => sum + m[0].length, 0) / testString.length) * 100).toFixed(1)
+                      : 0}% of text
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {matches.length === 0 ? (
             <div className="text-muted-foreground">
               {testString
@@ -180,7 +499,7 @@ export function RegexpTesterClient() {
           ) : (
             <div className="space-y-3">
               {matches.map((match, index) => (
-                <div key={index} className="border rounded-lg p-4">
+                <div key={index} className="border rounded-lg p-4 transition-colors" data-result-index={index}>
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="secondary">Match {index + 1}</Badge>
                     <span className="text-sm text-muted-foreground">

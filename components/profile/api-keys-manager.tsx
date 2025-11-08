@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,9 @@ import {
   AlertTriangle,
   CheckCircle,
   Loader2,
+  RefreshCw,
+  Wifi,
+  WifiOff,
 } from "lucide-react";
 
 interface ApiKey {
@@ -43,21 +46,33 @@ export default function ApiKeysManager() {
   const [visibleKeys, setVisibleKeys] = useState<Set<string>>(new Set());
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isConnected, setIsConnected] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const isPageVisibleRef = useRef(true);
   const { toast } = useToast();
 
-  // Fetch API keys on component mount
-  useEffect(() => {
-    fetchApiKeys();
-  }, []);
-
-  const fetchApiKeys = async () => {
+  const fetchApiKeys = useCallback(async (showLoadingState = false) => {
     try {
-      const response = await fetch("/api/api-keys");
+      if (showLoadingState) {
+        setIsRefreshing(true);
+      }
+      
+      const response = await fetch("/api/api-keys", {
+        cache: "no-cache",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      });
+      
       if (response.ok) {
         const data = await response.json();
         setApiKeys(data.apiKeys || []);
+        setLastUpdated(new Date());
+        setIsConnected(true);
       } else {
+        setIsConnected(false);
         toast({
           title: "Error",
           description: "Failed to load API keys",
@@ -66,20 +81,27 @@ export default function ApiKeysManager() {
       }
     } catch (error) {
       console.error("Error fetching API keys:", error);
+      setIsConnected(false);
       toast({
         title: "Error",
         description: "Failed to load API keys",
         variant: "destructive",
       });
     } finally {
+      if (showLoadingState) {
+        setIsRefreshing(false);
+      }
       setIsLoading(false);
     }
-  };
+  }, [toast]);
+
+  const handleRefresh = useCallback(() => {
+    fetchApiKeys(true);
+  }, [fetchApiKeys]);
 
   const handleCreateKey = async () => {
     if (!newKeyName.trim()) return;
 
-    setIsSubmitting(true);
     try {
       const response = await fetch("/api/api-keys", {
         method: "POST",
@@ -91,8 +113,8 @@ export default function ApiKeysManager() {
 
       if (response.ok) {
         const data = await response.json();
-        // Add the new key to the list (it will be masked)
-        setApiKeys((prev) => [data.apiKey, ...prev]);
+        // Refresh the list to get the latest data
+        fetchApiKeys();
         setNewKeyName("");
         setIsCreating(false);
         toast({
@@ -114,8 +136,6 @@ export default function ApiKeysManager() {
         description: "Failed to create API key",
         variant: "destructive",
       });
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -126,7 +146,10 @@ export default function ApiKeysManager() {
       });
 
       if (response.ok) {
+        // Remove the key from the list immediately for better UX
         setApiKeys((prev) => prev.filter((key) => key.id !== keyId));
+        // Also refresh to ensure we have the latest data
+        fetchApiKeys();
         toast({
           title: "Success",
           description: "API key revoked successfully",
@@ -184,6 +207,37 @@ export default function ApiKeysManager() {
     return `${key.substring(0, 8)}${"•".repeat(key.length - 16)}${key.substring(key.length - 8)}`;
   };
 
+  useEffect(() => {
+    // Initial fetch
+    fetchApiKeys();
+
+    // Set up auto-refresh every 60 seconds for API keys
+    pollIntervalRef.current = setInterval(() => {
+      if (isPageVisibleRef.current) {
+        fetchApiKeys();
+      }
+    }, 60000);
+
+    // Handle page visibility change
+    const handleVisibilityChange = () => {
+      isPageVisibleRef.current = !document.hidden;
+      if (!document.hidden) {
+        // Refresh when page becomes visible
+        fetchApiKeys();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [fetchApiKeys]);
+
   if (isLoading) {
     return (
       <Card>
@@ -199,55 +253,79 @@ export default function ApiKeysManager() {
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Key className="h-5 w-5" />
-            API Keys
-          </CardTitle>
-          <Dialog open={isCreating} onOpenChange={setIsCreating}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-2 h-4 w-4" />
-                Create API Key
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New API Key</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="keyName">Key Name</Label>
-                  <Input
-                    id="keyName"
-                    value={newKeyName}
-                    onChange={(e) => setNewKeyName(e.target.value)}
-                    placeholder="e.g., Development Key"
-                  />
+          <div className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              API Keys
+            </CardTitle>
+            {isConnected ? (
+              <Wifi className="h-4 w-4 text-green-500" />
+            ) : (
+              <WifiOff className="h-4 w-4 text-red-500" />
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            {lastUpdated && (
+              <span className="text-xs text-muted-foreground">
+                {lastUpdated.toLocaleTimeString()}
+              </span>
+            )}
+            <Button
+              onClick={handleRefresh}
+              variant="ghost"
+              size="sm"
+              disabled={isRefreshing}
+            >
+              <RefreshCw 
+                className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`} 
+              />
+            </Button>
+            <Dialog open={isCreating} onOpenChange={setIsCreating}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create API Key
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Create New API Key</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="keyName">Key Name</Label>
+                    <Input
+                      id="keyName"
+                      value={newKeyName}
+                      onChange={(e) => setNewKeyName(e.target.value)}
+                      placeholder="e.g., Development Key"
+                    />
+                  </div>
+                  <Alert>
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      Make sure to copy your API key now. You won't be able
+                      to see it again!
+                    </AlertDescription>
+                  </Alert>
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleCreateKey}
+                      disabled={!newKeyName.trim()}
+                    >
+                      Create Key
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsCreating(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
-                <Alert>
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    Make sure to copy your API key now. You won&apos;t be able
-                    to see it again!
-                  </AlertDescription>
-                </Alert>
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleCreateKey}
-                    disabled={!newKeyName.trim()}
-                  >
-                    Create Key
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsCreating(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -333,10 +411,11 @@ export default function ApiKeysManager() {
           <ul className="text-sm text-muted-foreground space-y-1">
             <li>• Keep your API keys secure and never share them publicly</li>
             <li>
-              • Regenerate keys if you suspect they&apos;ve been compromised
+              • Regenerate keys if you suspect they've been compromised
             </li>
             <li>• Use different keys for development and production</li>
             <li>• Monitor your API usage regularly</li>
+            <li>• Auto-refreshes every 60 seconds for latest status</li>
           </ul>
         </div>
       </CardContent>

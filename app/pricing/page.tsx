@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Pricing | DevTools Hub - Developer Tools Pricing Plans",
+  title: "Pricing | DvTools - Developer Tools Pricing Plans",
   description:
     "Choose the perfect plan for your development needs. From free tier to enterprise solutions, get access to professional developer tools with flexible pricing.",
   keywords: [
@@ -29,24 +29,24 @@ export const metadata: Metadata = {
     "coding tools plans",
   ],
   openGraph: {
-    title: "Pricing | DevTools Hub - Developer Tools Pricing Plans",
+    title: "Pricing | DvTools - Developer Tools Pricing Plans",
     description:
       "Choose the perfect plan for your development needs. From free tier to enterprise solutions.",
     type: "website",
     url: "/pricing",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
     images: [
       {
         url: "/pricing-og.jpg",
         width: 1200,
         height: 630,
-        alt: "DevTools Hub Pricing",
+        alt: "DvTools Pricing",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pricing | DevTools Hub - Developer Tools Pricing Plans",
+    title: "Pricing | DvTools - Developer Tools Pricing Plans",
     description:
       "Choose the perfect plan for your development needs. From free tier to enterprise solutions.",
     images: ["/pricing-og.jpg"],
@@ -270,7 +270,7 @@ export default function PricingPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Product",
-            name: "DevTools Hub",
+            name: "DvTools",
             description:
               "Professional developer tools platform with flexible pricing plans",
             offers: pricingPlans
@@ -408,7 +408,7 @@ export default function PricingPage() {
       {/* Features Section */}
       <section className="mb-16">
         <h2 className="text-3xl font-bold text-center mb-12">
-          Why Choose DevTools Hub?
+          Why Choose DvTools?
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (

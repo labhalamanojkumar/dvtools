@@ -5,9 +5,9 @@ import { ArrowLeft, CheckCircle } from "lucide-react";
 import SignUpForm from "@/components/auth/signup-form";
 
 export const metadata: Metadata = {
-  title: "Sign Up | DevTools Hub - Create Your Account",
+  title: "Sign Up | DvTools - Create Your Account",
   description:
-    "Join DevTools Hub and get access to professional developer tools. Create your account to start using our comprehensive suite of development utilities.",
+    "Join DvTools and get access to professional developer tools. Create your account to start using our comprehensive suite of development utilities.",
   keywords: [
     "sign up",
     "register",
@@ -16,18 +16,18 @@ export const metadata: Metadata = {
     "join devtools hub",
   ],
   openGraph: {
-    title: "Sign Up | DevTools Hub - Create Your Account",
+    title: "Sign Up | DvTools - Create Your Account",
     description:
-      "Join DevTools Hub and get access to professional developer tools.",
+      "Join DvTools and get access to professional developer tools.",
     type: "website",
     url: "/auth/signup",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sign Up | DevTools Hub - Create Your Account",
+    title: "Sign Up | DvTools - Create Your Account",
     description:
-      "Join DevTools Hub and get access to professional developer tools.",
+      "Join DvTools and get access to professional developer tools.",
   },
   alternates: {
     canonical: "/auth/signup",
@@ -79,7 +79,7 @@ export default function SignUpPage() {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
             </Link>
-            <h1 className="text-3xl font-bold mb-4">Join DevTools Hub</h1>
+            <h1 className="text-3xl font-bold mb-4">Join DvTools</h1>
             <p className="text-lg text-muted-foreground mb-8">
               Get access to professional developer tools and start building
               better software faster.

@@ -20,7 +20,7 @@ import ExportData from "@/components/settings/export-data";
 import AccountSettings from "@/components/profile/account-settings";
 
 export const metadata: Metadata = {
-  title: "Settings | DevTools Hub - Manage Your Account",
+  title: "Settings | DvTools - Manage Your Account",
   description:
     "Manage your API keys, export data, and configure your account settings.",
   keywords: [
@@ -31,11 +31,11 @@ export const metadata: Metadata = {
     "configuration",
   ],
   openGraph: {
-    title: "Settings | DevTools Hub - Manage Your Account",
+    title: "Settings | DvTools - Manage Your Account",
     description: "Manage your API keys and account settings.",
     type: "website",
     url: "/settings",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
   },
   robots: {
     index: false,

@@ -1,0 +1,166 @@
+[
+  {
+    "id": "1761816706553",
+    "name": "logistic regression Model",
+    "type": "classification",
+    "algorithm": "logistic_regression",
+    "status": "training",
+    "parameters": {},
+    "datasetId": "1761816688486",
+    "createdAt": "2025-10-30T09:31:46.553Z",
+    "progress": 0
+  },
+  {
+    "id": "1761817575464",
+    "name": "knn Model",
+    "type": "classification",
+    "algorithm": "knn",
+    "status": "completed",
+    "parameters": {
+      "n_neighbors": 18,
+      "weights": "distance",
+      "algorithm": "ball_tree"
+    },
+    "datasetId": "1761817562489",
+    "createdAt": "2025-10-30T09:46:15.464Z",
+    "progress": 100,
+    "trainingTime": 30.57727064834043,
+    "accuracy": 0.7779173866598516
+  },
+  {
+    "id": "1761817663961",
+    "name": "svm Model",
+    "type": "classification",
+    "algorithm": "svm",
+    "status": "completed",
+    "parameters": {
+      "C": 0.6526232418611176,
+      "kernel": "poly",
+      "gamma": "scale"
+    },
+    "datasetId": "1761817625648",
+    "createdAt": "2025-10-30T09:47:43.961Z",
+    "progress": 100,
+    "trainingTime": 13.592408885609597,
+    "accuracy": 0.9238186858091593
+  },
+  {
+    "id": "1761817849336",
+    "name": "svm Model",
+    "type": "classification",
+    "algorithm": "svm",
+    "status": "completed",
+    "parameters": {
+      "C": 1.592201587259926,
+      "kernel": "sigmoid",
+      "gamma": "auto"
+    },
+    "datasetId": "1761817808890",
+    "createdAt": "2025-10-30T09:50:49.336Z",
+    "progress": 100,
+    "trainingTime": 11.261750000901781,
+    "accuracy": 0.8424402344488946
+  },
+  {
+    "id": "1761892463524",
+    "name": "svm Model",
+    "type": "classification",
+    "algorithm": "svm",
+    "status": "completed",
+    "parameters": {
+      "C": 2.2657164567312313,
+      "kernel": "linear",
+      "gamma": "scale"
+    },
+    "datasetId": "1761892429034",
+    "createdAt": "2025-10-31T06:34:23.524Z",
+    "progress": 100,
+    "trainingTime": 33.267869671859984,
+    "accuracy": 0.819519713854746
+  },
+  {
+    "id": "1761892488401",
+    "name": "knn Model",
+    "type": "classification",
+    "algorithm": "knn",
+    "status": "completed",
+    "parameters": {
+      "n_neighbors": 6,
+      "weights": "uniform",
+      "algorithm": "ball_tree"
+    },
+    "datasetId": "1761892429034",
+    "createdAt": "2025-10-31T06:34:48.401Z",
+    "progress": 100,
+    "trainingTime": 11.449173251095655,
+    "accuracy": 0.9378014046984827
+  },
+  {
+    "id": "1762190630482",
+    "name": "logistic regression Model",
+    "type": "classification",
+    "algorithm": "logistic_regression",
+    "status": "completed",
+    "parameters": {
+      "C": 5.869911116678816,
+      "max_iter": 113,
+      "solver": "liblinear"
+    },
+    "datasetId": "1762190616654",
+    "createdAt": "2025-11-03T17:23:50.482Z",
+    "progress": 100,
+    "trainingTime": 30.6734169808042,
+    "accuracy": 0.71168514761901
+  },
+  {
+    "id": "1762190657769",
+    "name": "knn Model",
+    "type": "classification",
+    "algorithm": "knn",
+    "status": "completed",
+    "parameters": {
+      "n_neighbors": 10,
+      "weights": "distance",
+      "algorithm": "brute"
+    },
+    "datasetId": "1762190616654",
+    "createdAt": "2025-11-03T17:24:17.769Z",
+    "progress": 100,
+    "trainingTime": 6.35955234341358,
+    "accuracy": 0.7550138050670838
+  },
+  {
+    "id": "1762190669904",
+    "name": "svm Model",
+    "type": "classification",
+    "algorithm": "svm",
+    "status": "completed",
+    "parameters": {
+      "C": 9.458212848278492,
+      "kernel": "rbf",
+      "gamma": "auto"
+    },
+    "datasetId": "1762190616654",
+    "createdAt": "2025-11-03T17:24:29.904Z",
+    "progress": 100,
+    "trainingTime": 21.570918562166202,
+    "accuracy": 0.859853356527897
+  },
+  {
+    "id": "1762191000743",
+    "name": "svm Model",
+    "type": "classification",
+    "algorithm": "svm",
+    "status": "completed",
+    "parameters": {
+      "C": 4.413675443707389,
+      "kernel": "linear",
+      "gamma": "scale"
+    },
+    "datasetId": "1762190966990",
+    "createdAt": "2025-11-03T17:30:00.743Z",
+    "progress": 100,
+    "trainingTime": 17.62789273449484,
+    "accuracy": 0.9653988719449964
+  }
+]

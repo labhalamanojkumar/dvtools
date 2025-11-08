@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 interface AccountSettingsProps {
-  user: {
+  user?: {
     id: string;
     name?: string | null;
     email?: string | null;
@@ -27,10 +27,7 @@ interface AccountSettingsProps {
   isAdmin: boolean;
 }
 
-export default function AccountSettings({
-  user,
-  isAdmin,
-}: AccountSettingsProps) {
+export default function AccountSettings({ user: _user, isAdmin }: AccountSettingsProps) {
   return (
     <Card>
       <CardHeader>

@@ -1,0 +1,1309 @@
+"use client";
+
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Separator } from "@/components/ui/separator";
+import {
+  Upload,
+  Download,
+  Undo,
+  Redo,
+  Crop,
+  Palette,
+  Image as ImageIcon,
+  Square,
+  Circle,
+  ArrowRight,
+  Minus,
+} from "lucide-react";
+import { useToast } from "@/components/ui/toaster";
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+interface Annotation {
+  id: string;
+  type: 'text' | 'arrow' | 'rectangle' | 'circle' | 'line' | 'freehand';
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  text?: string;
+  color: string;
+  strokeWidth: number;
+  fontSize?: number;
+  points?: Point[];
+  visible: boolean;
+}
+
+interface ImageState {
+  image: HTMLImageElement;
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  originalWidth: number;
+  originalHeight: number;
+  currentWidth: number;
+  currentHeight: number;
+  scale: number;
+  rotation: number;
+  flipHorizontal: boolean;
+  flipVertical: boolean;
+  cropArea?: { x: number; y: number; width: number; height: number };
+  annotations: Annotation[];
+  history: ImageData[];
+  historyIndex: number;
+}
+
+interface FilterSettings {
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  hue: number;
+  blur: number;
+  sepia: number;
+  grayscale: number;
+}
+
+const tools = [
+  { id: 'select', name: 'Select', icon: '👆' },
+  { id: 'crop', name: 'Crop', icon: '✂️' },
+  { id: 'text', name: 'Text', icon: '📝' },
+  { id: 'draw', name: 'Draw', icon: '✏️' },
+  { id: 'shapes', name: 'Shapes', icon: '⬜' },
+  { id: 'filters', name: 'Filters', icon: '🎨' },
+];
+
+const shapeTools = [
+  { id: 'rectangle', name: 'Rectangle', icon: Square },
+  { id: 'circle', name: 'Circle', icon: Circle },
+  { id: 'arrow', name: 'Arrow', icon: ArrowRight },
+  { id: 'line', name: 'Line', icon: Minus },
+];
+
+const colors = [
+  '#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF',
+  '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080',
+  '#FFC0CB', '#A52A2A', '#808080', '#000080', '#008000'
+];
+
+export default function ImageEditorClient() {
+  const [imageState, setImageState] = useState<ImageState | null>(null);
+  const [selectedTool, setSelectedTool] = useState('select');
+  const [selectedShape, setSelectedShape] = useState('rectangle');
+  const [selectedColor, setSelectedColor] = useState('#FF0000');
+  const [strokeWidth, setStrokeWidth] = useState(2);
+  const [fontSize, setFontSize] = useState(16);
+  const [isDraggingHandle, setIsDraggingHandle] = useState<string | null>(null);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
+  const [filters, setFilters] = useState<FilterSettings>({
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    hue: 0,
+    blur: 0,
+    sepia: 0,
+    grayscale: 0,
+  });
+
+  const [textInput, setTextInput] = useState('');
+  const [showTextInput, setShowTextInput] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const loadImage = useCallback(async (file: File) => {
+    return new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
+  }, []);
+
+  const initializeCanvas = useCallback((img: HTMLImageElement) => {
+    // Validate image dimensions
+    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+      throw new Error('Invalid image dimensions');
+    }
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) throw new Error('Canvas context not available');
+
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+
+    // Validate canvas was created with correct dimensions
+    if (canvas.width !== img.naturalWidth || canvas.height !== img.naturalHeight) {
+      throw new Error('Failed to set canvas dimensions');
+    }
+
+    const newState: ImageState = {
+      image: img,
+      canvas,
+      ctx,
+      originalWidth: img.naturalWidth,
+      originalHeight: img.naturalHeight,
+      currentWidth: img.naturalWidth,
+      currentHeight: img.naturalHeight,
+      scale: 1,
+      rotation: 0,
+      flipHorizontal: false,
+      flipVertical: false,
+      annotations: [],
+      history: [],
+      historyIndex: -1,
+      cropArea: selectedTool === 'crop' ? {
+        x: 0,
+        y: 0,
+        width: img.naturalWidth,
+        height: img.naturalHeight
+      } : undefined,
+    };
+
+    setImageState(newState);
+    saveToHistory(newState);
+    renderCanvas(newState);
+  }, [selectedTool]);
+
+  const saveToHistory = useCallback((state: ImageState) => {
+    // Validate canvas before saving to history
+    if (!state.canvas || state.canvas.width === 0 || state.canvas.height === 0) {
+      console.warn('Cannot save invalid canvas state to history');
+      return;
+    }
+
+    try {
+      const imageData = state.ctx.getImageData(0, 0, state.canvas.width, state.canvas.height);
+      const newHistory = state.history.slice(0, state.historyIndex + 1);
+      newHistory.push(imageData);
+
+      if (newHistory.length > 50) { // Limit history to 50 states
+        newHistory.shift();
+      }
+
+      state.history = newHistory;
+      state.historyIndex = newHistory.length - 1;
+    } catch (error) {
+      console.error('Failed to save canvas state to history:', error);
+    }
+  }, []);
+
+  const renderCanvas = useCallback((state: ImageState) => {
+    const { ctx, canvas, image, scale, rotation, flipHorizontal, flipVertical, annotations, cropArea } = state;
+
+    // Check if canvas has valid dimensions
+    if (canvas.width === 0 || canvas.height === 0) {
+      console.warn('Cannot render canvas with invalid dimensions');
+      return;
+    }
+
+    try {
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Save context
+      ctx.save();
+
+      // Apply transformations
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      if (rotation) ctx.rotate((rotation * Math.PI) / 180);
+      if (flipHorizontal) ctx.scale(-1, 1);
+      if (flipVertical) ctx.scale(1, -1);
+      ctx.translate(-canvas.width / 2, -canvas.height / 2);
+
+      // Apply scale
+      if (scale !== 1) {
+        ctx.scale(scale, scale);
+      }
+
+      // Draw image
+      ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      // Apply filters
+      applyFilters(ctx, canvas, filters);
+
+      // Draw crop area if active
+      if (cropArea && selectedTool === 'crop') {
+        ctx.strokeStyle = '#00FF00';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(cropArea.x, cropArea.y, cropArea.width, cropArea.height);
+        ctx.setLineDash([]);
+
+        // Draw resize handles
+        const handleSize = 8;
+        ctx.fillStyle = '#00FF00';
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 1;
+
+        // Corner handles
+        const corners = [
+          { x: cropArea.x, y: cropArea.y }, // top-left
+          { x: cropArea.x + cropArea.width, y: cropArea.y }, // top-right
+          { x: cropArea.x, y: cropArea.y + cropArea.height }, // bottom-left
+          { x: cropArea.x + cropArea.width, y: cropArea.y + cropArea.height }, // bottom-right
+        ];
+
+        corners.forEach(corner => {
+          ctx.fillRect(corner.x - handleSize/2, corner.y - handleSize/2, handleSize, handleSize);
+          ctx.strokeRect(corner.x - handleSize/2, corner.y - handleSize/2, handleSize, handleSize);
+        });
+
+        // Edge handles (midpoints)
+        const edges = [
+          { x: cropArea.x + cropArea.width/2, y: cropArea.y }, // top
+          { x: cropArea.x + cropArea.width, y: cropArea.y + cropArea.height/2 }, // right
+          { x: cropArea.x + cropArea.width/2, y: cropArea.y + cropArea.height }, // bottom
+          { x: cropArea.x, y: cropArea.y + cropArea.height/2 }, // left
+        ];
+
+        edges.forEach(edge => {
+          ctx.fillRect(edge.x - handleSize/2, edge.y - handleSize/2, handleSize, handleSize);
+          ctx.strokeRect(edge.x - handleSize/2, edge.y - handleSize/2, handleSize, handleSize);
+        });
+      }
+
+      // Draw annotations
+      annotations.filter(ann => ann.visible).forEach(annotation => {
+        drawAnnotation(ctx, annotation);
+      });
+
+      // Restore context
+      ctx.restore();
+
+      // Update display canvas
+      if (canvasRef.current) {
+        const displayCtx = canvasRef.current.getContext('2d', { willReadFrequently: true });
+        if (displayCtx) {
+          canvasRef.current.width = canvas.width;
+          canvasRef.current.height = canvas.height;
+          displayCtx.drawImage(canvas, 0, 0);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to render canvas:', error);
+    }
+  }, [selectedTool, filters]);
+
+  const applyFilters = useCallback((ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, filters: FilterSettings) => {
+    // Check if canvas has valid dimensions
+    if (canvas.width === 0 || canvas.height === 0) {
+      return;
+    }
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      let r = data[i];
+      let g = data[i + 1];
+      let b = data[i + 2];
+
+      // Brightness
+      r *= filters.brightness / 100;
+      g *= filters.brightness / 100;
+      b *= filters.brightness / 100;
+
+      // Contrast
+      const contrast = filters.contrast / 100;
+      r = ((r - 128) * contrast) + 128;
+      g = ((g - 128) * contrast) + 128;
+      b = ((b - 128) * contrast) + 128;
+
+      // Saturation
+      const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
+      r = gray + (r - gray) * (filters.saturation / 100);
+      g = gray + (g - gray) * (filters.saturation / 100);
+      b = gray + (b - gray) * (filters.saturation / 100);
+
+      // Hue (simplified)
+      if (filters.hue !== 0) {
+        const hue = filters.hue * Math.PI / 180;
+        const cos = Math.cos(hue);
+        const sin = Math.sin(hue);
+        const newR = r * (0.299 + 0.701 * cos + 0.168 * sin) +
+                    g * (0.587 - 0.587 * cos + 0.330 * sin) +
+                    b * (0.114 - 0.114 * cos - 0.497 * sin);
+        const newG = r * (0.299 - 0.299 * cos - 0.328 * sin) +
+                    g * (0.587 + 0.413 * cos + 0.035 * sin) +
+                    b * (0.114 - 0.114 * cos + 0.292 * sin);
+        const newB = r * (0.299 - 0.300 * cos + 1.250 * sin) +
+                    g * (0.587 - 0.588 * cos - 1.050 * sin) +
+                    b * (0.114 + 0.886 * cos - 0.203 * sin);
+        r = newR;
+        g = newG;
+        b = newB;
+      }
+
+      // Grayscale
+      if (filters.grayscale > 0) {
+        const gray = 0.2989 * r + 0.5870 * g + 0.1140 * b;
+        r = r * (1 - filters.grayscale / 100) + gray * (filters.grayscale / 100);
+        g = g * (1 - filters.grayscale / 100) + gray * (filters.grayscale / 100);
+        b = b * (1 - filters.grayscale / 100) + gray * (filters.grayscale / 100);
+      }
+
+      // Sepia
+      if (filters.sepia > 0) {
+        const sepiaR = r * (1 - filters.sepia / 100) + (r * 0.393 + g * 0.769 + b * 0.189) * (filters.sepia / 100);
+        const sepiaG = g * (1 - filters.sepia / 100) + (r * 0.349 + g * 0.686 + b * 0.168) * (filters.sepia / 100);
+        const sepiaB = b * (1 - filters.sepia / 100) + (r * 0.272 + g * 0.534 + b * 0.131) * (filters.sepia / 100);
+        r = sepiaR;
+        g = sepiaG;
+        b = sepiaB;
+      }
+
+      // Clamp values
+      data[i] = Math.max(0, Math.min(255, r));
+      data[i + 1] = Math.max(0, Math.min(255, g));
+      data[i + 2] = Math.max(0, Math.min(255, b));
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+
+    // Apply blur if needed
+    if (filters.blur > 0) {
+      ctx.filter = `blur(${filters.blur}px)`;
+      ctx.drawImage(canvas, 0, 0);
+      ctx.filter = 'none';
+    }
+  }, []);
+
+  const getResizeHandleAt = useCallback((x: number, y: number, cropArea: CropArea): string | null => {
+    if (!cropArea) return null;
+
+    const handleSize = 8;
+    const tolerance = handleSize / 2;
+
+    // Check corners
+    if (Math.abs(x - cropArea.x) <= tolerance && Math.abs(y - cropArea.y) <= tolerance) {
+      return 'nw'; // northwest
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width)) <= tolerance && Math.abs(y - cropArea.y) <= tolerance) {
+      return 'ne'; // northeast
+    }
+    if (Math.abs(x - cropArea.x) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height)) <= tolerance) {
+      return 'sw'; // southwest
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width)) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height)) <= tolerance) {
+      return 'se'; // southeast
+    }
+
+    // Check edges
+    if (Math.abs(x - (cropArea.x + cropArea.width/2)) <= tolerance && Math.abs(y - cropArea.y) <= tolerance) {
+      return 'n'; // north
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width)) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height/2)) <= tolerance) {
+      return 'e'; // east
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width/2)) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height)) <= tolerance) {
+      return 's'; // south
+    }
+    if (Math.abs(x - cropArea.x) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height/2)) <= tolerance) {
+      return 'w'; // west
+    }
+
+    return null;
+  }, []);
+    ctx.strokeStyle = annotation.color;
+    ctx.fillStyle = annotation.color;
+    ctx.lineWidth = annotation.strokeWidth;
+
+    switch (annotation.type) {
+      case 'text':
+        if (annotation.text) {
+          ctx.font = `${annotation.fontSize || 16}px Arial`;
+          ctx.fillText(annotation.text, annotation.x, annotation.y);
+        }
+        break;
+      case 'rectangle':
+        if (annotation.width && annotation.height) {
+          ctx.strokeRect(annotation.x, annotation.y, annotation.width, annotation.height);
+        }
+        break;
+      case 'circle':
+        if (annotation.width) {
+          const radius = annotation.width / 2;
+          ctx.beginPath();
+          ctx.arc(annotation.x + radius, annotation.y + radius, radius, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+        break;
+      case 'line':
+        if (annotation.width) {
+          ctx.beginPath();
+          ctx.moveTo(annotation.x, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width, annotation.y);
+          ctx.stroke();
+        }
+        break;
+      case 'arrow':
+        if (annotation.width) {
+          // Draw line
+          ctx.beginPath();
+          ctx.moveTo(annotation.x, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width, annotation.y);
+          ctx.stroke();
+
+          // Draw arrowhead
+          const headLength = 10;
+          const angle = Math.atan2(0, annotation.width);
+          ctx.beginPath();
+          ctx.moveTo(annotation.x + annotation.width, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width - headLength * Math.cos(angle - Math.PI / 6),
+                    annotation.y - headLength * Math.sin(angle - Math.PI / 6));
+          ctx.moveTo(annotation.x + annotation.width, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width - headLength * Math.cos(angle + Math.PI / 6),
+                    annotation.y - headLength * Math.sin(angle + Math.PI / 6));
+          ctx.stroke();
+        }
+        break;
+      case 'freehand':
+        if (annotation.points && annotation.points.length > 1) {
+          ctx.beginPath();
+          ctx.moveTo(annotation.points[0].x, annotation.points[0].y);
+          for (let i = 1; i < annotation.points.length; i++) {
+            ctx.lineTo(annotation.points[i].x, annotation.points[i].y);
+          }
+          ctx.stroke();
+        }
+        break;
+    }
+  }, []);
+
+  const getResizeHandleAt = useCallback((x: number, y: number, cropArea: CropArea): string | null => {
+    if (!cropArea) return null;
+
+    const handleSize = 8;
+    const tolerance = handleSize / 2;
+
+    // Check corners
+    if (Math.abs(x - cropArea.x) <= tolerance && Math.abs(y - cropArea.y) <= tolerance) {
+      return 'nw'; // northwest
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width)) <= tolerance && Math.abs(y - cropArea.y) <= tolerance) {
+      return 'ne'; // northeast
+    }
+    if (Math.abs(x - cropArea.x) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height)) <= tolerance) {
+      return 'sw'; // southwest
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width)) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height)) <= tolerance) {
+      return 'se'; // southeast
+    }
+
+    // Check edges
+    if (Math.abs(x - (cropArea.x + cropArea.width/2)) <= tolerance && Math.abs(y - cropArea.y) <= tolerance) {
+      return 'n'; // north
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width)) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height/2)) <= tolerance) {
+      return 'e'; // east
+    }
+    if (Math.abs(x - (cropArea.x + cropArea.width/2)) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height)) <= tolerance) {
+      return 's'; // south
+    }
+    if (Math.abs(x - cropArea.x) <= tolerance && Math.abs(y - (cropArea.y + cropArea.height/2)) <= tolerance) {
+      return 'w'; // west
+    }
+
+    return null;
+  }, []);
+
+  const drawAnnotation = useCallback((ctx: CanvasRenderingContext2D, annotation: Annotation) => {
+    ctx.strokeStyle = annotation.color;
+    ctx.fillStyle = annotation.color;
+    ctx.lineWidth = annotation.strokeWidth;
+
+    switch (annotation.type) {
+      case 'text':
+        if (annotation.text) {
+          ctx.font = `${annotation.fontSize || 16}px Arial`;
+          ctx.fillText(annotation.text, annotation.x, annotation.y);
+        }
+        break;
+      case 'rectangle':
+        if (annotation.width && annotation.height) {
+          ctx.strokeRect(annotation.x, annotation.y, annotation.width, annotation.height);
+        }
+        break;
+      case 'circle':
+        if (annotation.width) {
+          const radius = annotation.width / 2;
+          ctx.beginPath();
+          ctx.arc(annotation.x + radius, annotation.y + radius, radius, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+        break;
+      case 'line':
+        if (annotation.width) {
+          ctx.beginPath();
+          ctx.moveTo(annotation.x, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width, annotation.y);
+          ctx.stroke();
+        }
+        break;
+      case 'arrow':
+        if (annotation.width) {
+          // Draw line
+          ctx.beginPath();
+          ctx.moveTo(annotation.x, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width, annotation.y);
+          ctx.stroke();
+
+          // Draw arrowhead
+          const headLength = 10;
+          const angle = Math.atan2(0, annotation.width);
+          ctx.beginPath();
+          ctx.moveTo(annotation.x + annotation.width, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width - headLength * Math.cos(angle - Math.PI / 6),
+                    annotation.y - headLength * Math.sin(angle - Math.PI / 6));
+          ctx.moveTo(annotation.x + annotation.width, annotation.y);
+          ctx.lineTo(annotation.x + annotation.width - headLength * Math.cos(angle + Math.PI / 6),
+                    annotation.y - headLength * Math.sin(angle + Math.PI / 6));
+          ctx.stroke();
+        }
+        break;
+      case 'freehand':
+        if (annotation.points && annotation.points.length > 1) {
+          ctx.beginPath();
+          ctx.moveTo(annotation.points[0].x, annotation.points[0].y);
+          for (let i = 1; i < annotation.points.length; i++) {
+            ctx.lineTo(annotation.points[i].x, annotation.points[i].y);
+          }
+          ctx.stroke();
+        }
+        break;
+    }
+  }, []);
+
+  const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const img = await loadImage(file);
+      initializeCanvas(img);
+      toast({
+        title: "Image loaded",
+        description: `Successfully loaded ${file.name}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error loading image",
+        description: "Failed to load the selected image",
+        variant: "destructive",
+      });
+    }
+  }, [loadImage, initializeCanvas, toast]);
+
+  const handleCanvasMouseDown = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!imageState || !canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = imageState.canvas.width / rect.width;
+    const scaleY = imageState.canvas.height / rect.height;
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
+    setIsDrawing(true);
+
+    switch (selectedTool) {
+      case 'crop':
+        setImageState(prev => prev ? {
+          ...prev,
+          cropArea: { x, y, width: 0, height: 0 }
+        } : null);
+        break;
+      case 'text':
+        setCurrentAnnotation({
+          type: 'text',
+          x,
+          y,
+          color: selectedColor,
+          strokeWidth,
+          fontSize,
+          text: '',
+          visible: true,
+        });
+        setShowTextInput(true);
+        break;
+      case 'draw':
+        setCurrentAnnotation({
+          type: 'freehand',
+          x,
+          y,
+          color: selectedColor,
+          strokeWidth,
+          points: [{ x, y }],
+          visible: true,
+        });
+        break;
+      case 'shapes':
+        setCurrentAnnotation({
+          type: selectedShape as any,
+          x,
+          y,
+          color: selectedColor,
+          strokeWidth,
+          visible: true,
+        });
+        break;
+    }
+  }, [imageState, selectedTool, selectedShape, selectedColor, strokeWidth, fontSize]);
+
+  const handleCanvasMouseMove = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing || !imageState || !canvasRef.current || !currentAnnotation) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = imageState.canvas.width / rect.width;
+    const scaleY = imageState.canvas.height / rect.height;
+    const x = (event.clientX - rect.left) * scaleX;
+    const y = (event.clientY - rect.top) * scaleY;
+
+    switch (selectedTool) {
+      case 'crop':
+        if (imageState.cropArea) {
+          const width = x - imageState.cropArea.x;
+          const height = y - imageState.cropArea.y;
+          setImageState(prev => prev ? {
+            ...prev,
+            cropArea: { ...prev.cropArea!, width, height }
+          } : null);
+        }
+        break;
+      case 'draw':
+        if (currentAnnotation.points) {
+          currentAnnotation.points.push({ x, y });
+        }
+        break;
+      case 'shapes':
+        const width = x - currentAnnotation.x!;
+        const height = y - currentAnnotation.y!;
+        setCurrentAnnotation(prev => prev ? {
+          ...prev,
+          width,
+          height,
+        } : null);
+        break;
+    }
+
+    renderCanvas(imageState);
+  }, [isDrawing, imageState, currentAnnotation, selectedTool, renderCanvas]);
+
+  const handleCanvasMouseUp = useCallback(() => {
+    if (!isDrawing || !imageState || !currentAnnotation) return;
+
+    setIsDrawing(false);
+
+    // Don't add text annotations automatically - wait for user input
+    if (selectedTool === 'text') {
+      return;
+    }
+
+    // Add annotation to state
+    const annotation: Annotation = {
+      id: Date.now().toString(),
+      ...currentAnnotation,
+    } as Annotation;
+
+    setImageState(prev => prev ? {
+      ...prev,
+      annotations: [...prev.annotations, annotation],
+    } : null);
+
+    setCurrentAnnotation(null);
+    saveToHistory(imageState);
+  }, [isDrawing, imageState, currentAnnotation, selectedTool, saveToHistory]);
+
+  const applyCrop = useCallback(() => {
+    if (!imageState?.cropArea || !imageState.canvas) return;
+
+    const { cropArea } = imageState;
+    const { x, y, width, height } = cropArea;
+
+    // Validate crop area dimensions
+    const absWidth = Math.abs(width);
+    const absHeight = Math.abs(height);
+
+    // Validate crop area dimensions - allow minimum 10px crops
+    const minCropSize = 10;
+    if (absWidth < minCropSize || absHeight < minCropSize) {
+      toast({
+        title: "Crop area too small",
+        description: `Please select an area of at least ${minCropSize}×${minCropSize} pixels`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate source canvas dimensions
+    if (imageState.canvas.width === 0 || imageState.canvas.height === 0) {
+      toast({
+        title: "Canvas error",
+        description: "Image canvas is not properly initialized",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create new canvas with cropped dimensions
+    const newCanvas = document.createElement('canvas');
+    const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
+    if (!newCtx) {
+      toast({
+        title: "Canvas error",
+        description: "Failed to create canvas context",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    newCanvas.width = absWidth;
+    newCanvas.height = absHeight;
+
+    // Calculate source coordinates (handle negative dimensions)
+    const sourceX = width < 0 ? x + width : x;
+    const sourceY = height < 0 ? y + height : y;
+
+    try {
+      // Draw cropped area
+      newCtx.drawImage(
+        imageState.canvas,
+        sourceX, sourceY, absWidth, absHeight,
+        0, 0, absWidth, absHeight
+      );
+
+      setImageState(prev => {
+        const newState = prev ? {
+          ...prev,
+          canvas: newCanvas,
+          ctx: newCtx,
+          currentWidth: absWidth,
+          currentHeight: absHeight,
+          cropArea: undefined,
+        } : null;
+
+        // Save the new cropped state to history
+        if (newState) {
+          saveToHistory(newState);
+        }
+
+        return newState;
+      });
+
+      // Re-render with the new state
+      const newState = {
+        ...imageState,
+        canvas: newCanvas,
+        ctx: newCtx,
+        currentWidth: absWidth,
+        currentHeight: absHeight,
+        cropArea: undefined,
+      };
+      renderCanvas(newState);
+
+      toast({
+        title: "Crop applied",
+        description: `Image cropped to ${absWidth} × ${absHeight}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Crop failed",
+        description: "Failed to apply crop operation",
+        variant: "destructive",
+      });
+    }
+  }, [imageState, saveToHistory, renderCanvas, toast]);
+
+  const undo = useCallback(() => {
+    if (!imageState || imageState.historyIndex <= 0) return;
+
+    try {
+      const previousState = imageState.history[imageState.historyIndex - 1];
+      if (!previousState) return;
+
+      // Create a temporary canvas to get the dimensions from the image data
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = previousState.width;
+      tempCanvas.height = previousState.height;
+
+      // Put the image data onto the temporary canvas
+      const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+      if (!tempCtx) return;
+
+      tempCtx.putImageData(previousState, 0, 0);
+
+      // Update the main canvas with the restored state
+      imageState.canvas.width = previousState.width;
+      imageState.canvas.height = previousState.height;
+      imageState.ctx.putImageData(previousState, 0, 0);
+
+      setImageState(prev => prev ? {
+        ...prev,
+        currentWidth: previousState.width,
+        currentHeight: previousState.height,
+        historyIndex: prev.historyIndex - 1,
+      } : null);
+
+      renderCanvas(imageState);
+    } catch (error) {
+      console.error('Failed to undo:', error);
+      toast({
+        title: "Undo failed",
+        description: "Could not restore previous state",
+        variant: "destructive",
+      });
+    }
+  }, [imageState, renderCanvas, toast]);
+
+  const redo = useCallback(() => {
+    if (!imageState || imageState.historyIndex >= imageState.history.length - 1) return;
+
+    try {
+      const nextState = imageState.history[imageState.historyIndex + 1];
+      if (!nextState) return;
+
+      // Update the main canvas dimensions and content
+      imageState.canvas.width = nextState.width;
+      imageState.canvas.height = nextState.height;
+      imageState.ctx.putImageData(nextState, 0, 0);
+
+      setImageState(prev => prev ? {
+        ...prev,
+        currentWidth: nextState.width,
+        currentHeight: nextState.height,
+        historyIndex: prev.historyIndex + 1,
+      } : null);
+
+      renderCanvas(imageState);
+    } catch (error) {
+      console.error('Failed to redo:', error);
+      toast({
+        title: "Redo failed",
+        description: "Could not restore next state",
+        variant: "destructive",
+      });
+    }
+  }, [imageState, renderCanvas, toast]);
+
+  const addTextAnnotation = useCallback(() => {
+    if (!currentAnnotation || !textInput.trim() || !imageState) return;
+
+    const annotation: Annotation = {
+      id: Date.now().toString(),
+      ...currentAnnotation,
+      text: textInput.trim(),
+    } as Annotation;
+
+    setImageState(prev => prev ? {
+      ...prev,
+      annotations: [...prev.annotations, annotation],
+    } : null);
+
+    setCurrentAnnotation(null);
+    setTextInput('');
+    setShowTextInput(false);
+    saveToHistory(imageState);
+  }, [currentAnnotation, textInput, imageState, saveToHistory]);
+
+  const downloadImage = useCallback(() => {
+    if (!imageState) return;
+
+    const link = document.createElement('a');
+    link.download = 'edited-image.png';
+    link.href = imageState.canvas.toDataURL();
+    link.click();
+  }, [imageState]);
+
+  useEffect(() => {
+    if (imageState && selectedTool === 'crop' && !imageState.cropArea) {
+      setImageState(prev => prev ? {
+        ...prev,
+        cropArea: {
+          x: 0,
+          y: 0,
+          width: prev.currentWidth,
+          height: prev.currentHeight
+        }
+      } : null);
+    }
+  }, [selectedTool, imageState]);
+
+  // Handle keyboard events for text input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (showTextInput && e.key === 'Escape') {
+        setShowTextInput(false);
+        setCurrentAnnotation(null);
+        setTextInput('');
+      }
+    };
+
+    if (showTextInput) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [showTextInput]);
+
+  return (
+    <div className="space-y-6">
+      {/* Upload Section */}
+      {!imageState && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5" />
+              Upload Image
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="border-2 border-dashed rounded-lg p-8 text-center">
+              <ImageIcon className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-lg font-medium mb-2">
+                Drop an image here or click to browse
+              </p>
+              <p className="text-muted-foreground mb-4">
+                Supports JPEG, PNG, WebP, and other common formats
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <Button onClick={() => fileInputRef.current?.click()}>
+                Choose Image
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Editor Interface */}
+      {imageState && (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Toolbar */}
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle className="text-lg">Tools</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Main Tools */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Main Tools</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {tools.map((tool) => (
+                    <Button
+                      key={tool.id}
+                      variant={selectedTool === tool.id ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setSelectedTool(tool.id)}
+                      className="flex flex-col items-center gap-1 h-auto py-3"
+                    >
+                      <span className="text-lg">{tool.icon}</span>
+                      <span className="text-xs">{tool.name}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Shape Tools */}
+              {selectedTool === 'shapes' && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Shapes</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {shapeTools.map((shape) => {
+                      const Icon = shape.icon;
+                      return (
+                        <Button
+                          key={shape.id}
+                          variant={selectedShape === shape.id ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setSelectedShape(shape.id)}
+                          className="flex flex-col items-center gap-1 h-auto py-3"
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="text-xs">{shape.name}</span>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Color Picker */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Color</Label>
+                <div className="grid grid-cols-5 gap-2">
+                  {colors.map((color) => (
+                    <button
+                      key={color}
+                      className={`w-8 h-8 rounded border-2 ${
+                        selectedColor === color ? 'border-primary' : 'border-muted'
+                      }`}
+                      style={{ backgroundColor: color }}
+                      onClick={() => setSelectedColor(color)}
+                    />
+                  ))}
+                </div>
+                <Input
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => setSelectedColor(e.target.value)}
+                  className="w-full h-8"
+                />
+              </div>
+
+              {/* Stroke Width */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Stroke Width: {strokeWidth}px</Label>
+                <Slider
+                  value={[strokeWidth]}
+                  onValueChange={(value) => setStrokeWidth(value[0])}
+                  max={20}
+                  min={1}
+                  step={1}
+                />
+              </div>
+
+              {/* Font Size */}
+              {selectedTool === 'text' && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Font Size: {fontSize}px</Label>
+                  <Slider
+                    value={[fontSize]}
+                    onValueChange={(value) => setFontSize(value[0])}
+                    max={72}
+                    min={8}
+                    step={2}
+                  />
+                </div>
+              )}
+
+              {/* Text Input */}
+              {showTextInput && selectedTool === 'text' && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Enter Text</Label>
+                  <Input
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    placeholder="Type your text here..."
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        addTextAnnotation();
+                      } else if (e.key === 'Escape') {
+                        setShowTextInput(false);
+                        setCurrentAnnotation(null);
+                        setTextInput('');
+                      }
+                    }}
+                    autoFocus
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={addTextAnnotation}
+                      disabled={!textInput.trim()}
+                      className="flex-1"
+                    >
+                      Add Text
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setShowTextInput(false);
+                        setCurrentAnnotation(null);
+                        setTextInput('');
+                      }}
+                      className="flex-1"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <Separator />
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={undo}
+                  disabled={!imageState || imageState.historyIndex <= 0}
+                  className="w-full"
+                >
+                  <Undo className="h-4 w-4 mr-2" />
+                  Undo
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={redo}
+                  disabled={!imageState || imageState.historyIndex >= imageState.history.length - 1}
+                  className="w-full"
+                >
+                  <Redo className="h-4 w-4 mr-2" />
+                  Redo
+                </Button>
+                {selectedTool === 'crop' && imageState.cropArea && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={applyCrop}
+                    className="w-full"
+                  >
+                    <Crop className="h-4 w-4 mr-2" />
+                    Apply Crop
+                  </Button>
+                )}
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={downloadImage}
+                  className="w-full"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Canvas Area */}
+          <Card className="lg:col-span-3">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Image Editor</span>
+                <div className="flex gap-2">
+                  <Badge variant="outline">
+                    {imageState.currentWidth} × {imageState.currentHeight}
+                  </Badge>
+                </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="border rounded-lg overflow-auto max-h-[600px]">
+                <canvas
+                  ref={canvasRef}
+                  onMouseDown={handleCanvasMouseDown}
+                  onMouseMove={handleCanvasMouseMove}
+                  onMouseUp={handleCanvasMouseUp}
+                  onMouseLeave={handleCanvasMouseUp}
+                  className="cursor-crosshair"
+                  style={{ maxWidth: '100%', height: 'auto' }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Filters Panel */}
+      {imageState && selectedTool === 'filters' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Palette className="h-5 w-5" />
+              Image Filters
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="space-y-2">
+                <Label>Brightness: {filters.brightness}%</Label>
+                <Slider
+                  value={[filters.brightness]}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, brightness: value[0] }))}
+                  max={200}
+                  min={0}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Contrast: {filters.contrast}%</Label>
+                <Slider
+                  value={[filters.contrast]}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, contrast: value[0] }))}
+                  max={200}
+                  min={0}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Saturation: {filters.saturation}%</Label>
+                <Slider
+                  value={[filters.saturation]}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, saturation: value[0] }))}
+                  max={200}
+                  min={0}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Hue: {filters.hue}°</Label>
+                <Slider
+                  value={[filters.hue]}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, hue: value[0] }))}
+                  max={180}
+                  min={-180}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Blur: {filters.blur}px</Label>
+                <Slider
+                  value={[filters.blur]}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, blur: value[0] }))}
+                  max={20}
+                  min={0}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Sepia: {filters.sepia}%</Label>
+                <Slider
+                  value={[filters.sepia]}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, sepia: value[0] }))}
+                  max={100}
+                  min={0}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Grayscale: {filters.grayscale}%</Label>
+                <Slider
+                  value={[filters.grayscale]}
+                  onValueChange={(value) => setFilters(prev => ({ ...prev, grayscale: value[0] }))}
+                  max={100}
+                  min={0}
+                />
+              </div>
+              <div className="space-y-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setFilters({
+                    brightness: 100,
+                    contrast: 100,
+                    saturation: 100,
+                    hue: 0,
+                    blur: 0,
+                    sepia: 0,
+                    grayscale: 0,
+                  })}
+                  className="w-full"
+                >
+                  Reset Filters
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

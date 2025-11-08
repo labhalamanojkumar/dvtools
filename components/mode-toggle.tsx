@@ -14,7 +14,18 @@ export function ModeToggle() {
   }, []);
 
   if (!mounted) {
-    return null;
+    // Return a placeholder button with the same structure to avoid hydration mismatch
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        disabled
+        suppressHydrationWarning
+      >
+        <Sun className="h-5 w-5" suppressHydrationWarning />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    );
   }
 
   return (

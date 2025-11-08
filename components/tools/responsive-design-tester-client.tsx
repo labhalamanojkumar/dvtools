@@ -28,8 +28,12 @@ import {
   SmartphoneIcon,
   MonitorIcon,
   TabletIcon,
+  Upload,
+  FileCode,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toaster";
+import { toast as sonnerToast } from "sonner";
 
 interface DevicePreset {
   name: string;
@@ -333,12 +337,64 @@ export default function ResponsiveDesignTesterClient() {
     "portrait",
   );
   const [inputMode, setInputMode] = useState<"url" | "html">("html");
+  const [isLoading, setIsLoading] = useState(false);
+  const [analysis, setAnalysis] = useState<any>(null);
   const { toast } = useToast();
 
   const handleDeviceSelect = (device: DevicePreset) => {
     setSelectedDevice(device);
     setCustomWidth(device.width.toString());
     setCustomHeight(device.height.toString());
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.html') && !file.name.endsWith('.htm')) {
+      sonnerToast.error('Please upload an HTML file');
+      return;
+    }
+
+    try {
+      const content = await file.text();
+      setHtml(content);
+      setInputMode('html');
+      sonnerToast.success('HTML file loaded successfully');
+    } catch (error) {
+      console.error('Error reading file:', error);
+      sonnerToast.error('Failed to read HTML file');
+    }
+  };
+
+  const handleAnalyze = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/tools/responsive-design-tester', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'analyze',
+          url,
+          html,
+          width: parseInt(customWidth) || selectedDevice.width,
+          height: parseInt(customHeight) || selectedDevice.height
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setAnalysis(data.analysis);
+        sonnerToast.success('Analysis completed successfully');
+      } else {
+        sonnerToast.error(data.error || 'Analysis failed');
+      }
+    } catch (error) {
+      console.error('Error analyzing:', error);
+      sonnerToast.error('Failed to analyze responsiveness');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCustomSize = () => {
@@ -454,7 +510,24 @@ export default function ResponsiveDesignTesterClient() {
 
             <TabsContent value="html" className="space-y-4">
               <div>
-                <Label htmlFor="html-input">HTML Code</Label>
+                <div className="flex items-center justify-between mb-2">
+                  <Label htmlFor="html-input">HTML Code</Label>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload HTML File
+                  </Button>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept=".html,.htm"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                </div>
                 <textarea
                   id="html-input"
                   placeholder="Paste your HTML code here..."
@@ -555,6 +628,44 @@ export default function ResponsiveDesignTesterClient() {
               </Button>
             </div>
           </div>
+
+          {/* Analyze Button */}
+          <div className="flex justify-center">
+            <Button onClick={handleAnalyze} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Analyze Responsiveness
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Analysis Results */}
+          {analysis && (
+            <div className="border-2 border-blue-200 bg-blue-50/50 rounded-lg p-4">
+              <p className="font-semibold text-lg mb-3">Analysis Results</p>
+              <div className="space-y-4">
+                <div>
+                  <p className="font-semibold">Current Breakpoint:</p>
+                  <Badge variant="default">{analysis.currentBreakpoint}</Badge>
+                </div>
+                <div>
+                  <p className="font-semibold mb-2">Recommendations:</p>
+                  <ul className="list-disc list-inside space-y-1 text-sm">
+                    {analysis.recommendations?.map((rec: string, idx: number) => (
+                      <li key={idx}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -614,6 +725,35 @@ export default function ResponsiveDesignTesterClient() {
             </div>
           </div>
 
+          {/* Blocked Content Notice */}
+          {inputMode === "url" && url && (
+            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="text-yellow-600 mt-0.5">
+                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="text-sm">
+                  <p className="font-medium text-yellow-800">Content Blocking Notice</p>
+                  <p className="text-yellow-700 mt-1">
+                    If you see &ldquo;This content is blocked. Contact the site owner to fix the issue,&rdquo; 
+                    it means the website prevents iframe embedding for security reasons. 
+                    Many websites (like Google, Facebook, banking sites) block iframe loading to prevent clickjacking attacks.
+                  </p>
+                  <p className="text-yellow-700 mt-2">
+                    <strong>Solutions:</strong>
+                  </p>
+                  <ul className="list-disc list-inside text-yellow-700 mt-1 space-y-1">
+                    <li>Use the &ldquo;Open&rdquo; button above to view the site in a new tab</li>
+                    <li>Test with your own website or development server</li>
+                    <li>For local development, use URLs like <code className="bg-yellow-100 px-1 rounded">http://localhost:3000</code></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Device Info */}
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
@@ -653,14 +793,14 @@ export default function ResponsiveDesignTesterClient() {
             <div className="text-center p-4 border rounded-lg">
               <div className="text-lg font-bold text-green-600">Tablet</div>
               <div className="text-sm text-muted-foreground">
-                768px - 1023px
+                768px &ndash; 1023px
               </div>
               <div className="text-xs mt-2">Tablets and small laptops</div>
             </div>
             <div className="text-center p-4 border rounded-lg">
               <div className="text-lg font-bold text-orange-600">Desktop</div>
               <div className="text-sm text-muted-foreground">
-                1024px - 1279px
+                1024px &ndash; 1279px
               </div>
               <div className="text-xs mt-2">Laptops and desktops</div>
             </div>

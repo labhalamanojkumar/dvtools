@@ -14,6 +14,12 @@ import {
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
+// Enhanced components
+import { TableOfContents } from "@/components/blog/table-of-contents";
+import { AuthorCard } from "@/components/blog/author-card";
+import { SocialSharing } from "@/components/blog/social-sharing";
+import { BlogComments } from "@/components/blog/comments";
+
 // This would typically come from your CMS or database
 const blogPosts = [
   {
@@ -149,7 +155,7 @@ Mastering JSON formatting is an essential skill for modern developers. By follow
     featured: true,
     seo: {
       title:
-        "Mastering JSON Formatting: Best Practices for Developers | DevTools Hub",
+        "Mastering JSON Formatting: Best Practices for Developers | DvTools",
       description:
         "Learn essential JSON formatting techniques, best practices, and tools for developers. Master JSON structure, validation, and formatting for better code quality.",
       keywords: [
@@ -225,7 +231,7 @@ JWT authentication, when implemented correctly, provides a robust and scalable s
     readTime: 8,
     featured: false,
     seo: {
-      title: "Complete Guide to JWT Authentication | DevTools Hub",
+      title: "Complete Guide to JWT Authentication | DvTools",
       description:
         "Master JWT authentication with this comprehensive guide covering implementation, security best practices, and common pitfalls.",
       keywords: ["JWT", "authentication", "security", "tokens", "API security"],
@@ -327,7 +333,7 @@ Regular expressions are indispensable tools for text processing. With practice a
     readTime: 12,
     featured: false,
     seo: {
-      title: "Regular Expressions: From Beginner to Expert | DevTools Hub",
+      title: "Regular Expressions: From Beginner to Expert | DvTools",
       description:
         "Master regular expressions with practical examples and advanced techniques for pattern matching and text processing.",
       keywords: [
@@ -353,7 +359,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (!post) {
     return {
-      title: "Post Not Found | DevTools Hub Blog",
+      title: "Post Not Found | DvTools Blog",
     };
   }
 
@@ -366,7 +372,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.seo.description,
       type: "article",
       url: `/blog/${post.slug}`,
-      siteName: "DevTools Hub",
+      siteName: "DvTools",
       publishedTime: post.publishedAt,
       modifiedTime: post.updatedAt,
       authors: [post.author.name],
@@ -435,7 +441,7 @@ export default function BlogPostPage({ params }: Props) {
             },
             publisher: {
               "@type": "Organization",
-              name: "DevTools Hub",
+              name: "DvTools",
               logo: {
                 "@type": "ImageObject",
                 url: "https://devtoolshub.com/logo.png",
@@ -525,49 +531,93 @@ export default function BlogPostPage({ params }: Props) {
         </div>
       </header>
 
-      {/* Article Content */}
-      <article className="prose prose-lg max-w-none dark:prose-invert">
-        <ReactMarkdown
-          components={{
-            h1: ({ children }) => (
-              <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>
-            ),
-            h2: ({ children }) => (
-              <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>
-            ),
-            h3: ({ children }) => (
-              <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>
-            ),
-            p: ({ children }) => (
-              <p className="mb-4 leading-relaxed">{children}</p>
-            ),
-            ul: ({ children }) => (
-              <ul className="mb-4 ml-6 list-disc">{children}</ul>
-            ),
-            ol: ({ children }) => (
-              <ol className="mb-4 ml-6 list-decimal">{children}</ol>
-            ),
-            li: ({ children }) => <li className="mb-2">{children}</li>,
-            blockquote: ({ children }) => (
-              <blockquote className="border-l-4 border-primary pl-4 italic my-4">
-                {children}
-              </blockquote>
-            ),
-            code: ({ children }) => (
-              <code className="bg-muted px-2 py-1 rounded text-sm font-mono">
-                {children}
-              </code>
-            ),
-            pre: ({ children }) => (
-              <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
-                {children}
-              </pre>
-            ),
-          }}
-        >
-          {post.content}
-        </ReactMarkdown>
-      </article>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-3">
+          {/* Article Content */}
+          <article className="prose prose-lg max-w-none dark:prose-invert">
+            <ReactMarkdown
+              components={{
+                h1: ({ children }) => (
+                  <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>
+                ),
+                p: ({ children }) => (
+                  <p className="mb-4 leading-relaxed">{children}</p>
+                ),
+                ul: ({ children }) => (
+                  <ul className="mb-4 ml-6 list-disc">{children}</ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="mb-4 ml-6 list-decimal">{children}</ol>
+                ),
+                li: ({ children }) => <li className="mb-2">{children}</li>,
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-4 border-primary pl-4 italic my-4">
+                    {children}
+                  </blockquote>
+                ),
+                code: ({ children }) => (
+                  <code className="bg-muted px-2 py-1 rounded text-sm font-mono">
+                    {children}
+                  </code>
+                ),
+                pre: ({ children }) => (
+                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
+                    {children}
+                  </pre>
+                ),
+              }}
+            >
+              {post.content}
+            </ReactMarkdown>
+          </article>
+
+          {/* Author Card */}
+          <div className="mt-8">
+            <AuthorCard
+              author={{
+                name: post.author.name,
+                avatar: post.author.avatar || '/avatars/default.png',
+                bio: 'Technical writer and developer advocate passionate about sharing knowledge with the community.',
+                role: 'Technical Writer',
+              }}
+              publishedAt={post.publishedAt}
+              readTime={post.readTime}
+            />
+          </div>
+
+          {/* Social Sharing */}
+          <div className="mt-6">
+            <SocialSharing
+              title={post.title}
+              url={`/blog/${post.slug}`}
+              description={post.excerpt}
+              className="mb-6"
+            />
+          </div>
+
+          {/* Comments Section */}
+          <div className="mt-12">
+            <BlogComments postSlug={post.slug} />
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-8 space-y-6">
+            {/* Table of Contents */}
+            <TableOfContents content={post.content} />
+            
+            {/* More sidebar content can be added here */}
+          </div>
+        </div>
+      </div>
 
       {/* Article Footer */}
       <footer className="mt-12 pt-8 border-t">

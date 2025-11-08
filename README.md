@@ -1,4 +1,4 @@
-# DevTools Hub - Professional Multi-Tool Web Platform
+# DvTools - Professional Multi-Tool Web Platform
 
 A comprehensive, production-ready multi-tool web platform built with Next.js 14, TypeScript, and Tailwind CSS. This platform provides developers with professional-grade tools for JSON formatting, Base64 encoding, JWT decoding, code beautification, URL encoding, and regular expression testing.
 
@@ -64,41 +64,108 @@ A comprehensive, production-ready multi-tool web platform built with Next.js 14,
 ### Prerequisites
 
 - Node.js 18+ and npm 9+
-- PostgreSQL database
-- Redis server (optional, for rate limiting)
+- Git
 
-### Setup
+### 🚀 Quick Start (Best Practice - Local Development)
 
-1. **Clone and install dependencies:**
+1. **Clone the repository:**
    \`\`\`bash
-   cd "/Users/manojkumar/Desktop/Work flow/Malti tool platform"
+   git clone <repository-url>
+   cd dvtools
+   \`\`\`
+
+2. **Install dependencies:**
+   \`\`\`bash
    npm install
    \`\`\`
 
-2. **Configure environment variables:**
+3. **Start local development environment:**
+   \`\`\`bash
+   npm run dev:setup
+   \`\`\`
+
+   This will:
+   - Start MySQL database on localhost:3306
+   - Start Redis on localhost:6379
+   - Set up the database schema
+   - Seed initial data
+   - Start the development server on localhost:3000
+
+4. **Access the application:**
+   - **Application:** http://localhost:3000
+   - **Admin Panel:** http://localhost:3000/admin (admin@dvtools.local / Admin@123)
+
+### 🛠️ Manual Setup (Alternative)
+
+If you prefer manual setup:
+
+1. **Configure environment variables:**
    \`\`\`bash
    cp .env.example .env
    \`\`\`
 
-Edit `.env` and configure:
+   Edit `.env` with your database credentials.
 
-- `DATABASE_URL` - PostgreSQL connection string
-- `REDIS_URL` - Redis connection string (optional)
-- `NEXTAUTH_SECRET` - Generate with \`openssl rand -base64 32\`
-- `NEXTAUTH_URL` - Your application URL
-
-3. **Set up the database:**
+2. **Set up the database:**
    \`\`\`bash
    npx prisma generate
    npx prisma db push
+   npm run seed
    \`\`\`
 
-4. **Run development server:**
+3. **Run development server:**
    \`\`\`bash
    npm run dev
    \`\`\`
 
-Visit [http://localhost:3000](http://localhost:3000)
+### 🐳 Docker Commands
+
+\`\`\`bash
+# Start all services
+npm run dev:local
+
+# Stop all services
+npm run dev:stop
+
+# View logs
+docker-compose -f docker-compose.dev.yml logs -f
+
+# Reset database
+docker-compose -f docker-compose.dev.yml down -v
+npm run dev:setup
+\`\`\`
+
+### 🐛 Hydration Error Fix
+
+If you encounter hydration errors (especially "Text content does not match server-rendered HTML"), follow these steps:
+
+#### Quick Fix (Browser Console)
+```javascript
+// Run this in your browser's Developer Tools console
+async function fixHydration() {
+  const regs = await navigator.serviceWorker.getRegistrations();
+  regs.forEach(reg => reg.unregister());
+  const names = await caches.keys();
+  names.forEach(name => caches.delete(name));
+  localStorage.clear();
+  sessionStorage.clear();
+  console.log('Cache cleared! Refresh the page.');
+}
+fixHydration();
+```
+
+#### Complete Fix
+```bash
+# 1. Stop the development server
+# 2. Clear Next.js cache
+npm run dev:reset
+
+# 3. Clear browser cache or use incognito mode
+# 4. Restart development server
+npm run dev
+```
+
+**Why this happens:** Service worker caches old HTML content, causing server/client mismatches.
 
 ## 📂 Project Structure
 
@@ -286,7 +353,7 @@ For issues and questions:
 
 - GitHub Issues: [Create an issue](https://github.com/yourusername/devtools-hub/issues)
 - Documentation: [Read the docs](/docs)
-- Email: support@devtools-hub.com
+- Email: connect@dvtools.in
 
 ## 🙏 Acknowledgments
 

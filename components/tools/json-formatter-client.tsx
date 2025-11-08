@@ -13,6 +13,8 @@ import {
   AlertCircle,
   Minimize2,
   Maximize2,
+  Upload,
+  FileText,
 } from "lucide-react";
 import Ajv from "ajv";
 import addFormats from "ajv-formats";
@@ -25,7 +27,77 @@ export function JsonFormatterClient() {
   const [output, setOutput] = useState("");
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState<boolean | null>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const { toast } = useToast();
+
+  const handleFileUpload = (file: File) => {
+    if (!file) return;
+
+    // Check file type
+    if (!file.name.toLowerCase().endsWith('.json') && !file.type.includes('json')) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please select a JSON file (.json)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File Too Large",
+        description: "File size must be less than 10MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      setInput(content);
+      toast({
+        title: "File Loaded",
+        description: `Successfully loaded ${file.name}`,
+      });
+    };
+    reader.onerror = () => {
+      toast({
+        title: "Error",
+        description: "Failed to read the file",
+        variant: "destructive",
+      });
+    };
+    reader.readAsText(file);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
 
   const formatJson = (minify = false) => {
     try {
@@ -97,6 +169,43 @@ export function JsonFormatterClient() {
                   )}
                 </div>
               )}
+            </div>
+
+            {/* File Upload Section */}
+            <div className="mb-4">
+              <div
+                className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+                  isDragOver
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-950"
+                    : "border-gray-300 dark:border-gray-600"
+                }`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <FileText className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Drag & drop a JSON file here, or click to browse
+                </p>
+                <input
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={handleFileInputChange}
+                  className="hidden"
+                  id="json-file-input"
+                />
+                <label htmlFor="json-file-input">
+                  <Button variant="outline" size="sm" asChild>
+                    <span className="cursor-pointer">
+                      <Upload className="mr-2 h-4 w-4" />
+                      Choose File
+                    </span>
+                  </Button>
+                </label>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Supports .json files up to 10MB
+                </p>
+              </div>
             </div>
 
             <Textarea

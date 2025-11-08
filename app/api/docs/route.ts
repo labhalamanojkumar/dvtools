@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = 'force-dynamic';
 
 interface DocSection {
   id: string;
@@ -29,13 +30,13 @@ const documentation: DocCategory[] = [
         id: "introduction",
         title: "Introduction",
         slug: "introduction",
-        content: `# Welcome to DevTools Hub
+        content: `# Welcome to DvTools
 
-DevTools Hub is a comprehensive suite of developer tools designed to streamline your development workflow. Whether you're working with JSON, JWT tokens, regular expressions, or need to encode/decode data, we have you covered.
+DvTools is a comprehensive suite of developer tools designed to streamline your development workflow. Whether you're working with JSON, JWT tokens, regular expressions, or need to encode/decode data, we have you covered.
 
-## What is DevTools Hub?
+## What is DvTools?
 
-DevTools Hub provides:
+DvTools provides:
 - **JSON Formatter & Validator**: Format, validate, and beautify JSON data
 - **Base64 Encoder/Decoder**: Convert data to/from Base64 format
 - **JWT Decoder**: Decode and inspect JWT tokens
@@ -66,7 +67,7 @@ Transparent, community-driven development with regular updates.
 
 ## Browser Support
 
-DevTools Hub works in all modern browsers:
+DvTools works in all modern browsers:
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
@@ -87,7 +88,7 @@ DevTools Hub works in all modern browsers:
         slug: "quick-start",
         content: `# Quick Start Guide
 
-Get up and running with DevTools Hub in minutes.
+Get up and running with DvTools in minutes.
 
 ## First Steps
 
@@ -279,7 +280,7 @@ Support for multiple character encodings:
   {
     id: "api",
     name: "API Documentation",
-    description: "Integrate DevTools Hub into your applications",
+    description: "Integrate DvTools into your applications",
     icon: "🔌",
     sections: [
       {
@@ -288,7 +289,7 @@ Support for multiple character encodings:
         slug: "api-overview",
         content: `# API Documentation
 
-Integrate DevTools Hub functionality into your applications.
+Integrate DvTools functionality into your applications.
 
 ## Authentication
 

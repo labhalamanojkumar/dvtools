@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Cookie Policy | DevTools Hub - Cookie Usage & Preferences",
+  title: "Cookie Policy | DvTools - Cookie Usage & Preferences",
   description:
-    "Learn about how DevTools Hub uses cookies and similar technologies. Manage your cookie preferences and understand our data collection practices.",
+    "Learn about how DvTools uses cookies and similar technologies. Manage your cookie preferences and understand our data collection practices.",
   keywords: [
     "cookie policy",
     "cookie preferences",
@@ -29,26 +29,26 @@ export const metadata: Metadata = {
     "web analytics",
   ],
   openGraph: {
-    title: "Cookie Policy | DevTools Hub - Cookie Usage & Preferences",
+    title: "Cookie Policy | DvTools - Cookie Usage & Preferences",
     description:
-      "Learn about how DevTools Hub uses cookies and manage your preferences.",
+      "Learn about how DvTools uses cookies and manage your preferences.",
     type: "website",
     url: "/cookies",
-    siteName: "DevTools Hub",
+    siteName: "DvTools",
     images: [
       {
         url: "/cookies-og.jpg",
         width: 1200,
         height: 630,
-        alt: "DevTools Hub Cookie Policy",
+        alt: "DvTools Cookie Policy",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cookie Policy | DevTools Hub - Cookie Usage & Preferences",
+    title: "Cookie Policy | DvTools - Cookie Usage & Preferences",
     description:
-      "Learn about how DevTools Hub uses cookies and manage your preferences.",
+      "Learn about how DvTools uses cookies and manage your preferences.",
     images: ["/cookies-og.jpg"],
   },
   alternates: {
@@ -174,12 +174,12 @@ export default function CookiePolicyPage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            name: "Cookie Policy - DevTools Hub",
-            description: "DevTools Hub cookie policy and privacy preferences",
+            name: "Cookie Policy - DvTools",
+            description: "DvTools cookie policy and privacy preferences",
             url: "https://devtoolshub.com/cookies",
             publisher: {
               "@type": "Organization",
-              name: "DevTools Hub",
+              name: "DvTools",
               contactPoint: {
                 "@type": "ContactPoint",
                 email: "privacy@devtoolshub.com",

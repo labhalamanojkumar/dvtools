@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,9 @@ import {
   Type,
   Layout,
   MousePointer,
+  Upload,
+  File,
+  X,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toaster";
 
@@ -106,7 +109,135 @@ export default function ComponentPlaygroundClient() {
   const [componentProps, setComponentProps] = useState<any>({});
   const [generatedCode, setGeneratedCode] = useState("");
   const [previewMode, setPreviewMode] = useState<"preview" | "code">("preview");
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // File upload handlers
+  const handleFileUpload = (files: FileList | null) => {
+    if (!files) return;
+
+    const validFiles: File[] = [];
+    const maxSize = 5 * 1024 * 1024; // 5MB limit
+
+    Array.from(files).forEach((file) => {
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: `${file.name} exceeds 5MB limit`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const allowedTypes = [
+        "application/json",
+        "text/javascript",
+        "text/typescript",
+        "application/javascript",
+        "application/typescript",
+        "text/plain",
+      ];
+
+      if (!allowedTypes.includes(file.type) && !file.name.match(/\.(json|js|ts|tsx|jsx)$/)) {
+        toast({
+          title: "Invalid file type",
+          description: `${file.name} is not a supported file type`,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      validFiles.push(file);
+    });
+
+    if (validFiles.length > 0) {
+      setUploadedFiles((prev) => [...prev, ...validFiles]);
+      processUploadedFiles(validFiles);
+    }
+  };
+
+  const processUploadedFiles = async (files: File[]) => {
+    setIsProcessing(true);
+    try {
+      for (const file of files) {
+        const content = await file.text();
+
+        // Call API to process the component
+        const response = await fetch("/api/tools/component-playground", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            action: "process-component",
+            data: {
+              fileContent: content,
+              fileName: file.name,
+            },
+          }),
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.component) {
+          const componentConfig = result.component;
+
+          // Add new component to sampleComponents
+          (sampleComponents as any)[componentConfig.name] = {
+            name: componentConfig.name,
+            props: componentConfig.props,
+            render: componentConfig.render || ((props: any) => `<${componentConfig.name} />`),
+          };
+
+          toast({
+            title: "Component imported",
+            description: `Successfully imported ${componentConfig.name} component`,
+          });
+        } else {
+          toast({
+            title: "Processing failed",
+            description: result.error || "Failed to process component file",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: "Processing error",
+        description: "Failed to process uploaded files",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    setUploadedFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    handleFileUpload(e.dataTransfer.files);
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFileUpload(e.target.files);
+  };
 
   // Initialize component props when component changes
   useEffect(() => {
@@ -307,6 +438,92 @@ export default function ComponentPlaygroundClient() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* File Upload Section */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Upload className="h-4 w-4" />
+                  <Label className="text-sm font-medium">Import Components</Label>
+                </div>
+
+                {/* Drag and Drop Area */}
+                <div
+                  className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
+                    isDragOver
+                      ? "border-primary bg-primary/5"
+                      : "border-muted-foreground/25 hover:border-muted-foreground/50"
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <div className="space-y-2">
+                    <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">
+                        Drop component files here or{" "}
+                        <button
+                          type="button"
+                          className="text-primary hover:underline"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          browse
+                        </button>
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Supports JSON configs, JS/TS files (max 5MB)
+                      </p>
+                    </div>
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept=".json,.js,.ts,.tsx,.jsx"
+                    onChange={handleFileInputChange}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Uploaded Files List */}
+                {uploadedFiles.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Uploaded Files</Label>
+                    <div className="space-y-1">
+                      {uploadedFiles.map((file, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 bg-muted rounded-md"
+                        >
+                          <div className="flex items-center gap-2">
+                            <File className="h-4 w-4" />
+                            <span className="text-sm truncate">{file.name}</span>
+                            <Badge variant="secondary" className="text-xs">
+                              {(file.size / 1024).toFixed(1)}KB
+                            </Badge>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeFile(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {isProcessing && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+                    Processing files...
+                  </div>
+                )}
+              </div>
+
+              <Separator />
+
               {/* Component Selector */}
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Component</Label>

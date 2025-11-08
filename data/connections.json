@@ -1,0 +1,15 @@
+[
+  {
+    "id": "mhd75rt7nsgi6r2vzlj",
+    "name": "mysql",
+    "type": "database",
+    "subtype": "mysql",
+    "config": {},
+    "status": "disconnected",
+    "metrics": {
+      "recordsProcessed": 0,
+      "syncDuration": 0,
+      "errorCount": 0
+    }
+  }
+]

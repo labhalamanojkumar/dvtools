@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+export const dynamic = 'force-dynamic';
 
 interface BlogPost {
   id: string;
@@ -158,7 +159,7 @@ Mastering JSON formatting is an essential skill for modern developers. By follow
     featured: true,
     seo: {
       title:
-        "Mastering JSON Formatting: Best Practices for Developers | DevTools Hub",
+        "Mastering JSON Formatting: Best Practices for Developers | DvTools",
       description:
         "Learn essential JSON formatting techniques, best practices, and tools for developers. Master JSON structure, validation, and formatting for better code quality.",
       keywords: [
@@ -234,7 +235,7 @@ JWT authentication, when implemented correctly, provides a robust and scalable s
     readTime: 8,
     featured: false,
     seo: {
-      title: "Complete Guide to JWT Authentication | DevTools Hub",
+      title: "Complete Guide to JWT Authentication | DvTools",
       description:
         "Master JWT authentication with this comprehensive guide covering implementation, security best practices, and common pitfalls.",
       keywords: ["JWT", "authentication", "security", "tokens", "API security"],
@@ -336,7 +337,7 @@ Regular expressions are indispensable tools for text processing. With practice a
     readTime: 12,
     featured: false,
     seo: {
-      title: "Regular Expressions: From Beginner to Expert | DevTools Hub",
+      title: "Regular Expressions: From Beginner to Expert | DvTools",
       description:
         "Master regular expressions with practical examples and advanced techniques for pattern matching and text processing.",
       keywords: [

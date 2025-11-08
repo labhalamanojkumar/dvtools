@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -36,6 +36,25 @@ enum ToolType {
   PERFORMANCE_PROFILER
   STATIC_SITE_EXPORTER
   THEME_BUILDER
+  API_SIMULATOR
+  DATABASE_QUERY_RUNNER
+  MIGRATION_MANAGER
+  BACKGROUND_JOB_DEBUGGER
+  RATE_LIMITER_DASHBOARD
+  SECRETS_VAULT_INTERFACE
+  DESIGN_TO_CODE_EXPORTER
+  ICON_LIBRARY
+  COLOR_PALETTE_STUDIO
+  MOCK_DATA_GENERATOR
+  PROTOTYPE_LINKER
+  LOREM_IPSUM_GENERATOR
+  IMAGE_EDITOR
+  USAGE_ANALYTICS_EXPLORER
+  LOG_VIEWER_SEARCH
+  CSV_EXCEL_INSPECTOR
+  DATA_CONNECTOR_HUB
+  ML_PLAYGROUND
+  AB_TEST_MANAGER
 }
 
 enum AuditAction {
@@ -51,6 +70,13 @@ enum AuditAction {
   SETTING_CHANGED
   API_KEY_CREATED
   API_KEY_REVOKED
+  ANALYTICS_EVENT
+  LOG_ENTRY
+  AB_TEST_CREATED
+  AB_TEST_UPDATED
+  DATA_CONNECTION_CREATED
+  DATA_CONNECTION_USED
+  ML_MODEL_EXECUTED
 }
 
 model User {
@@ -62,6 +88,12 @@ model User {
   status        UserStatus   @default(ACTIVE)
   emailVerified DateTime?
   image         String?
+  bio           String?     
+  website       String?
+  location      String?
+  twitter       String?
+  github        String?
+  linkedin      String?
   twoFactorEnabled Boolean   @default(false)
   twoFactorSecret String?
   createdAt     DateTime     @default(now())
@@ -74,6 +106,14 @@ model User {
   toolSessions  ToolSession[]
   apiKeys       ApiKey[]
   auditLogs     AuditLog[]
+  analyticsEvents AnalyticsEvent[]
+  logEntries    LogEntry[]
+  dataConnections DataConnection[]
+  abTests       ABTest[]
+  abTestResults ABTestResult[]
+  mlExecutions  MLModelExecution[]
+  csvTransformations CSVTransformation[]
+  posts         Post[]
   
   @@index([email])
   @@index([role])
@@ -86,12 +126,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -214,3 +254,742 @@ model SystemMetric {
   @@index([metricName])
   @@index([timestamp])
 }
+
+// Analytics and Data Tools Models
+
+enum EventType {
+  PAGE_VIEW
+  TOOL_USAGE
+  USER_INTERACTION
+  ERROR_OCCURRED
+  CONVERSION
+  CUSTOM_EVENT
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+  CRITICAL
+}
+
+enum DataConnectorType {
+  POSTGRESQL
+  MYSQL
+  BIGQUERY
+  GOOGLE_SHEETS
+  S3
+  REDSHIFT
+  SNOWFLAKE
+}
+
+enum ABTestStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum MLModelType {
+  TEXT_CLASSIFICATION
+  TEXT_EMBEDDINGS
+  SENTIMENT_ANALYSIS
+  TOPIC_MODELING
+}
+
+model AnalyticsEvent {
+  id          String    @id @default(cuid())
+  userId      String?
+  sessionId   String
+  eventType   EventType
+  eventName   String
+  properties  Json?
+  timestamp   DateTime  @default(now())
+  ipAddress   String?
+  userAgent   String?
+  referrer    String?
+  pageUrl     String?
+  
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([eventType])
+  @@index([eventName])
+  @@index([timestamp])
+  @@index([sessionId])
+}
+
+model LogEntry {
+  id          String    @id @default(cuid())
+  userId      String?
+  level       LogLevel
+  message     String
+  category    String?
+  source      String?
+  stackTrace  String?
+  metadata    Json?
+  timestamp   DateTime  @default(now())
+  ipAddress   String?
+  userAgent   String?
+  
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([level])
+  @@index([category])
+  @@index([timestamp])
+}
+
+model DataConnection {
+  id          String            @id @default(cuid())
+  userId      String
+  name        String
+  type        DataConnectorType
+  config      Json // Encrypted connection details
+  isActive    Boolean           @default(true)
+  lastUsedAt  DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([type])
+}
+
+model ABTest {
+  id          String        @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  status      ABTestStatus  @default(DRAFT)
+  variants    Json // Array of test variants with their configurations
+  targetMetric String
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  results     ABTestResult[]
+  
+  @@index([userId])
+  @@index([status])
+}
+
+model ABTestResult {
+  id          String   @id @default(cuid())
+  testId      String
+  variantId   String
+  userId      String?
+  metricValue Float
+  timestamp   DateTime @default(now())
+  
+  test        ABTest   @relation(fields: [testId], references: [id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([testId])
+  @@index([variantId])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+model MLModelExecution {
+  id          String      @id @default(cuid())
+  userId      String?
+  modelType   MLModelType
+  input       Json
+  output      Json
+  confidence  Float?
+  executionTime Int // in milliseconds
+  timestamp   DateTime    @default(now())
+  ipAddress   String?
+  
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([modelType])
+  @@index([timestamp])
+}
+
+model CSVTransformation {
+  id          String   @id @default(cuid())
+  userId      String?
+  originalName String
+  transformedName String?
+  originalSize Int
+  transformedSize Int?
+  columnMappings Json?
+  transformations Json?
+  createdAt   DateTime @default(now())
+  
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// Contact and Feedback Models
+
+enum ContactStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum FeedbackStatus {
+  PENDING
+  REVIEWED
+  IMPLEMENTED
+  REJECTED
+}
+
+enum DonationStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum PaymentGateway {
+  STRIPE
+  PAYPAL
+  DODOPAYMENTS
+  RAZORPAY
+}
+
+model Contact {
+  id          String        @id @default(cuid())
+  name        String
+  email       String
+  subject     String
+  category    String
+  message     String       
+  status      ContactStatus @default(PENDING)
+  response    String?      
+  respondedAt DateTime?
+  respondedBy String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Feedback {
+  id           String         @id @default(cuid())
+  name         String
+  email        String?
+  toolUsed     String?
+  feedbackType String
+  feedback     String        
+  rating       Int
+  status       FeedbackStatus @default(PENDING)
+  notes        String?       
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  
+  @@index([rating])
+  @@index([status])
+  @@index([feedbackType])
+  @@index([createdAt])
+}
+
+model Donation {
+  id                String         @id @default(cuid())
+  amount            Float
+  donorName         String
+  donorEmail        String
+  tierId            String
+  status            DonationStatus @default(PENDING)
+  paymentGateway    PaymentGateway
+  gatewaySessionId  String?        @unique
+  gatewayPaymentId  String?
+  gatewayOrderId    String?
+  message           String?       
+  isPublic          Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  
+  // Campaign relationship
+  campaignId        String?
+  campaign          DonationCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  paymentPageId     String?
+  paymentPage       PaymentPage? @relation(fields: [paymentPageId], references: [id], onDelete: SetNull)
+  
+  // Sponsor relationship
+  sponsor           Sponsor?
+  
+  @@index([donorEmail])
+  @@index([status])
+  @@index([paymentGateway])
+  @@index([createdAt])
+  @@index([campaignId])
+  @@index([paymentPageId])
+}
+
+model DonationSettings {
+  id                    String   @id @default(cuid())
+  minimumAmount         Float    @default(1)
+  enableDonations       Boolean  @default(true)
+  thankYouMessage       String? 
+  updatedAt             DateTime @updatedAt
+  updatedBy             String?
+  
+  @@map("donation_settings")
+}
+
+model PaymentGatewayConfig {
+  id                String         @id @default(cuid())
+  gateway           PaymentGateway @unique
+  isEnabled         Boolean        @default(false)
+  displayName       String
+  description       String?
+  publicKey         String?       
+  secretKey         String?       
+  merchantId        String?
+  webhookSecret     String?       
+  additionalConfig  Json?          // For any extra configuration
+  displayOrder      Int            @default(0)
+  supportedCurrencies String?      // Comma-separated currency codes
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  updatedBy         String?
+  
+  @@map("payment_gateway_configs")
+}
+
+model PaymentPage {
+  id                String         @id @default(cuid())
+  title             String
+  description       String?       
+  amount            Float?         // Fixed amount for direct donations
+  currency          String         @default("USD")
+  slug              String         @unique // URL slug for direct access
+  imageUrl          String?
+  isActive          Boolean        @default(true)
+  isPublic          Boolean        @default(true) // Can be accessed without login
+  customMessage     String?       
+  successMessage    String?       
+  redirectUrl       String?        // Where to redirect after successful donation
+  metadata          Json?          // Additional page metadata
+  createdBy         String
+  viewCount         Int            @default(0)
+  donationCount     Int            @default(0)
+  totalRaised       Float          @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  
+  // Campaign relationship
+  campaignId        String?
+  campaign          DonationCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  
+  // Donation relationship
+  donations         Donation[]
+  
+  @@index([slug])
+  @@index([isActive])
+  @@index([createdBy])
+  @@index([campaignId])
+  @@map("payment_pages")
+}
+
+model DonationCampaign {
+  id                String         @id @default(cuid())
+  title             String
+  description       String?       
+  goalAmount        Float?         // Fundraising goal
+  currency          String         @default("USD")
+  startDate         DateTime       @default(now())
+  endDate           DateTime?
+  isActive          Boolean        @default(true)
+  isPublic          Boolean        @default(true)
+  imageUrl          String?
+  category          String?        // Campaign category (education, health, etc.)
+  tags              String?        // Comma-separated tags
+  featured          Boolean        @default(false)
+  priority          Int            @default(0) // Display priority
+  customSettings    Json?          // Campaign-specific settings
+  createdBy         String
+  viewCount         Int            @default(0)
+  donationCount     Int            @default(0)
+  totalRaised       Float          @default(0)
+  donorCount        Int            @default(0) // Unique donors
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  
+  // Relationships
+  paymentPages      PaymentPage[]
+  donations         Donation[]
+  
+  @@index([isActive])
+  @@index([isPublic])
+  @@index([featured])
+  @@index([category])
+  @@index([createdBy])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("donation_campaigns")
+}
+
+model Sponsor {
+  id                String    @id @default(cuid())
+  name              String
+  email             String?
+  company           String?
+  website           String?
+  logo              String?
+  amount            Float?    // Donation amount that qualifies them as sponsor
+  tier              String?   // e.g., "Bronze", "Silver", "Gold", "Platinum"
+  description       String?  
+  message           String?  
+  isActive          Boolean   @default(true)
+  isFeatured        Boolean   @default(false)
+  displayOrder      Int       @default(0)
+  startDate         DateTime  @default(now())
+  endDate           DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relationship to donation if they came from a donation
+  donationId        String?   @unique
+  donation          Donation? @relation(fields: [donationId], references: [id], onDelete: SetNull)
+  
+  @@index([isActive])
+  @@index([isFeatured])
+  @@index([displayOrder])
+  @@index([tier])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("sponsors")
+}
+
+// Ad Management System Models
+
+enum AdVendorType {
+  GOOGLE_ADSENSE
+  MONETAGE
+  MEDIANET
+  BUZZFEED_ADS
+  CUSTOM_HTML
+  CUSTOM_IMAGE
+  CUSTOM_VIDEO
+  AMAZON_ASSOCIATES
+}
+
+enum AdPlacementType {
+  HEADER_BANNER
+  SIDEBAR
+  FOOTER
+  CONTENT_MIDDLE
+  CONTENT_TOP
+  CONTENT_BOTTOM
+  MODAL_POPUP
+  MOBILE_BOTTOM
+  MOBILE_BANNER
+  ARTICLE_MIDDLE
+  TOOL_PAGE_TOP
+  TOOL_PAGE_BOTTOM
+  CUSTOM
+}
+
+enum AdCampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  DISABLED
+}
+
+model AdVendor {
+  id                String        @id @default(cuid())
+  name              String
+  type              AdVendorType
+  description       String?
+  apiKey            String?      
+  apiSecret         String?      
+  siteId            String?
+  publisherId       String?
+  isActive          Boolean       @default(true)
+  config            Json?         // Additional configuration
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relationships
+  campaigns         AdCampaign[]
+  placements        AdPlacement[]
+  
+  @@index([type])
+  @@index([isActive])
+  @@map("ad_vendors")
+}
+
+model AdPlacement {
+  id                String          @id @default(cuid())
+  name              String
+  key               String          @unique // Unique identifier for the placement location
+  description       String?
+  type              AdPlacementType
+  width             Int?
+  height            Int?
+  htmlClass         String?
+  isActive          Boolean         @default(true)
+  sortOrder         Int             @default(0)
+  maxAds            Int             @default(1)
+  refreshInterval   Int?            // in seconds
+  responsive        Boolean         @default(true)
+  fallbackImage     String?         // Default image for missing ads
+  fallbackUrl       String?         // Default URL for fallback
+  vendorId          String?
+  vendor            AdVendor?       @relation(fields: [vendorId], references: [id], onDelete: SetNull)
+  pages             Json?           // Array of page paths where this placement is active
+  deviceTypes       Json?           // Array of device types (desktop, mobile, tablet)
+  targetingRules    Json?           // Advanced targeting rules
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  
+  // Relationships
+  campaigns         AdCampaign[]
+  analytics         AdAnalytics[]
+  
+  @@index([key])
+  @@index([type])
+  @@index([isActive])
+  @@index([vendorId])
+  @@map("ad_placements")
+}
+
+model AdCampaign {
+  id                String            @id @default(cuid())
+  name              String
+  vendorId          String
+  vendor            AdVendor          @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  status            AdCampaignStatus  @default(DRAFT)
+  
+  // Ad content
+  title             String?
+  contentDescription String?          // Description for the ad content
+  imageUrl          String?
+  fallbackImage     String?           // For cases when ad doesn't load
+  videoUrl          String?
+  htmlCode          String?          
+  linkUrl           String?
+  callToAction      String?
+  
+  // Targeting
+  startDate         DateTime?
+  endDate           DateTime?
+  budget            Float?            // Daily budget limit
+  impressions       Int?              // Target impressions
+  targetClicks      Int?              // Target clicks
+  
+  // Statistics
+  views             Int               @default(0)
+  clicks            Int               @default(0)
+  conversions       Int               @default(0)
+  revenue           Float             @default(0)
+  
+  // Display settings
+  priority          Int               @default(0)
+  isFeatured        Boolean           @default(false)
+  responsive        Boolean           @default(true)
+  deviceTypes       Json?             // Array of device types
+  
+  // Relationships
+  placements        AdPlacement[]
+  analytics         AdAnalytics[]
+  
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  
+  @@index([vendorId])
+  @@index([status])
+  @@index([startDate])
+  @@index([endDate])
+  @@index([priority])
+  @@map("ad_campaigns")
+}
+
+model AdAnalytics {
+  id                String        @id @default(cuid())
+  campaignId        String
+  campaign          AdCampaign    @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  placementId       String?
+  placement         AdPlacement?  @relation(fields: [placementId], references: [id], onDelete: SetNull)
+  
+  // Tracking data
+  timestamp         DateTime      @default(now())
+  userId            String?
+  sessionId         String?
+  ipAddress         String?
+  userAgent         String?
+  referrer          String?
+  pageUrl           String?
+  deviceType        String?       // desktop, mobile, tablet
+  
+  // Event data
+  eventType         String        // view, click, conversion
+  revenue           Float?        // Revenue generated from this event
+  metadata          Json?         // Additional tracking data
+  
+  @@index([campaignId])
+  @@index([placementId])
+  @@index([timestamp])
+  @@index([eventType])
+  @@index([userId])
+  @@index([sessionId])
+  @@map("ad_analytics")
+}
+
+// Blog/News System Models
+
+enum PostType {
+  BLOG
+  NEWS
+  UPDATE
+  ANNOUNCEMENT
+  TUTORIAL
+  ARTICLE
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+model Post {
+  id                String       @id @default(cuid())
+  title             String
+  slug              String       @unique
+  excerpt           String?     
+  content           String      
+  markdownContent   String?      // Original markdown content
+  type              PostType     @default(BLOG)
+  status            PostStatus   @default(DRAFT)
+  
+  // SEO fields
+  metaTitle         String?
+  metaDescription   String?
+  metaKeywords      String?
+  ogImage           String?
+  
+  // Author and timestamps
+  authorId          String
+  author            User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  publishedAt       DateTime?
+  scheduledAt       DateTime?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  
+  // Engagement metrics
+  views             Int          @default(0)
+  likes             Int          @default(0)
+  shares            Int          @default(0)
+  
+  // Content organization
+  featured          Boolean      @default(false)
+  isPinned          Boolean      @default(false)
+  allowComments     Boolean      @default(true)
+  
+  // Categories and tags
+  categories        PostCategory[]
+  tags              PostTag[]
+  comments          PostComment[]
+  
+  @@index([slug])
+  @@index([authorId])
+  @@index([type])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([featured])
+  @@map("posts")
+}
+
+model Category {
+  id                String         @id @default(cuid())
+  name              String         @unique
+  slug              String         @unique
+  description       String?
+  color             String?
+  icon              String?
+  parentId          String?
+  parent            Category?      @relation("CategoryParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children          Category[]     @relation("CategoryParent")
+  posts             PostCategory[]
+  sortOrder         Int            @default(0)
+  isVisible         Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  
+  @@index([slug])
+  @@index([parentId])
+  @@map("categories")
+}
+
+model Tag {
+  id                String         @id @default(cuid())
+  name              String         @unique
+  slug              String         @unique
+  description       String?
+  color             String?
+  posts             PostTag[]
+  useCount          Int            @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  
+  @@index([slug])
+  @@map("tags")
+}
+
+model PostCategory {
+  postId            String
+  categoryId        String
+  post              Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category          Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  assignedAt        DateTime       @default(now())
+  
+  @@id([postId, categoryId])
+  @@index([postId])
+  @@index([categoryId])
+  @@map("post_categories")
+}
+
+model PostTag {
+  postId            String
+  tagId             String
+  post              Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag               Tag            @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  assignedAt        DateTime       @default(now())
+  
+  @@id([postId, tagId])
+  @@index([postId])
+  @@index([tagId])
+  @@map("post_tags")
+}
+
+model PostComment {
+  id                String         @id @default(cuid())
+  postId            String
+  post              Post           @relation(fields: [postId], references: [id], onDelete: Cascade)
+  authorName        String
+  authorEmail       String
+  content           String        
+  isApproved        Boolean        @default(false)
+  parentId          String?
+  parent            PostComment?   @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies           PostComment[]  @relation("CommentReplies")
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  
+  @@index([postId])
+  @@index([parentId])
+  @@index([isApproved])
+  @@map("post_comments")
+}
+

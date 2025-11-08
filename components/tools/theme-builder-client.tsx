@@ -32,8 +32,12 @@ import {
   Shuffle,
   CheckCircle,
   AlertTriangle,
+  Upload,
+  FileCode,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/components/ui/toaster";
+import { toast as sonnerToast } from "sonner";
 
 interface ColorPalette {
   primary: string;
@@ -226,8 +230,80 @@ export default function ThemeBuilderClient() {
   const [theme, setTheme] = useState<ThemeSettings>(defaultTheme);
   const [previewMode, setPreviewMode] = useState<"light" | "dark">("light");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [generatedCSS, setGeneratedCSS] = useState("");
+  const [analysis, setAnalysis] = useState<any | null>(null);
   const { toast } = useToast();
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const content = await file.text();
+      const fileType = file.name.endsWith('.json') ? 'json' : 'css';
+      
+      setIsLoading(true);
+      const response = await fetch('/api/tools/theme-builder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'import',
+          fileContent: content,
+          fileType
+        })
+      });
+
+      const data = await response.json();
+      if (data.success && data.theme) {
+        setTheme(data.theme);
+        sonnerToast.success('Theme imported successfully');
+      } else {
+        sonnerToast.error(data.error || 'Failed to import theme');
+      }
+    } catch (error) {
+      console.error('Error importing theme:', error);
+      sonnerToast.error('Failed to import theme file');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleExportTheme = async (format: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/tools/theme-builder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'export',
+          theme,
+          format
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        const blob = new Blob([data.data], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `theme.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        sonnerToast.success(`Theme exported as ${format.toUpperCase()}`);
+      } else {
+        sonnerToast.error(data.error || 'Export failed');
+      }
+    } catch (error) {
+      console.error('Error exporting theme:', error);
+      sonnerToast.error('Failed to export theme');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const generateRandomColor = (): string => {
     return (
@@ -277,38 +353,39 @@ export default function ThemeBuilderClient() {
     applyPalette(palette);
   };
 
-  const generateCSS = (): string => {
+  const generateCSS = (themeParam?: ThemeSettings): string => {
+    const t = themeParam || theme
     const cssVars = [];
 
     // Color variables
-    Object.entries(theme.colors).forEach(([key, value]) => {
+    Object.entries(t.colors || {}).forEach(([key, value]) => {
       cssVars.push(`  --color-${key}: ${value};`);
     });
 
     // Typography variables
     cssVars.push(`  --font-family: ${theme.typography.fontFamily};`);
-    Object.entries(theme.typography.fontSize).forEach(([key, value]) => {
+    Object.entries((t.typography && t.typography.fontSize) || {}).forEach(([key, value]) => {
       cssVars.push(`  --font-size-${key}: ${value};`);
     });
-    Object.entries(theme.typography.fontWeight).forEach(([key, value]) => {
+    Object.entries((t.typography && t.typography.fontWeight) || {}).forEach(([key, value]) => {
       cssVars.push(`  --font-weight-${key}: ${value};`);
     });
-    Object.entries(theme.typography.lineHeight).forEach(([key, value]) => {
+    Object.entries((t.typography && t.typography.lineHeight) || {}).forEach(([key, value]) => {
       cssVars.push(`  --line-height-${key}: ${value};`);
     });
 
     // Spacing variables
-    Object.entries(theme.spacing).forEach(([key, value]) => {
+    Object.entries(t.spacing || {}).forEach(([key, value]) => {
       cssVars.push(`  --spacing-${key}: ${value};`);
     });
 
     // Border radius variables
-    Object.entries(theme.borderRadius).forEach(([key, value]) => {
+    Object.entries(t.borderRadius || {}).forEach(([key, value]) => {
       cssVars.push(`  --border-radius-${key}: ${value};`);
     });
 
     // Shadow variables
-    Object.entries(theme.shadows).forEach(([key, value]) => {
+    Object.entries(t.shadows || {}).forEach(([key, value]) => {
       cssVars.push(`  --shadow-${key}: ${value};`);
     });
 
@@ -502,6 +579,72 @@ body {
           <Button variant="outline" onClick={randomizePalette}>
             <Shuffle className="mr-2 h-4 w-4" />
             Randomize
+          </Button>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              setIsLoading(true);
+              try {
+                // Call server to generate a theme based on current settings
+                const res = await fetch('/api/tools/theme-builder', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ action: 'generate', theme })
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success && data.theme) {
+                  // Replace theme with server-generated theme
+                  setTheme(data.theme)
+                  // generate CSS immediately from returned theme object
+                  const css = generateCSS(data.theme)
+                  setGeneratedCSS(css)
+                  sonnerToast.success('Theme generated from server');
+                } else {
+                  sonnerToast.error(data.error || 'Failed to generate theme');
+                }
+              } catch (err) {
+                console.error('Error generating theme from server:', err);
+                sonnerToast.error('Failed to generate theme');
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            disabled={isLoading}
+          >
+            <Loader2 className="mr-2 h-4 w-4" />
+            Get Results
+          </Button>
+
+          <Button
+            variant="outline"
+            onClick={async () => {
+              setIsLoading(true);
+              try {
+                const res = await fetch('/api/tools/theme-builder', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ action: 'analyze', theme })
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success && data.analysis) {
+                  setAnalysis(data.analysis);
+                  sonnerToast.success('Analysis complete');
+                } else {
+                  sonnerToast.error(data.error || 'Analysis failed');
+                }
+              } catch (err) {
+                console.error('Error analyzing theme:', err);
+                sonnerToast.error('Failed to run analysis');
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            disabled={isLoading}
+          >
+            <Type className="mr-2 h-4 w-4" />
+            Analyze
           </Button>
           <Button onClick={handleGenerateCSS} disabled={isGenerating}>
             {isGenerating ? (
@@ -873,6 +1016,36 @@ body {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Analysis Results */}
+      {analysis && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Theme Analysis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="font-semibold">Accessibility</h4>
+                <p>Contrast ratio: {analysis.accessibility?.contrastRatio ?? 'N/A'}</p>
+                <p>WCAG Level: {analysis.accessibility?.wcagLevel ?? 'N/A'}</p>
+                <ul className="list-disc ml-5 mt-2">
+                  {(analysis.accessibility?.recommendations || []).map((r: string, i: number) => (
+                    <li key={i}>{r}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold">Consistency</h4>
+                <p>Color Harmony: {analysis.consistency?.colorHarmony ?? 'N/A'}</p>
+                <p>Spacing Scale: {analysis.consistency?.spacingScale ?? 'N/A'}</p>
+                <p>Typography Scale: {analysis.consistency?.typographyScale ?? 'N/A'}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Generated CSS */}
       {generatedCSS && (

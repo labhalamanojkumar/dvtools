@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background Gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGradient)"/>
+  
+  <!-- Decorative Elements -->
+  <circle cx="100" cy="100" r="150" fill="#1e293b" opacity="0.5"/>
+  <circle cx="1100" cy="530" r="180" fill="#1e293b" opacity="0.5"/>
+  
+  <!-- Main Content Container -->
+  <rect x="50" y="50" width="1100" height="530" rx="20" fill="#1e293b" opacity="0.8"/>
+  
+  <!-- Header Section -->
+  <text x="600" y="120" font-family="Arial, sans-serif" font-size="56" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    DVtools Student Activity
+  </text>
+  
+  <!-- Contest Badge -->
+  <rect x="450" y="150" width="300" height="60" rx="30" fill="url(#accentGradient)"/>
+  <text x="600" y="190" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    CONTEST 2024
+  </text>
+  
+  <!-- Prize Money Banner -->
+  <rect x="350" y="240" width="500" height="120" rx="15" fill="#22c55e" opacity="0.9"/>
+  <text x="600" y="290" font-family="Arial, sans-serif" font-size="24" font-weight="600" fill="#ffffff" text-anchor="middle">
+    Win Cash Prize
+  </text>
+  <text x="600" y="340" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    ₹5,000
+  </text>
+  
+  <!-- Key Points -->
+  <g transform="translate(150, 400)">
+    <!-- Point 1 -->
+    <circle cx="20" cy="15" r="8" fill="#3b82f6"/>
+    <text x="40" y="22" font-family="Arial, sans-serif" font-size="20" fill="#e2e8f0">
+      Explore All DVtools Features
+    </text>
+    
+    <!-- Point 2 -->
+    <circle cx="320" cy="15" r="8" fill="#8b5cf6"/>
+    <text x="340" y="22" font-family="Arial, sans-serif" font-size="20" fill="#e2e8f0">
+      Create LinkedIn Post
+    </text>
+    
+    <!-- Point 3 -->
+    <circle cx="620" cy="15" r="8" fill="#ec4899"/>
+    <text x="640" y="22" font-family="Arial, sans-serif" font-size="20" fill="#e2e8f0">
+      Make a Video
+    </text>
+  </g>
+  
+  <!-- Additional Benefits -->
+  <g transform="translate(150, 460)">
+    <rect x="0" y="0" width="900" height="50" rx="10" fill="#475569" opacity="0.6"/>
+    <text x="450" y="32" font-family="Arial, sans-serif" font-size="18" fill="#ffffff" text-anchor="middle">
+      🎓 Certificate for All Participants  •  💼 Internship Opportunities Available
+    </text>
+  </g>
+  
+  <!-- Deadline -->
+  <text x="600" y="560" font-family="Arial, sans-serif" font-size="22" font-weight="600" fill="#fbbf24" text-anchor="middle">
+    Deadline: November 30, 2024
+  </text>
+  
+  <!-- Website -->
+  <text x="600" y="595" font-family="Arial, sans-serif" font-size="18" fill="#94a3b8" text-anchor="middle">
+    www.dvtools.in
+  </text>
+</svg>

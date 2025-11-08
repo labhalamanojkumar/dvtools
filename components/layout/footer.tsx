@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Code2, Github, Twitter, Linkedin } from "lucide-react";
+import { Logo } from "@/components/ui/logo";
+import { Github, Twitter, Linkedin } from "lucide-react";
 
 export function Footer() {
   return (
@@ -7,9 +8,11 @@ export function Footer() {
       <div className="container mx-auto px-4 py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Link href="/" className="mb-4 flex items-center space-x-2">
-              <Code2 className="h-6 w-6 text-primary" />
-              <span className="text-lg font-bold">DevTools Hub</span>
+            <Link href="/" className="mb-4 flex items-center space-x-3 group">
+              <Logo size="md" variant="gradient" className="group-hover:scale-105 transition-transform duration-200" />
+              <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                DvTools
+              </span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Professional developer tools for modern web development. Fast,
@@ -125,9 +128,10 @@ export function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-between border-t pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} DevTools Hub. All rights reserved.
-          </p>
+          <div className="text-sm text-muted-foreground flex items-center gap-2">
+            <Logo size="sm" variant="minimal" className="inline" />
+            © {new Date().getFullYear()} DvTools. All rights reserved.
+          </div>
           <div className="mt-4 flex space-x-4 sm:mt-0">
             <a
               href="https://github.com"
@@ -148,7 +152,7 @@ export function Footer() {
               <span className="sr-only">Twitter</span>
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/company/dvtools"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground transition-colors hover:text-primary"

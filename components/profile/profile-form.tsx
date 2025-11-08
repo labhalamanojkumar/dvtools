@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,8 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Save, Camera } from "lucide-react";
+import { User, Mail, Save, Camera, Globe, MapPin, Twitter, Github, Linkedin } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { toast } from "sonner";
 
 interface ProfileFormProps {
   user: {
@@ -29,27 +30,74 @@ export default function ProfileForm({ user }: ProfileFormProps) {
     name: user.name || "",
     email: user.email || "",
     bio: "",
+    website: "",
+    location: "",
+    twitter: "",
+    github: "",
+    linkedin: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    // Load full profile data
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const response = await fetch("/api/user/profile");
+      if (response.ok) {
+        const data = await response.json();
+        setFormData({
+          name: data.name || "",
+          email: data.email || "",
+          bio: data.bio || "",
+          website: data.website || "",
+          location: data.location || "",
+          twitter: data.twitter || "",
+          github: data.github || "",
+          linkedin: data.linkedin || "",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load profile:", error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // In a real app, this would make an API call to update the user profile
-      await update({
-        ...session,
-        user: {
-          ...session?.user,
-          name: formData.name,
-          email: formData.email,
+      const response = await fetch("/api/user/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify(formData),
       });
 
-      setIsEditing(false);
+      if (response.ok) {
+        const updatedUser = await response.json();
+        
+        // Update session with new name
+        await update({
+          ...session,
+          user: {
+            ...session?.user,
+            name: updatedUser.name,
+          },
+        });
+
+        toast.success("Profile updated successfully");
+        setIsEditing(false);
+      } else {
+        const error = await response.json();
+        toast.error(error.error || "Failed to update profile");
+      }
     } catch (error) {
       console.error("Failed to update profile:", error);
+      toast.error("Failed to update profile");
     } finally {
       setIsLoading(false);
     }
@@ -144,6 +192,93 @@ export default function ProfileForm({ user }: ProfileFormProps) {
             />
           </div>
 
+          {/* Additional Fields */}
+          <Separator />
+          <h3 className="font-semibold text-sm">Additional Information</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="website"
+                  type="url"
+                  value={formData.website}
+                  onChange={(e) => handleInputChange("website", e.target.value)}
+                  disabled={!isEditing}
+                  className="pl-10"
+                  placeholder="https://yourwebsite.com"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="location">Location</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => handleInputChange("location", e.target.value)}
+                  disabled={!isEditing}
+                  className="pl-10"
+                  placeholder="City, Country"
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+          <h3 className="font-semibold text-sm">Social Links</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="twitter">Twitter</Label>
+              <div className="relative">
+                <Twitter className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="twitter"
+                  value={formData.twitter}
+                  onChange={(e) => handleInputChange("twitter", e.target.value)}
+                  disabled={!isEditing}
+                  className="pl-10"
+                  placeholder="@username"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="github">GitHub</Label>
+              <div className="relative">
+                <Github className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="github"
+                  value={formData.github}
+                  onChange={(e) => handleInputChange("github", e.target.value)}
+                  disabled={!isEditing}
+                  className="pl-10"
+                  placeholder="github.com/username"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="linkedin">LinkedIn</Label>
+              <div className="relative">
+                <Linkedin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="linkedin"
+                  value={formData.linkedin}
+                  onChange={(e) => handleInputChange("linkedin", e.target.value)}
+                  disabled={!isEditing}
+                  className="pl-10"
+                  placeholder="linkedin.com/in/username"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="flex gap-3">
             {!isEditing ? (
               <Button type="button" onClick={() => setIsEditing(true)}>
@@ -159,11 +294,7 @@ export default function ProfileForm({ user }: ProfileFormProps) {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    setFormData({
-                      name: user.name || "",
-                      email: user.email || "",
-                      bio: "",
-                    });
+                    loadProfile();
                     setIsEditing(false);
                   }}
                 >

@@ -12,12 +12,6 @@ const componentPlaygroundSchema = z.object({
   framework: z.enum(["react", "vue", "angular", "svelte"]).optional(),
 });
 
-const cssLinterSchema = z.object({
-  tool: z.literal("css-linter-optimizer"),
-  css: z.string().min(1, "CSS code is required"),
-  rules: z.array(z.string()).optional(),
-});
-
 const responsiveTesterSchema = z.object({
   tool: z.literal("responsive-design-tester"),
   html: z.string().min(1, "HTML content is required"),
@@ -71,27 +65,36 @@ const themeBuilderSchema = z.object({
   spacing: z.record(z.string()).optional(),
 });
 
+const cssLinterOptimizerSchema = z.object({
+  tool: z.literal("css-linter-optimizer"),
+  input: z.string().min(1, "CSS input is required"),
+  config: z.object({
+    rules: z.record(z.any()).optional(),
+    optimization: z.record(z.any()).optional(),
+  }).optional(),
+});
+
 const toolAnalysisSchema = z.discriminatedUnion("tool", [
   componentPlaygroundSchema,
-  cssLinterSchema,
   responsiveTesterSchema,
   imageOptimizerSchema,
   accessibilityScannerSchema,
   performanceProfilerSchema,
   staticSiteExporterSchema,
   themeBuilderSchema,
+  cssLinterOptimizerSchema,
 ]);
 
 // Tool type mapping
 const TOOL_TYPE_MAP: Record<string, ToolType> = {
   "component-playground": ToolType.COMPONENT_PLAYGROUND,
-  "css-linter-optimizer": ToolType.CSS_LINTER_OPTIMIZER,
   "responsive-design-tester": ToolType.RESPONSIVE_DESIGN_TESTER,
   "image-optimizer-converter": ToolType.IMAGE_OPTIMIZER_CONVERTER,
   "accessibility-scanner": ToolType.ACCESSIBILITY_SCANNER,
   "performance-profiler": ToolType.PERFORMANCE_PROFILER,
   "static-site-exporter": ToolType.STATIC_SITE_EXPORTER,
   "theme-builder": ToolType.THEME_BUILDER,
+  "css-linter-optimizer": ToolType.CSS_LINTER_OPTIMIZER,
 };
 
 // POST /api/tools/analyze - Analyze content using various tools
@@ -120,12 +123,6 @@ export async function POST(request: NextRequest) {
         case "component-playground":
           result = await analyzeComponentPlayground(
             toolData as z.infer<typeof componentPlaygroundSchema>,
-          );
-          break;
-
-        case "css-linter-optimizer":
-          result = await analyzeCssLinter(
-            toolData as z.infer<typeof cssLinterSchema>,
           );
           break;
 
@@ -162,6 +159,12 @@ export async function POST(request: NextRequest) {
         case "theme-builder":
           result = await analyzeThemeBuilder(
             toolData as z.infer<typeof themeBuilderSchema>,
+          );
+          break;
+
+        case "css-linter-optimizer":
+          result = await analyzeCssLinterOptimizer(
+            toolData as z.infer<typeof cssLinterOptimizerSchema>,
           );
           break;
 
@@ -271,53 +274,6 @@ async function analyzeComponentPlayground(
       "Use meaningful component and prop names",
       "Consider extracting reusable components",
     ],
-  };
-}
-
-async function analyzeCssLinter(data: z.infer<typeof cssLinterSchema>) {
-  const { css, rules = ["all"] } = data;
-
-  const issues: Array<{
-    type: "error" | "warning";
-    message: string;
-    line?: number;
-    column?: number;
-  }> = [];
-
-  // Basic CSS validation
-  if (css.includes("{") && !css.includes("}")) {
-    issues.push({ type: "error", message: "Unclosed CSS rule" });
-  }
-
-  // Check for common issues
-  if (css.includes("!important")) {
-    issues.push({ type: "warning", message: "Use of !important detected" });
-  }
-
-  // Calculate metrics
-  const rulesCount = (css.match(/{/g) || []).length;
-  const selectorsCount = (css.match(/[^}]+{/g) || []).length;
-  const propertiesCount = (css.match(/[^:]+:[^;]+;/g) || []).length;
-
-  // Optimization suggestions
-  const suggestions: string[] = [];
-  if (css.length > 10000) {
-    suggestions.push("Consider splitting CSS into multiple files");
-  }
-  if (rulesCount > 100) {
-    suggestions.push("High number of CSS rules - consider optimization");
-  }
-
-  return {
-    issues,
-    metrics: {
-      rulesCount,
-      selectorsCount,
-      propertiesCount,
-      fileSize: css.length,
-    },
-    suggestions,
-    optimized: issues.length === 0,
   };
 }
 
@@ -579,6 +535,161 @@ async function analyzeThemeBuilder(data: z.infer<typeof themeBuilderSchema>) {
     ),
     readyForExport:
       analysis.colorCount >= 3 && analysis.typographySettings >= 2,
+  };
+}
+
+async function analyzeCssLinterOptimizer(
+  data: z.infer<typeof cssLinterOptimizerSchema>,
+) {
+  const { input: cssInput, config = { rules: {}, optimization: {} } } = data;
+  const { rules = {}, optimization = {} } = config;
+
+  const issues: Array<{
+    line: number;
+    column: number;
+    severity: "error" | "warning" | "info";
+    message: string;
+    rule: string;
+    source: string;
+  }> = [];
+
+  const changes: string[] = [];
+  let optimizedCss = cssInput;
+
+  // Basic CSS linting rules
+  const lines = cssInput.split('\n');
+
+  lines.forEach((line, index) => {
+    const lineNumber = index + 1;
+    const trimmedLine = line.trim();
+
+    // Check for empty rules
+    if (rules["no-empty-rules"] && trimmedLine === '{' && lines[index + 1]?.trim() === '}') {
+      issues.push({
+        line: lineNumber,
+        column: 1,
+        severity: "warning",
+        message: "Empty CSS rule",
+        rule: "no-empty-rules",
+        source: trimmedLine,
+      });
+    }
+
+    // Check for !important usage
+    if (rules["no-important"] && line.includes('!important')) {
+      issues.push({
+        line: lineNumber,
+        column: line.indexOf('!important') + 1,
+        severity: "warning",
+        message: "Avoid using !important",
+        rule: "no-important",
+        source: trimmedLine,
+      });
+    }
+
+    // Check for duplicate properties (basic check)
+    if (rules["no-duplicate-properties"]) {
+      const properties = line.match(/([a-z-]+)\s*:/g);
+      if (properties) {
+        const uniqueProps = new Set(properties.map(p => p.replace(/\s*:/, '')));
+        if (properties.length !== uniqueProps.size) {
+          issues.push({
+            line: lineNumber,
+            column: 1,
+            severity: "warning",
+            message: "Duplicate CSS properties in the same rule",
+            rule: "no-duplicate-properties",
+            source: trimmedLine,
+          });
+        }
+      }
+    }
+
+    // Check selector depth
+    if (rules["selector-max-depth"]) {
+      const selectors = line.match(/[^,{]+(?=\s*{)/g);
+      if (selectors) {
+        selectors.forEach(selector => {
+          const depth = (selector.match(/\s+/g) || []).length + 1;
+          if (depth > (rules["selector-max-depth"] as number)) {
+            issues.push({
+              line: lineNumber,
+              column: 1,
+              severity: "info",
+              message: `Selector depth exceeds maximum (${rules["selector-max-depth"]})`,
+              rule: "selector-max-depth",
+              source: selector.trim(),
+            });
+          }
+        });
+      }
+    }
+  });
+
+  // CSS Optimization
+  const originalSize = cssInput.length;
+
+  // Remove comments
+  if (optimization.removeComments) {
+    const commentRegex = /\/\*[\s\S]*?\*\//g;
+    const commentMatches = cssInput.match(commentRegex);
+    if (commentMatches) {
+      optimizedCss = optimizedCss.replace(commentRegex, '');
+      changes.push(`Removed ${commentMatches.length} comment(s)`);
+    }
+  }
+
+  // Remove whitespace
+  if (optimization.removeWhitespace) {
+    optimizedCss = optimizedCss
+      .replace(/\s+/g, ' ') // Multiple spaces to single
+      .replace(/\s*{\s*/g, '{') // Spaces around braces
+      .replace(/\s*}\s*/g, '}') // Spaces around closing braces
+      .replace(/\s*;\s*/g, ';') // Spaces around semicolons
+      .replace(/;\s*}/g, '}') // Semicolon before closing brace
+      .trim();
+    changes.push("Removed unnecessary whitespace");
+  }
+
+  // Shorten colors
+  if (optimization.shortenColors) {
+    const colorRegex = /#([a-fA-F0-9])\1([a-fA-F0-9])\2([a-fA-F0-9])\3/g;
+    const colorMatches = optimizedCss.match(colorRegex);
+    if (colorMatches) {
+      optimizedCss = optimizedCss.replace(colorRegex, '#$1$2$3');
+      changes.push(`Shortened ${colorMatches.length} color value(s)`);
+    }
+  }
+
+  // Remove empty rules
+  if (optimization.removeEmptyRules) {
+    const emptyRuleRegex = /[^\}]+\{\s*\}/g;
+    const emptyMatches = optimizedCss.match(emptyRuleRegex);
+    if (emptyMatches) {
+      optimizedCss = optimizedCss.replace(emptyRuleRegex, '');
+      changes.push(`Removed ${emptyMatches.length} empty rule(s)`);
+    }
+  }
+
+  // Minify
+  if (optimization.minify) {
+    optimizedCss = optimizedCss.replace(/\s*{\s*/g, '{').replace(/\s*}\s*/g, '}').replace(/\s*;\s*/g, ';').replace(/;\s*}/g, '}');
+    changes.push("Applied minification");
+  }
+
+  const optimizedSize = optimizedCss.length;
+  const compressionRatio = originalSize > 0 ? ((originalSize - optimizedSize) / originalSize) * 100 : 0;
+
+  return {
+    issues,
+    optimizedCss,
+    optimization: {
+      originalSize,
+      optimizedSize,
+      compressionRatio,
+      changes,
+    },
+    valid: issues.filter(i => i.severity === "error").length === 0,
   };
 }
 
