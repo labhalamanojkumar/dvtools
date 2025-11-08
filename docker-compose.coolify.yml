@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   dvtools:
-    image: manojkumarlabhala/dvtools:v1.0.0
+    image: manojkumarlabhala/dvtools:v1.1.3
     container_name: dvtools-app
     restart: unless-stopped
     ports:

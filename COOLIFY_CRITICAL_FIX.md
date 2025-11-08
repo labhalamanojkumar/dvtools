@@ -1,7 +1,7 @@
 # 🚨 CRITICAL: Coolify Deployment Fix
 
 ## The Problem
-Coolify is trying to run: `docker push manojkumarlabhala/dvtools:v1.0.0` during deployment, which is **WRONG**.
+Coolify is trying to run: `docker push manojkumarlabhala/dvtools:v1.1.2` during deployment, which is **WRONG**.
 
 **This command should NEVER run during deployment!** Coolify should be **pulling** the image, not pushing it.
 
@@ -16,10 +16,16 @@ The error `"unable to get image 'docker push manojkumarlabhala/dvtools:v1.0.0'"`
 ## ✅ VERIFIED: Images are Available
 
 ```bash
-✅ docker pull manojkumarlabhala/dvtools:v1.0.0  # WORKS
+✅ docker pull manojkumarlabhala/dvtools:v1.1.3  # LATEST WORKING VERSION - MYSQL SUPPORT
 ✅ docker pull manojkumarlabhala/dvtools:latest  # WORKS
 ✅ Images exist on Docker Hub: https://hub.docker.com/r/manojkumarlabhala/dvtools
 ```
+
+## 🗄️ DATABASE CONFIGURATION FIXED
+
+**Issue:** Prisma schema was configured for SQLite but production uses MySQL
+**Fix:** Updated schema.prisma to use MySQL provider
+**Result:** v1.1.3 now supports MySQL databases correctly
 
 ---
 
@@ -38,8 +44,8 @@ The error `"unable to get image 'docker push manojkumarlabhala/dvtools:v1.0.0'"`
 2. **Image Configuration:**
    ```
    Registry: Docker Hub
-   Image: manojkumarlabhala/dvtools:v1.0.0
-   Tag: v1.0.0
+   Image: manojkumarlabhala/dvtools:v1.1.3
+   Tag: v1.1.3
    ```
    ⚠️ **NO spaces, NO extra characters**
 
@@ -57,6 +63,7 @@ The error `"unable to get image 'docker push manojkumarlabhala/dvtools:v1.0.0'"`
    NEXTAUTH_SECRET=your-secret-here
    NODE_ENV=production
    ```
+   ⚠️ **DATABASE_URL must be MySQL format!**
 
 5. **Deploy**
 
@@ -81,12 +88,12 @@ If Coolify continues to fail, deploy manually:
 
 ```bash
 # 1. Pull and run locally first
-docker pull manojkumarlabhala/dvtools:v1.0.0
+docker pull manojkumarlabhala/dvtools:v1.1.2
 docker run -d -p 3000:3000 --name dvtools \
   -e DATABASE_URL="your-db-url" \
   -e NEXTAUTH_URL="https://yourdomain.com" \
   -e NEXTAUTH_SECRET="your-secret" \
-  manojkumarlabhala/dvtools:v1.0.0
+  manojkumarlabhala/dvtools:v1.1.2
 
 # 2. Test locally
 curl http://localhost:3000/api/health
@@ -100,7 +107,7 @@ curl http://localhost:3000/api/health
 
 ## Is the Image Available?
 ```bash
-✅ docker pull manojkumarlabhala/dvtools:v1.0.0  # Should work
+✅ docker pull manojkumarlabhala/dvtools:v1.1.2  # Should work
 ✅ docker images | grep dvtools                   # Should show image
 ```
 
@@ -122,7 +129,7 @@ Dockerfile: Dockerfile
 ```
 Type: Docker Image
 Registry: Docker Hub
-Image: manojkumarlabhala/dvtools:v1.0.0
+Image: manojkumarlabhala/dvtools:v1.1.2
 ```
 
 ---
@@ -203,13 +210,13 @@ Run this to confirm everything works:
 
 ```bash
 # Test image pull
-docker pull manojkumarlabhala/dvtools:v1.0.0 && echo "✅ Image OK"
+docker pull manojkumarlabhala/dvtools:v1.1.2 && echo "✅ Image OK"
 
 # Test basic run
-docker run --rm manojkumarlabhala/dvtools:v1.0.0 echo "✅ Container OK"
+docker run --rm manojkumarlabhala/dvtools:v1.1.2 echo "✅ Container OK"
 
 # Check image info
-docker inspect manojkumarlabhala/dvtools:v1.0.0 | grep -A 5 "Config" | head -10
+docker inspect manojkumarlabhala/dvtools:v1.1.2 | grep -A 5 "Config" | head -10
 ```
 
 **Expected output:**
@@ -232,7 +239,7 @@ docker inspect manojkumarlabhala/dvtools:v1.0.0 | grep -A 5 "Config" | head -10
 **Next Steps:**
 1. Delete failed deployment
 2. Create new Docker Image resource
-3. Use exact image name: `manojkumarlabhala/dvtools:v1.0.0`
+3. Use exact image name: `manojkumarlabhala/dvtools:v1.1.2`
 4. Set environment variables
 5. Deploy
 

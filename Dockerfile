@@ -66,8 +66,8 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Copy package.json for scripts
 COPY --from=builder /app/package.json ./package.json
 
-# Copy entrypoint script
-COPY --from=builder /app/entrypoint.sh ./entrypoint.sh
+# Copy entrypoint script directly from source
+COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
 # Create data directory for uploads and logs

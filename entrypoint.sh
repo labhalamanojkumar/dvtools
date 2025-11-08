@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Entrypoint script for production deployment
 set -e
