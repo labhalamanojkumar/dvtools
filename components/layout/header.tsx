@@ -13,7 +13,7 @@ import {
   BarChart3,
   Heart,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import {
   DropdownMenu,
@@ -38,14 +38,19 @@ const navigation = [
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isAdmin =
     session?.user?.role === "ADMIN" || session?.user?.role === "SUPERADMIN";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" suppressHydrationWarning>
       <nav className="container mx-auto flex h-16 items-center justify-between px-4">
         <a href="/" className="flex items-center space-x-3 group">
           <Logo size="md" variant="gradient" className="group-hover:scale-105 transition-transform duration-200" />
@@ -60,6 +65,7 @@ export function Header() {
               key={item.href}
               href={item.href}
               className="text-sm font-medium transition-colors hover:text-primary text-muted-foreground"
+              suppressHydrationWarning
             >
               {item.name}
             </a>
@@ -76,7 +82,7 @@ export function Header() {
             </a>
           </Button>
 
-          {status === "loading" ? (
+          {status === "loading" || !mounted ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
           ) : session ? (
             <DropdownMenu>
@@ -105,7 +111,7 @@ export function Header() {
                     <p className="text-xs leading-none text-muted-foreground">
                       {session.user?.email}
                     </p>
-                    {isAdmin && (
+                    {isAdmin && mounted && (
                       <p className="text-xs leading-none text-primary font-medium">
                         Administrator
                       </p>
@@ -131,7 +137,7 @@ export function Header() {
                     <span>Settings</span>
                   </a>
                 </DropdownMenuItem>
-                {isAdmin && (
+                {isAdmin && mounted && (
                   <>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
@@ -191,6 +197,7 @@ export function Header() {
                 href={item.href}
                 className="block rounded-md px-3 py-2 text-base font-medium text-muted-foreground hover:bg-accent"
                 onClick={() => setMobileMenuOpen(false)}
+                suppressHydrationWarning
               >
                 {item.name}
               </a>
@@ -208,7 +215,7 @@ export function Header() {
               </Button>
             </div>
             <div className="px-3 py-2 space-y-2">
-              {session ? (
+              {session && mounted ? (
                 <>
                   <div className="flex items-center space-x-2 px-3 py-2">
                     <Avatar className="h-6 w-6">
@@ -224,7 +231,7 @@ export function Header() {
                       <p className="text-sm font-medium">
                         {session.user?.name}
                       </p>
-                      {isAdmin && (
+                      {isAdmin && mounted && (
                         <p className="text-xs text-primary">Administrator</p>
                       )}
                     </div>
@@ -255,7 +262,7 @@ export function Header() {
                       Profile
                     </a>
                   </Button>
-                  {isAdmin && (
+                  {isAdmin && mounted && (
                     <Button
                       asChild
                       variant="outline"

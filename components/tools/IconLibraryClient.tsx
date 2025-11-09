@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select';
+import DOMPurify from 'dompurify';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -64,6 +65,14 @@ interface IllustrationData {
   likes: number;
   isPremium: boolean;
 }
+
+// Sanitize SVG content to prevent XSS
+const sanitizeSvg = (svgContent: string): string => {
+  return DOMPurify.sanitize(svgContent, {
+    ALLOWED_TAGS: ['svg', 'path', 'circle', 'rect', 'line', 'polyline', 'polygon', 'g', 'defs', 'linearGradient', 'radialGradient', 'stop'],
+    ALLOWED_ATTR: ['d', 'cx', 'cy', 'r', 'x', 'y', 'width', 'height', 'x1', 'y1', 'x2', 'y2', 'points', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'viewBox', 'xmlns', 'transform', 'id', 'class']
+  });
+};
 
 const ICON_CATEGORIES = [
   'all', 'ui', 'arrows', 'social', 'commerce', 'media', 'navigation',
@@ -1270,7 +1279,7 @@ export default function IconLibraryClient() {
                     viewBox={item.viewBox}
                     className="w-8 h-8"
                     fill="currentColor"
-                    dangerouslySetInnerHTML={{ __html: item.svg }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeSvg(item.svg) }}
                   />
                 </div>
 

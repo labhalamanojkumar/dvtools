@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { marked } from 'marked';
+import sanitizeHtml from 'sanitize-html';
 import { 
   FileText,
   Upload,
@@ -55,6 +57,20 @@ interface SearchResult {
   score: number;
 }
 
+// Safely render markdown to HTML
+const renderSafeMarkdown = async (markdown: string): Promise<string> => {
+  const html = await marked.parse(markdown);
+  return sanitizeHtml(html, {
+    allowedTags: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'blockquote', 'code', 'pre', 'a', 'table', 'thead', 'tbody', 'tr', 'th', 'td'],
+    allowedAttributes: {
+      'a': ['href', 'target', 'rel'],
+      'code': ['class'],
+      'pre': ['class']
+    },
+    allowedSchemes: ['http', 'https', 'mailto']
+  });
+};
+
 export default function KnowledgeBaseEditorClient() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [currentDoc, setCurrentDoc] = useState<Document | null>(null);
@@ -68,7 +84,21 @@ export default function KnowledgeBaseEditorClient() {
   const [commitMessage, setCommitMessage] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [viewMode, setViewMode] = useState<"edit" | "preview">("edit");
+  const [renderedHtml, setRenderedHtml] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Render markdown to HTML when markdown changes
+  useEffect(() => {
+    const renderMarkdown = async () => {
+      if (markdown) {
+        const html = await renderSafeMarkdown(markdown);
+        setRenderedHtml(html);
+      } else {
+        setRenderedHtml("");
+      }
+    };
+    renderMarkdown();
+  }, [markdown]);
 
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -367,7 +397,7 @@ export default function KnowledgeBaseEditorClient() {
             </div>
           ) : (
             <div className="border rounded-lg p-6 min-h-[500px] prose prose-slate max-w-none">
-              <div dangerouslySetInnerHTML={{ __html: markdown.replace(/\n/g, '<br/>') }} />
+              <div dangerouslySetInnerHTML={{ __html: renderedHtml }} />
             </div>
           )}
 

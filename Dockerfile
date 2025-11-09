@@ -21,12 +21,15 @@ RUN apk add --no-cache libc6-compat curl openssl
 # Copy package files
 COPY package.json package-lock.json* ./
 
-    # Install all dependencies (including dev dependencies) for build  
-    # Use install instead of ci to handle package-lock sync issues
-    RUN npm install --legacy-peer-deps && npm cache clean --force
-    
-    # Copy source code
-    COPY . .
+# Install all dependencies (including dev dependencies) for build
+# Use install instead of ci to handle package-lock sync issues
+RUN npm install --legacy-peer-deps && npm cache clean --force
+
+# Copy source code
+COPY . .
+
+    # Clean any existing build artifacts
+    RUN rm -rf .next
 
     # Set environment variables for build
     ENV NEXT_TELEMETRY_DISABLED=1

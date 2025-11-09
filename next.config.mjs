@@ -20,6 +20,16 @@ const nextConfig = {
   // Experimental features to limit file system access
   experimental: {
     // Disable file tracing to avoid Windows permission issues
+    outputFileTracingRoot: undefined,
+    // Disable turbo for Windows compatibility
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
   },
   // Webpack configuration to exclude problematic directories
   webpack: (config, { isServer, webpack, dir }) => {
@@ -37,7 +47,18 @@ const nextConfig = {
         '**/Windows/**',
         '**/Program Files/**',
         '**/Program Files (x86)/**',
+        '**/AppData/**',
+        '**/Temp/**',
+        '**/tmp/**',
+        '**/$RECYCLE.BIN/**',
+        '**/System Volume Information/**',
+        '**/pagefile.sys',
+        '**/swapfile.sys',
+        '**/hiberfil.sys',
       ],
+      // Reduce polling interval and add stability threshold
+      poll: 1000,
+      aggregateTimeout: 300,
     };
     
     // Limit module resolution to project directory
@@ -66,11 +87,22 @@ const nextConfig = {
           // Ignore resources from system directories
           if (resource.includes('WinSAT') || 
               resource.includes('Windows') ||
-              resource.includes('Program Files')) {
+              resource.includes('Program Files') ||
+              resource.includes('AppData') ||
+              resource.includes('Temp') ||
+              resource.includes('$RECYCLE.BIN') ||
+              resource.includes('System Volume Information') ||
+              resource.includes('pagefile.sys') ||
+              resource.includes('swapfile.sys') ||
+              resource.includes('hiberfil.sys')) {
             return true;
           }
           return false;
         },
+      }),
+      // Add DefinePlugin to set environment variables
+      new webpack.DefinePlugin({
+        __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
       }),
     ];
     
@@ -86,6 +118,12 @@ const nextConfig = {
         hostname: 'avatars.githubusercontent.com',
         port: '',
         pathname: '/u/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

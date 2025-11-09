@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DOMPurify from 'dompurify';
 import {
   Search,
   Upload,
@@ -37,6 +38,14 @@ interface Icon {
   svg: string;
   selected?: boolean;
 }
+
+// Sanitize SVG content to prevent XSS
+const sanitizeSvg = (svgContent: string): string => {
+  return DOMPurify.sanitize(svgContent, {
+    ALLOWED_TAGS: ['svg', 'path', 'circle', 'rect', 'line', 'polyline', 'polygon', 'g', 'defs', 'linearGradient', 'radialGradient', 'stop'],
+    ALLOWED_ATTR: ['d', 'cx', 'cy', 'r', 'x', 'y', 'width', 'height', 'x1', 'y1', 'x2', 'y2', 'points', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'viewBox', 'xmlns', 'transform', 'id', 'class']
+  });
+};
 
 const categories = [
   { name: 'All', slug: 'all' },
@@ -368,7 +377,7 @@ export default function IconLibraryClient() {
                   )}
                   <div 
                     className="w-full h-16 flex items-center justify-center"
-                    dangerouslySetInnerHTML={{ __html: icon.svg }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeSvg(icon.svg) }}
                     style={{ color: customColor }}
                   />
                   <p className="text-xs mt-2 truncate">{icon.name}</p>
@@ -401,7 +410,7 @@ export default function IconLibraryClient() {
                   
                   <div 
                     className="w-12 h-12 flex items-center justify-center flex-shrink-0"
-                    dangerouslySetInnerHTML={{ __html: icon.svg }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeSvg(icon.svg) }}
                     style={{ color: customColor }}
                   />
                   

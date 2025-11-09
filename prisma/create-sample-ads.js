@@ -6,6 +6,12 @@ async function createSampleAdData() {
   try {
     console.log('Creating sample ad data...');
 
+    // Clean up existing data
+    await prisma.adAnalytics.deleteMany();
+    await prisma.adCampaign.deleteMany();
+    await prisma.adPlacement.deleteMany();
+    await prisma.adVendor.deleteMany();
+
     // Create Ad Vendors
     const googleAdSense = await prisma.adVendor.create({
       data: {
@@ -145,7 +151,7 @@ async function createSampleAdData() {
         status: 'ACTIVE',
         title: 'Summer Sale - Up to 50% Off!',
         contentDescription: 'Amazing summer deals on all products',
-        imageUrl: 'https://via.placeholder.com/728x90/FF6B6B/FFFFFF?text=Summer+Sale+50%25+Off',
+        imageUrl: '/placeholder-ad.jpg',
         linkUrl: 'https://example.com/summer-sale',
         callToAction: 'Shop Now',
         priority: 10,
@@ -168,7 +174,7 @@ async function createSampleAdData() {
         status: 'ACTIVE',
         title: 'Best JavaScript Development Tools',
         contentDescription: 'Professional JS tools for developers',
-        imageUrl: 'https://via.placeholder.com/300x250/4ECDC4/FFFFFF?text=JS+Tools',
+        imageUrl: '/placeholder-ad.jpg',
         linkUrl: 'https://example.com/js-tools',
         callToAction: 'Try Now',
         priority: 8,
@@ -214,7 +220,7 @@ async function createSampleAdData() {
         status: 'ACTIVE',
         title: 'Complete API Documentation',
         contentDescription: 'Learn how to integrate with our API',
-        imageUrl: 'https://via.placeholder.com/336x280/FFD93D/FFFFFF?text=API+Docs',
+        imageUrl: '/placeholder-ad.jpg',
         linkUrl: 'https://example.com/api-docs',
         callToAction: 'View Docs',
         priority: 7,

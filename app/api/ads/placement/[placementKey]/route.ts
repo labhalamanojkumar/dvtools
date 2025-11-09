@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-// GET - Fetch ad placement data and campaigns
 export async function GET(
   request: NextRequest,
   { params }: { params: { placementKey: string } }
@@ -49,50 +48,57 @@ export async function GET(
 
     if (!placement || !placement.isActive) {
       return NextResponse.json({
+        success: false,
         placement: null,
-        campaigns: []
+        campaigns: [],
+        message: 'Placement not found or inactive'
       })
     }
 
-    // Filter campaigns based on targeting rules
     let filteredCampaigns = placement.campaigns
 
-    // Check device targeting
+    // Filter by device type if specified
     if (placement.deviceTypes && Array.isArray(placement.deviceTypes)) {
       const allowedDevices = placement.deviceTypes as string[]
-      filteredCampaigns = filteredCampaigns.filter((campaign: any) => {
-        if (!campaign.deviceTypes || !Array.isArray(campaign.deviceTypes)) {
-          return true // No device restriction
-        }
-        return allowedDevices.includes(deviceType) ||
-               (campaign.deviceTypes as string[]).includes(deviceType)
-      })
-    }
-
-    // Check page targeting
-    if (placement.pages && Array.isArray(placement.pages)) {
-      const allowedPages = placement.pages as string[]
-      const matchesPage = allowedPages.some(pattern => {
-        if (pattern.endsWith('*')) {
-          return pageUrl.startsWith(pattern.slice(0, -1))
-        }
-        return pageUrl === pattern
-      })
-      
-      if (!matchesPage) {
-        filteredCampaigns = []
+      if (!allowedDevices.includes(deviceType)) {
+        return NextResponse.json({
+          success: false,
+          placement: null,
+          campaigns: [],
+          message: 'Device type not allowed for this placement'
+        })
       }
     }
 
-    // Shuffle campaigns for rotation if multiple exist
-    if (filteredCampaigns.length > 1) {
-      filteredCampaigns = [...filteredCampaigns].sort(() => Math.random() - 0.5)
+    // Filter by page if specified
+    if (placement.pages && Array.isArray(placement.pages)) {
+      const allowedPages = placement.pages as string[]
+      const isPageAllowed = allowedPages.some(pagePattern => {
+        if (pagePattern === '/*') return true
+        if (pagePattern.endsWith('/*')) {
+          const basePath = pagePattern.slice(0, -2)
+          return pageUrl.startsWith(basePath)
+        }
+        return pageUrl === pagePattern
+      })
+
+      if (!isPageAllowed) {
+        return NextResponse.json({
+          success: false,
+          placement: null,
+          campaigns: [],
+          message: 'Page not allowed for this placement'
+        })
+      }
     }
 
-    // Limit to maxAds
-    filteredCampaigns = filteredCampaigns.slice(0, placement.maxAds)
+    // Limit campaigns based on maxAds setting
+    if (placement.maxAds && placement.maxAds > 0) {
+      filteredCampaigns = filteredCampaigns.slice(0, placement.maxAds)
+    }
 
     return NextResponse.json({
+      success: true,
       placement: {
         id: placement.id,
         key: placement.key,
@@ -101,17 +107,10 @@ export async function GET(
         width: placement.width,
         height: placement.height,
         htmlClass: placement.htmlClass,
-        maxAds: placement.maxAds,
-        refreshInterval: placement.refreshInterval,
         responsive: placement.responsive,
-        fallbackImage: placement.fallbackImage,
-        fallbackUrl: placement.fallbackUrl,
-        vendorId: placement.vendorId,
-        pages: placement.pages,
-        deviceTypes: placement.deviceTypes,
-        targetingRules: placement.targetingRules
+        refreshInterval: placement.refreshInterval
       },
-      campaigns: filteredCampaigns.map((campaign: any) => ({
+      campaigns: filteredCampaigns.map(campaign => ({
         id: campaign.id,
         name: campaign.name,
         title: campaign.title,
@@ -122,18 +121,20 @@ export async function GET(
         htmlCode: campaign.htmlCode,
         linkUrl: campaign.linkUrl,
         callToAction: campaign.callToAction,
-        vendor: {
-          id: campaign.vendor.id,
-          name: campaign.vendor.name,
-          type: campaign.vendor.type
-        }
+        priority: campaign.priority,
+        isFeatured: campaign.isFeatured,
+        responsive: campaign.responsive,
+        vendor: campaign.vendor
       }))
     })
+
   } catch (error) {
-    console.error('Error fetching ad placement:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch ad placement' },
-      { status: 500 }
-    )
+    console.error('Ad placement API error:', error)
+    return NextResponse.json({
+      success: false,
+      placement: null,
+      campaigns: [],
+      message: 'Internal server error'
+    }, { status: 500 })
   }
 }
