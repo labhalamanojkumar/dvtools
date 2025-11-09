@@ -50,7 +50,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install production runtime dependencies
-RUN apk add --no-cache curl openssl libc6-compat
+RUN apk add --no-cache curl openssl libc6-compat python3 make g++
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
@@ -68,6 +68,9 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Copy package.json for scripts
 COPY --from=builder /app/package.json ./package.json
+
+# Rebuild bcrypt for Alpine Linux (musl)
+RUN npm install --build-from-source bcrypt && npm cache clean --force
 
 # Copy entrypoint script and ensure Unix line endings
 COPY entrypoint.sh ./entrypoint.sh
