@@ -55,9 +55,9 @@ docker pull manojkumarlabhala/dvtools:latest
 
 **Key Environment Variables to Set**:
 ```env
-# Database with SSL (required for secure MySQL connections)
-DATABASE_URL=mysql://user:password@host:3306/dvtools?sslaccept=strict
-# Alternative SSL modes: sslaccept=strict, sslaccept=accept_invalid_certs
+# Database with SSL (for self-signed certificates - common in Coolify)
+DATABASE_URL=mysql://user:password@host:3306/dvtools?sslaccept=accept_invalid_certs
+# For production with valid certificates, use: sslaccept=strict
 NEXTAUTH_SECRET=<your-secret>
 NEXTAUTH_URL=https://yourdomain.com
 NODE_ENV=production
@@ -163,19 +163,20 @@ If you see: `Connections using insecure transport are prohibited while --require
 
 ### SSL Connection Modes
 
-1. **Strict SSL (Recommended for Production)**:
-   ```env
-   DATABASE_URL=mysql://user:password@host:3306/dbname?sslaccept=strict
-   ```
-   - Validates SSL certificate
-   - Most secure option
-
-2. **Accept Invalid Certificates (Development/Self-signed)**:
+1. **Accept Invalid Certificates (Recommended for Coolify/Self-signed)**:
    ```env
    DATABASE_URL=mysql://user:password@host:3306/dbname?sslaccept=accept_invalid_certs
    ```
    - Accepts self-signed certificates
-   - Use when SSL is required but certificate validation fails
+   - Required for most Coolify deployments
+   - Still encrypted, just doesn't validate certificate chain
+
+2. **Strict SSL (Production with Valid Certificates)**:
+   ```env
+   DATABASE_URL=mysql://user:password@host:3306/dbname?sslaccept=strict
+   ```
+   - Validates SSL certificate
+   - Use only if you have properly signed certificates
 
 3. **Auto SSL Detection (Default)**:
    ```env
@@ -185,9 +186,11 @@ If you see: `Connections using insecure transport are prohibited while --require
    - Falls back to non-SSL if unavailable
 
 ### Coolify MySQL SSL Setup
-Most Coolify-managed MySQL databases require SSL. Add `?sslaccept=strict` to your connection string.
+Most Coolify-managed MySQL databases use self-signed certificates and require SSL. 
 
-**Note**: The entrypoint script automatically adds SSL parameters if not present.
+**Recommended setting**: Add `?sslaccept=accept_invalid_certs` to your connection string.
+
+**Note**: The entrypoint script automatically adds `sslaccept=accept_invalid_certs` if no SSL parameter is present.
 
 ## 🎯 Deployment Checklist
 

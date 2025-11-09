@@ -9,11 +9,11 @@ echo "🚀 Starting DVtools deployment..."
 if [ -n "$DATABASE_URL" ] && ! echo "$DATABASE_URL" | grep -q "sslaccept="; then
   # Check if URL already has query parameters
   if echo "$DATABASE_URL" | grep -q "?"; then
-    export DATABASE_URL="${DATABASE_URL}&sslaccept=strict"
+    export DATABASE_URL="${DATABASE_URL}&sslaccept=accept_invalid_certs"
   else
-    export DATABASE_URL="${DATABASE_URL}?sslaccept=strict"
+    export DATABASE_URL="${DATABASE_URL}?sslaccept=accept_invalid_certs"
   fi
-  echo "📡 SSL enabled for database connection"
+  echo "📡 SSL enabled for database connection (accepting self-signed certificates)"
 fi
 
 # Run database migrations if RUN_MIGRATIONS is true
