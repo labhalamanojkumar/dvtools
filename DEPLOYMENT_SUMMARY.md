@@ -55,7 +55,9 @@ docker pull manojkumarlabhala/dvtools:latest
 
 **Key Environment Variables to Set**:
 ```env
-DATABASE_URL=mysql://user:password@host:3306/dvtools
+# Database with SSL (required for secure MySQL connections)
+DATABASE_URL=mysql://user:password@host:3306/dvtools?sslaccept=strict
+# Alternative SSL modes: sslaccept=strict, sslaccept=accept_invalid_certs
 NEXTAUTH_SECRET=<your-secret>
 NEXTAUTH_URL=https://yourdomain.com
 NODE_ENV=production
@@ -151,6 +153,41 @@ All features are functional except donations:
    - Monitor resource usage
    - Check response times
    - Verify image optimization
+
+## 🔒 Database SSL Configuration
+
+### Issue: `require_secure_transport=ON`
+If you see: `Connections using insecure transport are prohibited while --require_secure_transport=ON`
+
+**Solution**: Add SSL parameters to your `DATABASE_URL`
+
+### SSL Connection Modes
+
+1. **Strict SSL (Recommended for Production)**:
+   ```env
+   DATABASE_URL=mysql://user:password@host:3306/dbname?sslaccept=strict
+   ```
+   - Validates SSL certificate
+   - Most secure option
+
+2. **Accept Invalid Certificates (Development/Self-signed)**:
+   ```env
+   DATABASE_URL=mysql://user:password@host:3306/dbname?sslaccept=accept_invalid_certs
+   ```
+   - Accepts self-signed certificates
+   - Use when SSL is required but certificate validation fails
+
+3. **Auto SSL Detection (Default)**:
+   ```env
+   DATABASE_URL=mysql://user:password@host:3306/dbname
+   ```
+   - Prisma attempts SSL automatically
+   - Falls back to non-SSL if unavailable
+
+### Coolify MySQL SSL Setup
+Most Coolify-managed MySQL databases require SSL. Add `?sslaccept=strict` to your connection string.
+
+**Note**: The entrypoint script automatically adds SSL parameters if not present.
 
 ## 🎯 Deployment Checklist
 
