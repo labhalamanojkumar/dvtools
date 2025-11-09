@@ -69,9 +69,10 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Copy package.json for scripts
 COPY --from=builder /app/package.json ./package.json
 
-# Copy entrypoint script directly from source
+# Copy entrypoint script and ensure Unix line endings
 COPY entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+RUN dos2unix ./entrypoint.sh 2>/dev/null || sed -i 's/\r$//' ./entrypoint.sh && \
+    chmod +x ./entrypoint.sh
 
 # Create data directory for uploads and logs
 RUN mkdir -p /app/data /app/logs && \
