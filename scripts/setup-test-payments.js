@@ -6,30 +6,29 @@ async function setupTestPaymentGateway() {
   console.log('🔧 Setting up test payment gateway...');
 
   try {
-    // Create a test Stripe configuration
+    // Create a test Razorpay configuration
     await prisma.paymentGatewayConfig.upsert({
-      where: { gateway: 'STRIPE' },
+      where: { gateway: 'RAZORPAY' },
       update: {
         isEnabled: true,
-        displayName: 'Stripe (Test)',
-        description: 'Secure payment processing with credit cards',
-        publicKey: 'pk_test_dummy',
-        secretKey: process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_testing',
-        webhookSecret: '',
-        supportedCurrencies: 'USD,EUR,GBP',
+        displayName: 'Razorpay (Test)',
+        description: 'Popular payment gateway in India with global support',
+        publicKey: 'rzp_test_dummy',
+        secretKey: process.env.RAZORPAY_KEY_SECRET || 'rzp_test_dummy_key_for_testing',
+        supportedCurrencies: 'INR,USD,EUR,GBP,AUD,CAD',
         displayOrder: 1,
-        additionalConfig: { testMode: true },
+        additionalConfig: { region: 'india' },
       },
       create: {
-        gateway: 'STRIPE',
+        gateway: 'RAZORPAY',
         isEnabled: true,
-        displayName: 'Stripe (Test)',
-        description: 'Secure payment processing with credit cards',
-        publicKey: 'pk_test_dummy',
-        secretKey: process.env.STRIPE_SECRET_KEY || 'sk_test_dummy_key_for_testing',
-        supportedCurrencies: 'USD,EUR,GBP',
+        displayName: 'Razorpay (Test)',
+        description: 'Popular payment gateway in India with global support',
+        publicKey: 'rzp_test_dummy',
+        secretKey: process.env.RAZORPAY_KEY_SECRET || 'rzp_test_dummy_key_for_testing',
+        supportedCurrencies: 'INR,USD,EUR,GBP,AUD,CAD',
         displayOrder: 1,
-        additionalConfig: { testMode: true },
+        additionalConfig: { region: 'india' },
       },
     });
 
@@ -37,7 +36,7 @@ async function setupTestPaymentGateway() {
 
     // Verify configuration
     const config = await prisma.paymentGatewayConfig.findUnique({
-      where: { gateway: 'STRIPE' },
+      where: { gateway: 'RAZORPAY' },
     });
 
     console.log('Gateway config:', {
@@ -65,7 +64,7 @@ async function setupTestPaymentGateway() {
     console.log('✅ Donation settings configured');
     console.log('✅ Setup complete! You can now test donations.');
     console.log('\n⚠️  NOTE: This is using test/dummy credentials.');
-    console.log('For production, set STRIPE_SECRET_KEY in your .env file.\n');
+    console.log('For production, set RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET in your .env file.\n');
   } catch (error) {
     console.error('❌ Setup failed:', error);
     process.exit(1);

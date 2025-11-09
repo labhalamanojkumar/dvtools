@@ -1,4 +1,3 @@
-import Stripe from 'stripe'
 import { PaymentGateway } from '@prisma/client'
 
 export interface PaymentGatewayConfig {
@@ -41,73 +40,6 @@ export interface PaymentVerificationResult {
   amount?: number
   status?: string
   error?: string
-}
-
-/**
- * Stripe Payment Gateway Handler
- */
-class StripePaymentService {
-  private stripe: Stripe
-
-  constructor(config: PaymentGatewayConfig) {
-    if (!config.secretKey) {
-      throw new Error('Stripe secret key is required')
-    }
-    this.stripe = new Stripe(config.secretKey)
-  }
-
-  async createCheckout(params: CreateCheckoutParams): Promise<CheckoutSession> {
-    const session = await this.stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: params.currency,
-            product_data: {
-              name: `Donation - Tier ${params.tierId}`,
-              description: params.message || 'Thank you for your support!',
-            },
-            unit_amount: Math.round(params.amount * 100), // Convert to cents
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: params.successUrl,
-      cancel_url: params.cancelUrl,
-      customer_email: params.donorEmail,
-      metadata: {
-        donorName: params.donorName,
-        tierId: params.tierId,
-        message: params.message || '',
-      },
-    })
-
-    return {
-      sessionId: session.id,
-      url: session.url!,
-      gateway: PaymentGateway.STRIPE,
-    }
-  }
-
-  async verifyPayment(params: VerifyPaymentParams): Promise<PaymentVerificationResult> {
-    try {
-      const session = await this.stripe.checkout.sessions.retrieve(params.sessionId)
-
-      return {
-        success: session.payment_status === 'paid',
-        paymentId: session.payment_intent as string,
-        orderId: session.id,
-        amount: session.amount_total ? session.amount_total / 100 : 0,
-        status: session.payment_status,
-      }
-    } catch (error) {
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to verify payment',
-      }
-    }
-  }
 }
 
 /**
@@ -403,9 +335,6 @@ export class PaymentService {
 
   static initialize(gateway: PaymentGateway, config: PaymentGatewayConfig): void {
     switch (gateway) {
-      case PaymentGateway.STRIPE:
-        this.instances.set(gateway, new StripePaymentService(config))
-        break
       case PaymentGateway.PAYPAL:
         this.instances.set(gateway, new PayPalPaymentService(config))
         break

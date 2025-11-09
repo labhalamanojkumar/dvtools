@@ -7,17 +7,16 @@ async function seedPaymentGateways() {
 
   const gateways = [
     {
-      gateway: 'STRIPE',
-      displayName: 'Stripe',
-      description: 'Secure payment processing with credit cards, digital wallets, and bank transfers',
-      publicKey: process.env.STRIPE_PUBLISHABLE_KEY || '',
-      secretKey: process.env.STRIPE_SECRET_KEY || '',
-      webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
-      supportedCurrencies: 'USD,EUR,GBP,AUD,CAD',
+      gateway: 'RAZORPAY',
+      displayName: 'Razorpay',
+      description: 'Popular payment gateway in India with global support',
+      publicKey: process.env.RAZORPAY_KEY_ID || '',
+      secretKey: process.env.RAZORPAY_KEY_SECRET || '',
+      supportedCurrencies: 'INR,USD,EUR,GBP,AUD,CAD',
       displayOrder: 1,
-      isEnabled: !!process.env.STRIPE_SECRET_KEY,
+      isEnabled: !!process.env.RAZORPAY_KEY_SECRET,
       additionalConfig: {
-        testMode: !process.env.STRIPE_SECRET_KEY?.startsWith('sk_live_')
+        region: 'india'
       }
     },
     {
@@ -44,19 +43,6 @@ async function seedPaymentGateways() {
       isEnabled: !!process.env.DODOPAY_API_KEY,
       additionalConfig: {
         testMode: process.env.DODOPAY_TEST_MODE === 'true'
-      }
-    },
-    {
-      gateway: 'RAZORPAY',
-      displayName: 'Razorpay',
-      description: 'Popular payment gateway in India with global support',
-      publicKey: process.env.RAZORPAY_KEY_ID || '',
-      secretKey: process.env.RAZORPAY_KEY_SECRET || '',
-      supportedCurrencies: 'INR,USD,EUR,GBP,AUD,CAD',
-      displayOrder: 4,
-      isEnabled: !!process.env.RAZORPAY_KEY_SECRET,
-      additionalConfig: {
-        region: 'india'
       }
     }
   ]

@@ -3,29 +3,29 @@ const prisma = new PrismaClient();
 
 async function configureTestGateway() {
   try {
-    console.log('🔧 Configuring Stripe test gateway...');
+    console.log('🔧 Configuring Razorpay test gateway...');
     
-    // Update Stripe configuration with test credentials
-    // NOTE: Replace these with your actual Stripe test keys
-    const stripe = await prisma.paymentGatewayConfig.update({
-      where: { gateway: 'STRIPE' },
+    // Update Razorpay configuration with test credentials
+    // NOTE: Replace these with your actual Razorpay test keys
+    const razorpay = await prisma.paymentGatewayConfig.update({
+      where: { gateway: 'RAZORPAY' },
       data: {
         isEnabled: true,
-        publicKey: 'pk_test_51234567890abcdefghijklmnopqrstuvwxyz',
-        secretKey: 'sk_test_51234567890abcdefghijklmnopqrstuvwxyz',
+        publicKey: 'rzp_test_1234567890abcdefghij',
+        secretKey: 'abcdefghijklmnopqrstuvwxyz123456',
       },
     });
 
-    console.log('✅ Stripe gateway configured and enabled');
+    console.log('✅ Razorpay gateway configured and enabled');
     console.log('');
-    console.log('⚠️  IMPORTANT: Replace the API keys with your actual Stripe test keys!');
-    console.log('   Get your keys from: https://dashboard.stripe.com/test/apikeys');
+    console.log('⚠️  IMPORTANT: Replace the API keys with your actual Razorpay test keys!');
+    console.log('   Get your keys from: https://dashboard.razorpay.com/app/keys');
     console.log('');
     console.log('📝 Current configuration:');
-    console.log('   Gateway:', stripe.gateway);
-    console.log('   Enabled:', stripe.isEnabled);
-    console.log('   Has Public Key:', !!stripe.publicKey);
-    console.log('   Has Secret Key:', !!stripe.secretKey);
+    console.log('   Gateway:', razorpay.gateway);
+    console.log('   Enabled:', razorpay.isEnabled);
+    console.log('   Has Public Key:', !!razorpay.publicKey);
+    console.log('   Has Secret Key:', !!razorpay.secretKey);
     
   } catch (error) {
     console.error('❌ Error:', error.message);

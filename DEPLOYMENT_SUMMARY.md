@@ -29,9 +29,10 @@
 
 ### 4. Docker Hub Push
 - ✅ Image pushed to Docker Hub: `manojkumarlabhala/dvtools:latest`
-- ✅ Image digest: `sha256:20a54f278a1999d7a498056c19414a98d8f6141867ca5fbcbc96573a44dcf1d0`
+- ✅ Image digest: `sha256:a47f4128953a666359e2d412ebc3cac4d61427add6888dc848ca2ad955af707b`
 - ✅ Image size: ~856 layers
 - ✅ Available for deployment
+- ✅ Latest image includes Razorpay integration
 
 ### 5. Version Control
 - ✅ Changes committed to git
@@ -58,6 +59,8 @@ DATABASE_URL=mysql://user:password@host:3306/dvtools
 NEXTAUTH_SECRET=<your-secret>
 NEXTAUTH_URL=https://yourdomain.com
 NODE_ENV=production
+RAZORPAY_KEY_ID=<your-razorpay-key-id>
+RAZORPAY_KEY_SECRET=<your-razorpay-key-secret>
 ```
 
 ### Option 2: Docker Compose Deployment
@@ -79,21 +82,19 @@ docker run -d \
   manojkumarlabhala/dvtools:latest
 ```
 
-## ⚠️ Known Issues
+## ✅ Payment Gateway Update
 
-### Donation Functionality Disabled
-- **Status**: Temporarily disabled
-- **Reason**: Stripe library bug with InvoiceRenderingTemplates
-- **Impact**: 
-  - Cannot create donation checkouts
-  - Cannot verify donation payments
-- **Workaround Options**:
-  1. Wait for Stripe library fix (monitor v19.x releases)
-  2. Downgrade to Stripe v17.x or earlier
-  3. Implement custom webpack plugin to patch Stripe
-  4. Use alternative payment gateway temporarily
+### Razorpay Integration Complete
+- **Status**: Active and functional
+- **Changes**: Replaced Stripe with Razorpay
+- **Reason**: Stripe library had persistent build issues with InvoiceRenderingTemplates
+- **New Features**:
+  - Razorpay donation checkout creation
+  - Razorpay payment verification
+  - Multi-gateway support (Razorpay, PayPal, DodoPay)
+- **Configuration**: Requires `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` environment variables
 
-See `STRIPE_ISSUE_NOTE.md` for detailed information.
+See `STRIPE_ISSUE_NOTE.md` for historical information about the Stripe issue.
 
 ## 📊 Build Metrics
 
