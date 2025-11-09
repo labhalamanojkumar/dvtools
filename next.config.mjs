@@ -36,6 +36,13 @@ const nextConfig = {
     // Set context to project directory to prevent scanning system directories
     config.context = dir;
     
+    // Fix Stripe's InvoiceRenderingTemplates module issue
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      './resources/InvoiceRenderingTemplates.js': false,
+      './resources/InvoiceRenderingTemplates': false,
+    };
+    
     // Exclude Windows system directories from scanning
     config.watchOptions = {
       ...config.watchOptions,
@@ -84,6 +91,10 @@ const nextConfig = {
       ...(config.plugins || []),
       new webpack.IgnorePlugin({
         checkResource(resource, context) {
+          // Ignore Stripe's InvoiceRenderingTemplates that doesn't exist
+          if (resource.includes('InvoiceRenderingTemplates')) {
+            return true;
+          }
           // Ignore resources from system directories
           if (resource.includes('WinSAT') || 
               resource.includes('Windows') ||
