@@ -158,7 +158,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: validPost.metaTitle || validPost.title,
       description: validPost.metaDescription || validPost.excerpt || "",
       type: "article",
-      url: `https://dvtools.dev/news/${validPost.slug}`,
+      url: `https://dvtools.in/news/${validPost.slug}`,
       siteName: "DvTools",
       images: validPost.ogImage
         ? [
@@ -233,7 +233,7 @@ export default async function PostPage({ params }: PageProps) {
   );
 
   const Icon = postTypeIcons[validPost.type as keyof typeof postTypeIcons];
-  const shareUrl = `https://dvtools.dev/news/${validPost.slug}`;
+  const shareUrl = `https://dvtools.in/news/${validPost.slug}`;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -259,7 +259,7 @@ export default async function PostPage({ params }: PageProps) {
               name: "DvTools",
               logo: {
                 "@type": "ImageObject",
-                url: "https://dvtools.dev/logo.png",
+                url: "https://dvtools.in/logo.png",
               },
             },
             mainEntityOfPage: {
@@ -373,12 +373,16 @@ export default async function PostPage({ params }: PageProps) {
 
               {/* Content */}
               <div className="prose prose-lg dark:prose-invert max-w-none">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight, rehypeSanitize]}
-                >
-                  {validPost.content}
-                </ReactMarkdown>
+                {validPost.markdownContent ? (
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight, rehypeSanitize]}
+                  >
+                    {validPost.markdownContent}
+                  </ReactMarkdown>
+                ) : (
+                  <div dangerouslySetInnerHTML={{ __html: validPost.content }} />
+                )}
               </div>
 
               {/* Tags */}

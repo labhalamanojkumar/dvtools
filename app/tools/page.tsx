@@ -202,6 +202,42 @@ export default function ToolsPage() {
       category: "Backend",
     },
     {
+      name: "Text to ASCII Art",
+      description: "Convert text to decorative ASCII art with multiple font styles",
+      href: "/tools/text-to-ascii-art",
+      category: "Development",
+    },
+    {
+      name: "HMAC Generator",
+      description: "Generate HMAC hashes for API authentication and data integrity verification",
+      href: "/tools/hmac-generator",
+      category: "Security",
+    },
+    {
+      name: "Code Beautifier Enhanced",
+      description: "Format and beautify HTML, CSS, and JavaScript code with customizable options",
+      href: "/tools/code-beautifier-enhanced",
+      category: "Development",
+    },
+    {
+      name: "Date & Timezone Converter",
+      description: "Convert dates and times between timezones with Unix timestamp support",
+      href: "/tools/date-timezone-tool",
+      category: "Development",
+    },
+    {
+      name: "SEO Meta Tag Generator",
+      description: "Generate optimized meta tags including OpenGraph, Twitter Cards, and JSON-LD",
+      href: "/tools/seo-meta-generator",
+      category: "Web",
+    },
+    {
+      name: "Text Diff Checker",
+      description: "Compare text files, code, and configurations with side-by-side diff viewer",
+      href: "/tools/text-diff-checker",
+      category: "Development",
+    },
+    {
       name: "Background Job Debugger",
       description: "Monitor and manage Bull queues with real-time job inspection",
       href: "/tools/background-job-debugger",
@@ -238,9 +274,33 @@ export default function ToolsPage() {
       category: "Design",
     },
     {
+      name: "Color Palette Generator",
+      description: "Create harmonious color schemes, extract colors from images, and export to CSS/JSON",
+      href: "/tools/color-palette-generator",
+      category: "Design",
+    },
+    {
       name: "Lorem Ipsum Generator",
       description: "Generate placeholder text for designs and prototypes",
       href: "/tools/lorem-ipsum-generator",
+      category: "Development",
+    },
+    {
+      name: "Markdown Editor",
+      description: "Live markdown editor with preview, syntax highlighting, and file upload support",
+      href: "/tools/markdown-editor",
+      category: "Development",
+    },
+    {
+      name: "YAML Validator & Converter",
+      description: "Validate YAML syntax and convert between YAML and JSON formats with file upload",
+      href: "/tools/yaml-validator",
+      category: "Development",
+    },
+    {
+      name: "Git Commands Cheatsheet",
+      description: "Comprehensive Git commands reference with search, examples, and copy functionality",
+      href: "/tools/git-cheatsheet",
       category: "Development",
     },
     {
@@ -301,6 +361,12 @@ export default function ToolsPage() {
       name: "Webhook Tester",
       description: "Test webhook endpoints with request capture, replay, and signature validation",
       href: "/tools/webhook-tester",
+      category: "Backend",
+    },
+    {
+      name: "WebSocket Tester",
+      description: "Test WebSocket connections, send and receive messages in real-time with logging",
+      href: "/tools/websocket-tester",
       category: "Backend",
     },
     {
@@ -411,9 +477,30 @@ export default function ToolsPage() {
       href: "/tools/code-beautifier",
       category: "Development",
     },
+    {
+      name: "Ad System Test",
+      description: "Test ad placements, impressions, and click tracking",
+      href: "/tools/ad-system-test",
+      category: "Testing",
+    },
   ];
 
-  const categories = Array.from(new Set(tools.map((t) => t.category)));
+  // Fixed category order to prevent hydration mismatch
+  const categories = [
+    "Data",
+    "Encoding", 
+    "Development",
+    "Web",
+    "Security",
+    "Design",
+    "Media",
+    "Testing",
+    "Backend",
+    "Analytics",
+    "AI/ML",
+    "DevOps",
+    "Collaboration"
+  ];
 
   return (
     <div className="container mx-auto px-4 py-12">

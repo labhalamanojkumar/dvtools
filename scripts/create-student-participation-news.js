@@ -204,7 +204,7 @@ async function createStudentParticipationNews() {
       console.log('✅ Post created successfully!');
       console.log(`📝 Title: ${post.title}`);
       console.log(`🔗 Slug: ${post.slug}`);
-      console.log(`🌐 URL: https://dvtools.dev/news/${post.slug}`);
+      console.log(`🌐 URL: https://dvtools.in/news/${post.slug}`);
       console.log(`📅 Published: ${post.publishedAt}`);
       console.log(`⭐ Featured: ${post.featured}`);
       console.log(`📌 Pinned: ${post.isPinned}`);
