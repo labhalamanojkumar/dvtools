@@ -5,12 +5,6 @@ import Image from "next/image";
 import { ExternalLink, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-// Dynamically import DOMPurify only on client side
-let DOMPurify: any = null;
-if (typeof window !== 'undefined') {
-  DOMPurify = require('dompurify');
-}
-
 interface AdCampaign {
   id: string;
   name: string;
@@ -67,8 +61,18 @@ export function AdPlacement({
   const [placement, setPlacement] = useState<AdPlacement | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const [DOMPurify, setDOMPurify] = useState<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const viewedAdsRef = useRef<Set<string>>(new Set());
+
+  // Load DOMPurify on client side only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      import('dompurify').then((module) => {
+        setDOMPurify(module.default);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     fetchPlacement();
