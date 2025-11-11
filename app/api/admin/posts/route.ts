@@ -94,38 +94,101 @@ export async function POST(request: NextRequest) {
 
     const data = await request.json();
 
-    // Create new post
-    const post = await prisma.post.create({
-      data: {
-        title: data.title,
-        slug: data.slug,
-        content: data.content,
-        excerpt: data.excerpt,
-        type: data.type || "BLOG",
-        status: data.status || "DRAFT",
-        publishedAt: data.status === "PUBLISHED" ? new Date() : null,
-        authorId: session.user.id,
-        metaTitle: data.metaTitle || data.title,
-        metaDescription: data.metaDescription || data.excerpt,
-        tags: data.tags || [],
-        categories: data.categories || [],
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    // Use transaction to ensure atomicity
+    const post = await prisma.$transaction(async (tx) => {
+      // First, create the post without relations
+      const newPost = await tx.post.create({
+        data: {
+          title: data.title,
+          slug: data.slug,
+          content: data.content,
+          excerpt: data.excerpt,
+          type: data.type || "BLOG",
+          status: data.status || "DRAFT",
+          publishedAt: data.status === "PUBLISHED" ? new Date() : null,
+          authorId: session.user.id,
+          metaTitle: data.metaTitle || data.title,
+          metaDescription: data.metaDescription || data.excerpt,
+        },
+      });
+
+      // Handle categories
+      if (data.categories && data.categories.length > 0) {
+        for (const categoryName of data.categories) {
+          // Find or create category
+          const category = await tx.category.upsert({
+            where: { name: categoryName },
+            update: {},
+            create: {
+              name: categoryName,
+              slug: categoryName.toLowerCase().replace(/\s+/g, '-'),
+            },
+          });
+
+          // Create PostCategory junction
+          await tx.postCategory.create({
+            data: {
+              postId: newPost.id,
+              categoryId: category.id,
+            },
+          });
+        }
+      }
+
+      // Handle tags
+      if (data.tags && data.tags.length > 0) {
+        for (const tagName of data.tags) {
+          // Find or create tag
+          const tag = await tx.tag.upsert({
+            where: { name: tagName },
+            update: { useCount: { increment: 1 } },
+            create: {
+              name: tagName,
+              slug: tagName.toLowerCase().replace(/\s+/g, '-'),
+              useCount: 1,
+            },
+          });
+
+          // Create PostTag junction
+          await tx.postTag.create({
+            data: {
+              postId: newPost.id,
+              tagId: tag.id,
+            },
+          });
+        }
+      }
+
+      // Fetch the complete post with relations
+      return await tx.post.findUnique({
+        where: { id: newPost.id },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          categories: {
+            include: {
+              category: true,
+            },
+          },
+          tags: {
+            include: {
+              tag: true,
+            },
           },
         },
-      },
+      });
     });
 
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
     console.error("Error creating post:", error);
     return NextResponse.json(
-      { error: "Failed to create post" },
+      { error: "Failed to create post", details: error instanceof Error ? error.message : "Unknown error" },
       { status: 500 }
     );
   }
