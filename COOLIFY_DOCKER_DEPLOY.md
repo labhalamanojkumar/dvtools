@@ -5,7 +5,7 @@
 Your DVtools application is ready to deploy on Coolify using Docker Hub.
 
 ### Docker Image
-- **Image**: `manojkumarlabhala/dvtools:latest`
+- **Image**: `manojkumarlabhala/dvtools_1:latest`
 - **Registry**: Docker Hub (Public)
 
 ---
@@ -23,7 +23,7 @@ chmod +x build-and-push.sh
 
 This will:
 - Build the Docker image
-- Tag it as `manojkumarlabhala/dvtools:latest`
+- Tag it as `manojkumarlabhala/dvtools_1:latest`
 - Push to Docker Hub
 - Display the image URL
 
@@ -33,7 +33,7 @@ This will:
 
 1. **Create New Resource** in Coolify
    - Select "Docker Image"
-   - Image: `manojkumarlabhala/dvtools:latest`
+   - Image: `manojkumarlabhala/dvtools_1:latest`
    - Registry: Docker Hub (no auth needed for public images)
 
 2. **Configure Environment Variables**

@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
       target: runner
     # For pre-built images, uncomment the line below and comment out the build section above
-    # image: manojkumarlabhala/dvtools:latest
+    image: manojkumarlabhala/dvtools_1:latest
     container_name: dvtools-app
     restart: unless-stopped
     ports:

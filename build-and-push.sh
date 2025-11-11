@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 
 # Configuration
 DOCKER_USERNAME="manojkumarlabhala"
-IMAGE_NAME="dvtools"
+IMAGE_NAME="dvtools_1"
 VERSION=${1:-"latest"}
 
 echo -e "${GREEN}========================================${NC}"
