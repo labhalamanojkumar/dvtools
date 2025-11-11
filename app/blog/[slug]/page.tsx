@@ -12,13 +12,12 @@ import {
   Share2,
   Bookmark,
 } from "lucide-react";
-import ReactMarkdown from "react-markdown";
-
 // Enhanced components
 import { TableOfContents } from "@/components/blog/table-of-contents";
 import { AuthorCard } from "@/components/blog/author-card";
 import { SocialSharing } from "@/components/blog/social-sharing";
 import { BlogComments } from "@/components/blog/comments";
+import { MarkdownRenderer } from "@/components/blog/markdown-renderer";
 
 // Fetch post from database
 async function getPost(slug: string) {
@@ -616,66 +615,7 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="lg:col-span-3">
           {/* Article Content */}
           <article className="prose prose-lg max-w-none dark:prose-invert">
-            <ReactMarkdown
-              components={{
-                h1: ({ children }) => (
-                  <h1 className="text-3xl font-bold mt-8 mb-4">{children}</h1>
-                ),
-                h2: ({ children }) => (
-                  <h2 className="text-2xl font-bold mt-8 mb-4">{children}</h2>
-                ),
-                h3: ({ children }) => (
-                  <h3 className="text-xl font-bold mt-6 mb-3">{children}</h3>
-                ),
-                p: ({ children }) => (
-                  <p className="mb-4 leading-relaxed">{children}</p>
-                ),
-                ul: ({ children }) => (
-                  <ul className="mb-4 ml-6 list-disc">{children}</ul>
-                ),
-                ol: ({ children }) => (
-                  <ol className="mb-4 ml-6 list-decimal">{children}</ol>
-                ),
-                li: ({ children }) => <li className="mb-2">{children}</li>,
-                blockquote: ({ children }) => (
-                  <blockquote className="border-l-4 border-primary pl-4 italic my-4">
-                    {children}
-                  </blockquote>
-                ),
-                code: ({ children }) => (
-                  <code className="bg-muted px-2 py-1 rounded text-sm font-mono">
-                    {children}
-                  </code>
-                ),
-                pre: ({ children }) => (
-                  <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
-                    {children}
-                  </pre>
-                ),
-                img: ({ src, alt, ...props }: any) => {
-                  // Filter out ALL event handlers that can't be serialized in Server Components
-                  const safeProps: any = {};
-                  Object.keys(props).forEach(key => {
-                    // Only include non-function props
-                    if (typeof props[key] !== 'function') {
-                      safeProps[key] = props[key];
-                    }
-                  });
-                  return (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img 
-                      src={src} 
-                      alt={alt || ""} 
-                      className="rounded-lg my-4 w-full" 
-                      loading="lazy"
-                      {...safeProps}
-                    />
-                  );
-                },
-              }}
-            >
-              {post.content}
-            </ReactMarkdown>
+            <MarkdownRenderer content={post.content} />
           </article>
 
           {/* Author Card */}
