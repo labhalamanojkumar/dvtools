@@ -5,11 +5,15 @@ import Image from "next/image";
 
 interface MarkdownRendererProps {
   content: string;
+  remarkPlugins?: any[];
+  rehypePlugins?: any[];
 }
 
-export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+export function MarkdownRenderer({ content, remarkPlugins, rehypePlugins }: MarkdownRendererProps) {
   return (
     <ReactMarkdown
+      remarkPlugins={remarkPlugins}
+      rehypePlugins={rehypePlugins}
       components={{
         // Handle images without event handlers
         img: ({ node, ...props }) => {

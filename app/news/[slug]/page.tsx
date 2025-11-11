@@ -23,6 +23,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize from "rehype-sanitize";
+import { MarkdownRenderer } from "@/components/blog/markdown-renderer";
 import { Post } from "@/types";
 import { ShareButtons } from "@/components/blog/share-buttons";
 
@@ -374,12 +375,11 @@ export default async function PostPage({ params }: PageProps) {
               {/* Content */}
               <div className="prose prose-lg dark:prose-invert max-w-none">
                 {validPost.markdownContent ? (
-                  <ReactMarkdown
+                  <MarkdownRenderer
+                    content={validPost.markdownContent}
                     remarkPlugins={[remarkGfm]}
                     rehypePlugins={[rehypeHighlight, rehypeSanitize]}
-                  >
-                    {validPost.markdownContent}
-                  </ReactMarkdown>
+                  />
                 ) : (
                   <div dangerouslySetInnerHTML={{ __html: validPost.content }} />
                 )}
