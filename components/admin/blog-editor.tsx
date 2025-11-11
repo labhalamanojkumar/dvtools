@@ -38,10 +38,13 @@ import {
   Eye,
   Save,
   X,
+  Upload,
+  Type,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
 
 interface BlogEditorProps {
   isOpen: boolean
@@ -96,6 +99,9 @@ export default function BlogEditor({
   const [isSaving, setIsSaving] = useState(false)
   const [tagInput, setTagInput] = useState('')
   const [categoryInput, setCategoryInput] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [selectedFontFamily, setSelectedFontFamily] = useState('Arial')
+  const [selectedFontSize, setSelectedFontSize] = useState('16px')
 
   const handleTitleChange = (title: string) => {
     const slug = title
@@ -103,6 +109,88 @@ export default function BlogEditor({
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '')
     setFormData({ ...formData, title, slug, metaTitle: title })
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.')
+      return
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size exceeds 5MB limit')
+      return
+    }
+
+    setUploadingImage(true)
+    const uploadFormData = new FormData()
+    uploadFormData.append('image', file)
+
+    try {
+      const response = await fetch('/api/admin/posts/upload-image', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        // Insert the uploaded image URL into the markdown
+        const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement
+        if (textarea) {
+          const start = textarea.selectionStart
+          const end = textarea.selectionEnd
+          const beforeText = formData.content.substring(0, start)
+          const afterText = formData.content.substring(end)
+          const imageMarkdown = `![${file.name}](${data.url})`
+          const newText = `${beforeText}${imageMarkdown}${afterText}`
+          setFormData({ ...formData, content: newText })
+        }
+        toast.success('Image uploaded successfully')
+      } else {
+        toast.error(data.error || 'Failed to upload image')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Failed to upload image')
+    } finally {
+      setUploadingImage(false)
+      // Reset file input
+      event.target.value = ''
+    }
+  }
+
+  const applyFontStyle = (type: 'family' | 'size') => {
+    const textarea = document.querySelector('textarea[name="content"]') as HTMLTextAreaElement
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const selectedText = formData.content.substring(start, end)
+
+    if (!selectedText) {
+      toast.error('Please select some text first')
+      return
+    }
+
+    const beforeText = formData.content.substring(0, start)
+    const afterText = formData.content.substring(end)
+
+    let styledText = ''
+    if (type === 'family') {
+      styledText = `<span style="font-family: ${selectedFontFamily};">${selectedText}</span>`
+    } else {
+      styledText = `<span style="font-size: ${selectedFontSize};">${selectedText}</span>`
+    }
+
+    const newText = `${beforeText}${styledText}${afterText}`
+    setFormData({ ...formData, content: newText })
   }
 
   const insertMarkdown = (syntax: string, placeholder: string = '') => {
@@ -408,6 +496,26 @@ export default function BlogEditor({
                   >
                     <Image className="h-4 w-4" />
                   </Button>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => document.getElementById('image-upload')?.click()}
+                      disabled={uploadingImage}
+                      title="Upload Image"
+                    >
+                      <Upload className="h-4 w-4" />
+                      {uploadingImage && <span className="ml-1 text-xs">...</span>}
+                    </Button>
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
@@ -415,6 +523,63 @@ export default function BlogEditor({
                     onClick={() => insertMarkdown('code', 'code')}
                   >
                     <Code className="h-4 w-4" />
+                  </Button>
+                  <div className="w-px h-8 bg-border mx-1" />
+                  <Select
+                    value={selectedFontSize}
+                    onValueChange={setSelectedFontSize}
+                  >
+                    <SelectTrigger className="h-8 w-[100px]">
+                      <SelectValue placeholder="Size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="12px">12px</SelectItem>
+                      <SelectItem value="14px">14px</SelectItem>
+                      <SelectItem value="16px">16px</SelectItem>
+                      <SelectItem value="18px">18px</SelectItem>
+                      <SelectItem value="20px">20px</SelectItem>
+                      <SelectItem value="24px">24px</SelectItem>
+                      <SelectItem value="28px">28px</SelectItem>
+                      <SelectItem value="32px">32px</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => applyFontStyle('size')}
+                    title="Apply Font Size"
+                  >
+                    <Type className="h-4 w-4" />
+                  </Button>
+                  <Select
+                    value={selectedFontFamily}
+                    onValueChange={setSelectedFontFamily}
+                  >
+                    <SelectTrigger className="h-8 w-[140px]">
+                      <SelectValue placeholder="Font" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Arial">Arial</SelectItem>
+                      <SelectItem value="Times New Roman">Times New Roman</SelectItem>
+                      <SelectItem value="Georgia">Georgia</SelectItem>
+                      <SelectItem value="Courier New">Courier New</SelectItem>
+                      <SelectItem value="Verdana">Verdana</SelectItem>
+                      <SelectItem value="Helvetica">Helvetica</SelectItem>
+                      <SelectItem value="Roboto">Roboto</SelectItem>
+                      <SelectItem value="Open Sans">Open Sans</SelectItem>
+                      <SelectItem value="Lato">Lato</SelectItem>
+                      <SelectItem value="Montserrat">Montserrat</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => applyFontStyle('family')}
+                    title="Apply Font Family"
+                  >
+                    <Type className="h-4 w-4" />
                   </Button>
                 </div>
 
@@ -432,7 +597,10 @@ export default function BlogEditor({
 
               <TabsContent value="preview">
                 <div className="border rounded-md p-6 min-h-[400px] prose dark:prose-invert max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeRaw]}
+                  >
                     {formData.content || '*No content yet...*'}
                   </ReactMarkdown>
                 </div>
