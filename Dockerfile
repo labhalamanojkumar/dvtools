@@ -77,9 +77,9 @@ COPY entrypoint.sh ./entrypoint.sh
 RUN dos2unix ./entrypoint.sh 2>/dev/null || sed -i 's/\r$//' ./entrypoint.sh && \
     chmod +x ./entrypoint.sh
 
-# Create data directory for uploads and logs
-RUN mkdir -p /app/data /app/logs && \
-    chown -R nextjs:nodejs /app/data /app/logs /app/prisma
+# Create data, uploads, and logs directories
+RUN mkdir -p /app/data /app/logs /app/public/uploads/blog && \
+    chown -R nextjs:nodejs /app/data /app/logs /app/public/uploads /app/prisma
 
 # Switch to non-root user
 USER nextjs

@@ -1,5 +1,25 @@
 # Coolify VPS Deployment Guide for DvTools
 
+## ⚠️ CRITICAL: Read Before Deployment
+
+### Common Issues & Solutions
+
+**1. News Articles Not Showing After Deployment:**
+- **Cause:** Using SQLite (`file:./prisma/dev.db`) instead of MySQL
+- **Solution:** Set correct `DATABASE_URL` in Coolify (see Environment Variables section)
+
+**2. Images Not Displaying/Upload Fails:**
+- **Cause:** No persistent storage volume
+- **Solution:** Already configured with `dvtools_uploads` volume mount
+
+**3. Posts Created But Not Visible:**
+- **Cause:** Post status is DRAFT or future `publishedAt` date
+- **Solution:** Set status to PUBLISHED and current/past date
+
+📖 **See `DEPLOYMENT_TROUBLESHOOTING.md` for detailed troubleshooting**
+
+---
+
 ## Prerequisites
 
 - Coolify installed on your VPS
@@ -29,6 +49,8 @@ Add these **required** environment variables in Coolify:
 
 ```bash
 # Database (Required) - Use Coolify's database service
+# ⚠️ CRITICAL: Do NOT use SQLite (file:./prisma/dev.db) in production
+# It will NOT persist data in Docker containers
 DATABASE_URL=mysql://username:password@mysql:3306/dvtools
 DATABASE_PROVIDER=mysql
 
