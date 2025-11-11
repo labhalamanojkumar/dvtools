@@ -47,7 +47,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
-import BlogEditor from "@/components/admin/blog-editor";
 
 interface Post {
   id: string;
@@ -86,9 +85,6 @@ export default function AdminPostsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [editingPost, setEditingPost] = useState<any>(null);
-  const [editorMode, setEditorMode] = useState<'create' | 'edit'>('create');
 
   useEffect(() => {
     loadPosts();
@@ -132,59 +128,6 @@ export default function AdminPostsPage() {
     }
   };
 
-  const handleCreate = () => {
-    setEditingPost(null);
-    setEditorMode('create');
-    setIsEditorOpen(true);
-  };
-
-  const handleEdit = async (postId: string) => {
-    try {
-      const response = await fetch(`/api/admin/posts/${postId}`);
-      if (response.ok) {
-        const post = await response.json();
-        setEditingPost(post);
-        setEditorMode('edit');
-        setIsEditorOpen(true);
-      } else {
-        toast.error("Failed to load post");
-      }
-    } catch (error) {
-      console.error("Error loading post:", error);
-      toast.error("Error loading post");
-    }
-  };
-
-  const handleSave = async (postData: any) => {
-    try {
-      const url = editorMode === 'create' 
-        ? '/api/admin/posts' 
-        : `/api/admin/posts/${editingPost.id}`;
-      
-      const method = editorMode === 'create' ? 'POST' : 'PUT';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(postData),
-      });
-
-      if (response.ok) {
-        toast.success(editorMode === 'create' ? 'Post created successfully' : 'Post updated successfully');
-        setIsEditorOpen(false);
-        loadPosts();
-      } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to save post');
-      }
-    } catch (error) {
-      console.error("Error saving post:", error);
-      throw error;
-    }
-  };
-
   const filteredPosts = posts.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -212,10 +155,12 @@ export default function AdminPostsPage() {
             Create and manage blog posts, news, and updates
           </p>
         </div>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          New Post
-        </Button>
+        <Link href="/admin/posts/new">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            New Post
+          </Button>
+        </Link>
       </div>
 
       {/* Stats */}
@@ -391,9 +336,11 @@ export default function AdminPostsPage() {
                                 View
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEdit(post.id)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              Edit
+                            <DropdownMenuItem asChild>
+                              <Link href={`/admin/posts/${post.id}/edit`}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                Edit
+                              </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
@@ -414,15 +361,6 @@ export default function AdminPostsPage() {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Blog Editor Dialog */}
-      <BlogEditor
-        isOpen={isEditorOpen}
-        onClose={() => setIsEditorOpen(false)}
-        onSave={handleSave}
-        initialData={editingPost}
-        mode={editorMode}
-      />
     </div>
   );
 }
