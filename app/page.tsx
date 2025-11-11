@@ -40,7 +40,7 @@ import {
   Clock,
 } from "lucide-react";
 import type { Metadata } from "next";
-import { AdPlacement } from "@/components/ads/ad-placement";
+import { AdPlacementWrapper } from "@/components/ads/ad-placement-wrapper";
 
 export const metadata: Metadata = {
   title: "DvTools - 70+ Free Online Developer Tools 2025 | #1 Developer Toolkit Platform",
@@ -1058,7 +1058,7 @@ export default function HomePage() {
       </section>
 
       {/* Ad placement between hero and stats */}
-      <AdPlacement
+      <AdPlacementWrapper
         placementKey="content_middle"
         className="py-4"
       />
@@ -1432,7 +1432,7 @@ export default function HomePage() {
       </section>
 
       {/* Ad placement between featured tools and features */}
-      <AdPlacement
+      <AdPlacementWrapper
         placementKey="sidebar_ad"
         className="py-4"
       />
