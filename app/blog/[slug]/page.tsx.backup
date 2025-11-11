@@ -20,30 +20,8 @@ import { AuthorCard } from "@/components/blog/author-card";
 import { SocialSharing } from "@/components/blog/social-sharing";
 import { BlogComments } from "@/components/blog/comments";
 
-// Fetch post from database
-async function getPost(slug: string) {
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/blog/${slug}`, {
-      cache: 'no-store',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!res.ok) {
-      return null;
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('Error fetching post:', error);
-    return null;
-  }
-}
-
-// Mock data for backwards compatibility with tool blogs
-const toolBlogPosts = [
+// This would typically come from your CMS or database
+const blogPosts = [
   {
     id: "1",
     title: "Mastering JSON Formatting: Best Practices for Developers",
@@ -377,13 +355,7 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // Try to fetch from database first
-  let post = await getPost(params.slug);
-  
-  // Fallback to tool blog posts
-  if (!post) {
-    post = toolBlogPosts.find((p) => p.slug === params.slug);
-  }
+  const post = blogPosts.find((p) => p.slug === params.slug);
 
   if (!post) {
     return {
@@ -391,26 +363,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  // Handle database post metadata
-  if (post.metaTitle || post.author?.name) {
-    return {
-      title: post.metaTitle || post.title,
-      description: post.metaDescription || post.excerpt,
-      keywords: post.metaKeywords ? post.metaKeywords.split(',') : [],
-      authors: post.author ? [{ name: post.author.name }] : [],
-      openGraph: {
-        title: post.metaTitle || post.title,
-        description: post.metaDescription || post.excerpt,
-        type: "article",
-        publishedTime: post.publishedAt,
-        modifiedTime: post.updatedAt,
-        authors: post.author ? [post.author.name] : [],
-        images: post.ogImage ? [post.ogImage] : [],
-      },
-    };
-  }
-
-  // Handle tool blog post metadata
   return {
     title: post.seo.title,
     description: post.seo.description,
@@ -457,14 +409,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function BlogPostPage({ params }: Props) {
-  // First try to fetch from database
-  let post = await getPost(params.slug);
-  
-  // Fallback to tool blog posts if not found in database
-  if (!post) {
-    post = toolBlogPosts.find((p) => p.slug === params.slug);
-  }
+export default function BlogPostPage({ params }: Props) {
+  const post = blogPosts.find((p) => p.slug === params.slug);
 
   if (!post) {
     notFound();
@@ -477,28 +423,6 @@ export default async function BlogPostPage({ params }: Props) {
       day: "numeric",
     });
   };
-  
-  // Calculate read time for database posts that don't have it
-  const calculateReadTime = (content: string) => {
-    const wordsPerMinute = 200;
-    const words = content.split(/\s+/).length;
-    return Math.ceil(words / wordsPerMinute);
-  };
-  
-  const readTime = post.readTime || calculateReadTime(post.content || '');
-  const authorName = post.author?.name || post.author;
-  const authorAvatar = post.author?.image || post.author?.avatar || '/avatars/default.png';
-  const authorBio = post.author?.bio || 'Technical writer and developer advocate passionate about sharing knowledge with the community.';
-
-  // Prepare tags for structured data - handle both array of objects and array of strings
-  const tagsArray = post.tags ? (
-    Array.isArray(post.tags) && post.tags.length > 0
-      ? post.tags.map((t: any) => typeof t === 'string' ? t : (t.tag?.name || t.name || '')).filter(Boolean)
-      : []
-  ) : [];
-
-  // Get OG image - handle both database posts (ogImage) and tool blogs (seo.ogImage)
-  const ogImageUrl = post.ogImage || post.seo?.ogImage || '';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -513,25 +437,25 @@ export default async function BlogPostPage({ params }: Props) {
             description: post.excerpt,
             author: {
               "@type": "Person",
-              name: authorName,
+              name: post.author.name,
             },
             publisher: {
               "@type": "Organization",
               name: "DvTools",
               logo: {
                 "@type": "ImageObject",
-                url: "https://dvtools.in/logo.png",
+                url: "https://devtoolshub.com/logo.png",
               },
             },
             datePublished: post.publishedAt,
             dateModified: post.updatedAt,
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `https://dvtools.in/blog/${post.slug}`,
+              "@id": `https://devtoolshub.com/blog/${post.slug}`,
             },
-            keywords: tagsArray.join(", "),
-            articleSection: tagsArray[0] || "Blog",
-            image: ogImageUrl,
+            keywords: post.tags.join(", "),
+            articleSection: post.tags[0],
+            image: post.seo.ogImage,
           }),
         }}
       />
@@ -553,7 +477,7 @@ export default async function BlogPostPage({ params }: Props) {
           <span>{formatDate(post.publishedAt)}</span>
           <span>•</span>
           <Clock className="h-4 w-4" />
-          <span>{readTime} min read</span>
+          <span>{post.readTime} min read</span>
           {post.featured && (
             <>
               <span>•</span>
@@ -575,7 +499,7 @@ export default async function BlogPostPage({ params }: Props) {
               <User className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-medium">{authorName}</p>
+              <p className="font-medium">{post.author.name}</p>
               <p className="text-sm text-muted-foreground">Author</p>
             </div>
           </div>
@@ -594,20 +518,16 @@ export default async function BlogPostPage({ params }: Props) {
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mt-6">
-          {post.tags && post.tags.length > 0 && post.tags.map((tag: any) => {
-            const tagName = typeof tag === 'string' ? tag : (tag.tag?.name || tag.name);
-            const tagSlug = typeof tag === 'string' ? tag.toLowerCase() : (tag.tag?.slug || tag.slug);
-            return (
-              <Link key={tagSlug || tagName} href={`/blog?tag=${tagSlug}`}>
-                <Badge
-                  variant="outline"
-                  className="hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  {tagName}
-                </Badge>
-              </Link>
-            );
-          })}
+          {post.tags.map((tag) => (
+            <Link key={tag} href={`/blog?tag=${tag.toLowerCase()}`}>
+              <Badge
+                variant="outline"
+                className="hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                {tag}
+              </Badge>
+            </Link>
+          ))}
         </div>
       </header>
 
@@ -652,26 +572,6 @@ export default async function BlogPostPage({ params }: Props) {
                     {children}
                   </pre>
                 ),
-                img: ({ src, alt, ...props }: any) => {
-                  // Filter out ALL event handlers that can't be serialized in Server Components
-                  const safeProps: any = {};
-                  Object.keys(props).forEach(key => {
-                    // Only include non-function props
-                    if (typeof props[key] !== 'function') {
-                      safeProps[key] = props[key];
-                    }
-                  });
-                  return (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img 
-                      src={src} 
-                      alt={alt || ""} 
-                      className="rounded-lg my-4 w-full" 
-                      loading="lazy"
-                      {...safeProps}
-                    />
-                  );
-                },
               }}
             >
               {post.content}
@@ -682,13 +582,13 @@ export default async function BlogPostPage({ params }: Props) {
           <div className="mt-8">
             <AuthorCard
               author={{
-                name: authorName,
-                avatar: authorAvatar,
-                bio: authorBio,
+                name: post.author.name,
+                avatar: post.author.avatar || '/avatars/default.png',
+                bio: 'Technical writer and developer advocate passionate about sharing knowledge with the community.',
                 role: 'Technical Writer',
               }}
               publishedAt={post.publishedAt}
-              readTime={readTime}
+              readTime={post.readTime}
             />
           </div>
 
@@ -738,10 +638,10 @@ export default async function BlogPostPage({ params }: Props) {
       <section className="mt-12">
         <h3 className="text-2xl font-bold mb-6">Related Articles</h3>
         <div className="grid md:grid-cols-2 gap-6">
-          {toolBlogPosts
-            .filter((p: any) => p.id !== post.id)
+          {blogPosts
+            .filter((p) => p.id !== post.id)
             .slice(0, 2)
-            .map((relatedPost: any) => (
+            .map((relatedPost) => (
               <Card
                 key={relatedPost.id}
                 className="hover:shadow-lg transition-shadow"

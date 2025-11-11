@@ -19,10 +19,10 @@ fi
 # Run database migrations if RUN_MIGRATIONS is true
 if [ "$RUN_MIGRATIONS" = "true" ]; then
   echo "📊 Running database migrations..."
-  npx prisma migrate deploy
+  PRISMA_CONFIG_PATH="" DATABASE_URL="$DATABASE_URL" npx prisma migrate deploy --schema=./prisma/schema.prisma
   
   echo "🌱 Generating Prisma client..."
-  npx prisma generate
+  PRISMA_CONFIG_PATH="" DATABASE_URL="$DATABASE_URL" npx prisma generate --schema=./prisma/schema.prisma
 fi
 
 # Skip database push in production - just verify connection

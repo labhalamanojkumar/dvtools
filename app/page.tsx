@@ -43,7 +43,7 @@ import type { Metadata } from "next";
 import { AdPlacementWrapper } from "@/components/ads/ad-placement-wrapper";
 
 export const metadata: Metadata = {
-  title: "DvTools - 70+ Free Online Developer Tools 2025 | #1 Developer Toolkit Platform",
+  title: "DvTools - 70+ Free Online Developer Tools | #1 Developer Toolkit Platform",
   description: "★★★★★ World's most comprehensive developer toolkit with 70+ free tools. JSON formatter, JWT decoder, API testing, Base64 encoder, text diff checker, code beautifier, HMAC generator, and more. Zero installation, 100% privacy-first, works offline. Trusted by 100,000+ developers worldwide in 2025.",
   keywords: [
     // Primary Keywords (High Volume)
@@ -591,14 +591,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://dvtools.com"),
+  metadataBase: new URL("https://dvtools.in"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "DvTools - 70+ Free Online Developer Tools 2025 | #1 Toolkit Platform",
     description: "★★★★★ Comprehensive developer toolkit with 70+ free professional tools. JSON formatter, JWT decoder, API testing, Base64 encoder, text diff checker, code beautifier. Zero installation, 100% privacy-first, works offline. Trusted by 100K+ developers.",
-    url: "https://dvtools.com",
+    url: "https://dvtools.in",
     siteName: "DvTools - Ultimate Developer Toolkit",
     locale: "en_US",
     type: "website",
@@ -645,11 +645,11 @@ export default function HomePage() {
     "@graph": [
       {
         "@type": "WebApplication",
-        "@id": "https://dvtools.com/#webapp",
+        "@id": "https://dvtools.in/#webapp",
         name: "DvTools - Ultimate Developer Toolkit",
         alternateName: ["Developer Tools", "DvTools Platform", "Free Developer Tools 2025"],
         description: "Comprehensive developer toolkit with 70+ professional-grade free tools for developers, DevOps engineers, and data scientists. Features include JSON formatter, JWT decoder, API testing, Base64 encoder, text diff checker, HMAC generator, code beautifier, and more. 100% free, client-side processing, privacy-first, works offline.",
-        url: "https://dvtools.com",
+        url: "https://dvtools.in",
         applicationCategory: "DeveloperApplication",
         applicationSubCategory: "Developer Tools Platform",
         operatingSystem: ["Web Browser", "Chrome", "Firefox", "Safari", "Edge"],
@@ -657,7 +657,7 @@ export default function HomePage() {
         softwareVersion: "2.5.0",
         datePublished: "2023-01-15",
         dateModified: "2025-11-11",
-        screenshot: "https://dvtools.com/screenshots/homepage.png",
+        screenshot: "https://dvtools.in/screenshots/homepage.png",
         offers: {
           "@type": "Offer",
           price: "0",
@@ -700,7 +700,7 @@ export default function HomePage() {
           "@type": "UseAction",
           target: {
             "@type": "EntryPoint",
-            urlTemplate: "https://dvtools.com/tools",
+            urlTemplate: "https://dvtools.in/tools",
             actionPlatform: [
               "http://schema.org/DesktopWebPlatform",
               "http://schema.org/MobileWebPlatform",
@@ -712,13 +712,13 @@ export default function HomePage() {
       },
       {
         "@type": "Organization",
-        "@id": "https://dvtools.com/#organization",
+        "@id": "https://dvtools.in/#organization",
         name: "DvTools",
         legalName: "DvTools Developer Platform",
-        url: "https://dvtools.com",
+        url: "https://dvtools.in",
         logo: {
           "@type": "ImageObject",
-          url: "https://dvtools.com/logo.png",
+          url: "https://dvtools.in/logo.png",
           width: 512,
           height: 512,
         },
@@ -738,18 +738,18 @@ export default function HomePage() {
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "Customer Support",
-          email: "support@dvtools.com",
+          email: "support@dvtools.in",
           availableLanguage: ["English"],
         },
       },
       {
         "@type": "WebSite",
-        "@id": "https://dvtools.com/#website",
-        url: "https://dvtools.com",
+        "@id": "https://dvtools.in/#website",
+        url: "https://dvtools.in",
         name: "DvTools - Free Developer Tools Platform",
         description: "70+ free professional developer tools including JSON formatter, JWT decoder, API testing, and more.",
         publisher: {
-          "@id": "https://dvtools.com/#organization",
+          "@id": "https://dvtools.in/#organization",
         },
         inLanguage: "en-US",
         potentialAction: [
@@ -757,7 +757,7 @@ export default function HomePage() {
             "@type": "SearchAction",
             target: {
               "@type": "EntryPoint",
-              urlTemplate: "https://dvtools.com/tools?search={search_term_string}",
+              urlTemplate: "https://dvtools.in/tools?search={search_term_string}",
             },
             "query-input": "required name=search_term_string",
           },
@@ -765,25 +765,25 @@ export default function HomePage() {
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://dvtools.com/#breadcrumb",
+        "@id": "https://dvtools.in/#breadcrumb",
         itemListElement: [
           {
             "@type": "ListItem",
             position: 1,
             name: "Home",
-            item: "https://dvtools.com",
+            item: "https://dvtools.in",
           },
           {
             "@type": "ListItem",
             position: 2,
             name: "Tools",
-            item: "https://dvtools.com/tools",
+            item: "https://dvtools.in/tools",
           },
         ],
       },
       {
         "@type": "ItemList",
-        "@id": "https://dvtools.com/#toollist",
+        "@id": "https://dvtools.in/#toollist",
         name: "Developer Tools Collection",
         description: "Comprehensive collection of 70+ professional developer tools",
         numberOfItems: 70,
@@ -791,38 +791,38 @@ export default function HomePage() {
           {
             "@type": "ListItem",
             position: 1,
-            url: "https://dvtools.com/tools/json-formatter",
+            url: "https://dvtools.in/tools/json-formatter",
             name: "JSON Formatter & Validator",
           },
           {
             "@type": "ListItem",
             position: 2,
-            url: "https://dvtools.com/tools/jwt-decoder",
+            url: "https://dvtools.in/tools/jwt-decoder",
             name: "JWT Token Decoder",
           },
           {
             "@type": "ListItem",
             position: 3,
-            url: "https://dvtools.com/tools/base64",
+            url: "https://dvtools.in/tools/base64",
             name: "Base64 Encoder/Decoder",
           },
           {
             "@type": "ListItem",
             position: 4,
-            url: "https://dvtools.com/tools/text-diff-checker",
+            url: "https://dvtools.in/tools/text-diff-checker",
             name: "Text Diff Checker",
           },
           {
             "@type": "ListItem",
             position: 5,
-            url: "https://dvtools.com/tools/hmac-generator",
+            url: "https://dvtools.in/tools/hmac-generator",
             name: "HMAC Generator",
           },
         ],
       },
       {
         "@type": "FAQPage",
-        "@id": "https://dvtools.com/#faq",
+        "@id": "https://dvtools.in/#faq",
         mainEntity: [
           {
             "@type": "Question",
@@ -908,7 +908,7 @@ export default function HomePage() {
       },
       {
         "@type": "SoftwareApplication",
-        "@id": "https://dvtools.com/#software",
+        "@id": "https://dvtools.in/#software",
         name: "DvTools Developer Toolkit",
         applicationCategory: "DeveloperApplication",
         operatingSystem: "Web Browser",
