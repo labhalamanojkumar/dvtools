@@ -596,7 +596,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "DvTools - 70+ Free Online Developer Tools 2025 | #1 Toolkit Platform",
+    title: "DvTools - 70+ Free Online Developer Tools | #1 Toolkit Platform",
     description: "★★★★★ Comprehensive developer toolkit with 70+ free professional tools. JSON formatter, JWT decoder, API testing, Base64 encoder, text diff checker, code beautifier. Zero installation, 100% privacy-first, works offline. Trusted by 100K+ developers.",
     url: "https://dvtools.in",
     siteName: "DvTools - Ultimate Developer Toolkit",
@@ -966,7 +966,7 @@ export default function HomePage() {
 
             {/* H1 - Primary Keywords for SEO */}
             <h1 className="mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-              <span className="block">Free Online Developer Tools 2025</span>
+              <span className="block">Free Online Developer Tools</span>
               <span className="mt-2 block bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
                 #1 Professional Toolkit Platform
               </span>
