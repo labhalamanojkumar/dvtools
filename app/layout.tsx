@@ -4,7 +4,7 @@ import { Providers } from "@/components/providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Toaster } from "@/components/ui/toaster";
-import { AdPlacement } from "@/components/ads/ad-placement";
+import { AdPlacementWrapper } from "@/components/ads/ad-placement-wrapper";
 import { InstallBanner } from "@/components/install-banner";
 import { FloatingInstallButton } from "@/components/floating-install-button";
 import { ServiceWorkerRegistration } from "@/components/service-worker-registration";
@@ -103,12 +103,12 @@ export default function RootLayout({
           <ServiceWorkerRegistration />
           <div className="flex min-h-screen flex-col">
             <Header />
-            <AdPlacement
+            <AdPlacementWrapper
               placementKey="header_banner"
               className="mb-4"
             />
             <main className="flex-1">{children}</main>
-            <AdPlacement
+            <AdPlacementWrapper
               placementKey="footer_banner"
               className="mt-8"
             />

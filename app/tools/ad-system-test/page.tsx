@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { AdPlacement } from "@/components/ads/ad-placement";
+import { AdPlacementWrapper } from "@/components/ads/ad-placement-wrapper";
 
 export const metadata: Metadata = {
   title: "Ad System Test - Multi-Tool Platform",
@@ -35,7 +35,7 @@ export default function AdSystemTestPage() {
           <h2 className="text-lg font-semibold mb-2">Header Banner Test</h2>
           <p className="text-sm text-muted-foreground mb-2">Testing header_banner placement</p>
         </div>
-        <AdPlacement
+        <AdPlacementWrapper
           placementKey="header_banner"
           className="mb-8"
         />
@@ -45,7 +45,7 @@ export default function AdSystemTestPage() {
           <h2 className="text-lg font-semibold mb-2">Tool Page Top Test</h2>
           <p className="text-sm text-muted-foreground mb-2">Testing tool_page_top placement</p>
         </div>
-        <AdPlacement
+        <AdPlacementWrapper
           placementKey="tool_page_top"
           className="mb-8"
         />
@@ -55,7 +55,7 @@ export default function AdSystemTestPage() {
           <h2 className="text-lg font-semibold mb-2">Content Middle Test</h2>
           <p className="text-sm text-muted-foreground mb-2">Testing content_middle placement</p>
         </div>
-        <AdPlacement
+        <AdPlacementWrapper
           placementKey="content_middle"
           className="mb-8"
         />
@@ -65,7 +65,7 @@ export default function AdSystemTestPage() {
           <h2 className="text-lg font-semibold mb-2">Sidebar Ad Test</h2>
           <p className="text-sm text-muted-foreground mb-2">Testing sidebar_ad placement</p>
         </div>
-        <AdPlacement
+        <AdPlacementWrapper
           placementKey="sidebar_ad"
           className="mb-8"
         />
@@ -75,7 +75,7 @@ export default function AdSystemTestPage() {
           <h2 className="text-lg font-semibold mb-2">Mobile Banner Test</h2>
           <p className="text-sm text-muted-foreground mb-2">Testing mobile_banner placement</p>
         </div>
-        <AdPlacement
+        <AdPlacementWrapper
           placementKey="mobile_banner"
           className="mb-8"
         />
@@ -85,7 +85,7 @@ export default function AdSystemTestPage() {
           <h2 className="text-lg font-semibold mb-2">Footer Banner Test</h2>
           <p className="text-sm text-muted-foreground mb-2">Testing footer_banner placement</p>
         </div>
-        <AdPlacement
+        <AdPlacementWrapper
           placementKey="footer_banner"
           className="mb-8"
         />

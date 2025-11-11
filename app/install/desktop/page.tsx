@@ -14,7 +14,7 @@ import {
   Globe,
   Apple,
 } from "lucide-react";
-import { AdPlacement } from "@/components/ads/ad-placement";
+import { AdPlacementWrapper } from "@/components/ads/ad-placement-wrapper";
 
 export const metadata: Metadata = {
   title: "Install DvTools on Desktop - Windows, Mac & Linux PWA Guide",
@@ -178,7 +178,7 @@ export default function DesktopInstallPage() {
       </section>
 
       {/* Ad placement */}
-      <AdPlacement placementKey="content_top" className="py-4" />
+      <AdPlacementWrapper placementKey="content_top" className="py-4" />
 
       {/* Browser Selection */}
       <section className="py-20">

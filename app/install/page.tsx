@@ -15,7 +15,7 @@ import {
   Star,
   Zap,
 } from "lucide-react";
-import { AdPlacement } from "@/components/ads/ad-placement";
+import { AdPlacementWrapper } from "@/components/ads/ad-placement-wrapper";
 
 export const metadata: Metadata = {
   title: "Install DvTools - Download for All Devices | Progressive Web App",
@@ -180,7 +180,7 @@ export default function InstallPage() {
       </section>
 
       {/* Ad placement */}
-      <AdPlacement placementKey="content_top" className="py-4" />
+      <AdPlacementWrapper placementKey="content_top" className="py-4" />
 
       {/* Platform Selection */}
       <section id="platforms" className="py-20">

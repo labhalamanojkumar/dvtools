@@ -15,7 +15,7 @@ import {
   Star,
   Plus,
 } from "lucide-react";
-import { AdPlacement } from "@/components/ads/ad-placement";
+import { AdPlacementWrapper } from "@/components/ads/ad-placement-wrapper";
 
 export const metadata: Metadata = {
   title: "Install DvTools on iPhone & iPad - Add to Home Screen Guide",
@@ -164,7 +164,7 @@ export default function IOSInstallPage() {
       </section>
 
       {/* Ad placement */}
-      <AdPlacement placementKey="content_top" className="py-4" />
+      <AdPlacementWrapper placementKey="content_top" className="py-4" />
 
       {/* Installation Steps */}
       <section className="py-20">
