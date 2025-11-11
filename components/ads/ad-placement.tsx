@@ -4,7 +4,12 @@ import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { ExternalLink, Eye } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import DOMPurify from 'dompurify';
+
+// Dynamically import DOMPurify only on client side
+let DOMPurify: any = null;
+if (typeof window !== 'undefined') {
+  DOMPurify = require('dompurify');
+}
 
 interface AdCampaign {
   id: string;
@@ -195,10 +200,12 @@ export function AdPlacement({
   const renderAd = () => {
     if (currentCampaign.htmlCode) {
       // Custom HTML ad - sanitize to prevent XSS
-      const sanitizedHtml = DOMPurify.sanitize(currentCampaign.htmlCode, {
-        ALLOWED_TAGS: ['a', 'b', 'br', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'i', 'img', 'li', 'ol', 'p', 'span', 'strong', 'u', 'ul'],
-        ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class', 'id', 'style']
-      });
+      const sanitizedHtml = DOMPurify 
+        ? DOMPurify.sanitize(currentCampaign.htmlCode, {
+            ALLOWED_TAGS: ['a', 'b', 'br', 'div', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'i', 'img', 'li', 'ol', 'p', 'span', 'strong', 'u', 'ul'],
+            ALLOWED_ATTR: ['href', 'target', 'rel', 'src', 'alt', 'class', 'id', 'style']
+          })
+        : currentCampaign.htmlCode;
       return (
         <div
           className="ad-content ad-content--html"
