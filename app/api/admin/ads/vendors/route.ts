@@ -73,7 +73,11 @@ export async function POST(request: NextRequest) {
       type,
       description,
       isActive = true,
-      config = {}
+      config = {},
+      verificationCode,
+      verificationFile,
+      adsTxtEntry,
+      isVerified = false
     } = body
 
     // Validate required fields
@@ -91,15 +95,48 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Prepare vendor data
+    const vendorData: any = {
+      name,
+      type,
+      description,
+      isActive,
+      config
+    }
+
+    // Add verification fields to config if provided
+    if (verificationCode) {
+      vendorData.config = {
+        ...config,
+        verificationCode
+      }
+    }
+
+    if (verificationFile) {
+      vendorData.config = {
+        ...vendorData.config,
+        verificationFile
+      }
+    }
+
+    if (adsTxtEntry) {
+      vendorData.config = {
+        ...vendorData.config,
+        adsTxtEntry
+      }
+    }
+
+    if (isVerified !== undefined) {
+      vendorData.config = {
+        ...vendorData.config,
+        isVerified,
+        verifiedAt: isVerified ? new Date().toISOString() : null
+      }
+    }
+
     // Create the vendor
     const vendor = await prisma.adVendor.create({
-      data: {
-        name,
-        type,
-        description,
-        isActive,
-        config
-      }
+      data: vendorData
     })
 
     return NextResponse.json({
@@ -138,7 +175,11 @@ export async function PUT(request: NextRequest) {
       type,
       description,
       isActive,
-      config
+      config,
+      verificationCode,
+      verificationFile,
+      adsTxtEntry,
+      isVerified
     } = body
 
     if (!id) {
@@ -160,17 +201,45 @@ export async function PUT(request: NextRequest) {
       )
     }
 
+    // Prepare update data
+    const updateData: any = {
+      ...(name && { name }),
+      ...(type && { type }),
+      ...(description !== undefined && { description }),
+      ...(isActive !== undefined && { isActive }),
+      updatedAt: new Date()
+    }
+
+    // Handle config updates
+    if (config || verificationCode || verificationFile || adsTxtEntry || isVerified !== undefined) {
+      const existingConfig = (existingVendor.config as any) || {}
+      updateData.config = {
+        ...existingConfig,
+        ...config
+      }
+
+      if (verificationCode !== undefined) {
+        updateData.config.verificationCode = verificationCode
+      }
+
+      if (verificationFile !== undefined) {
+        updateData.config.verificationFile = verificationFile
+      }
+
+      if (adsTxtEntry !== undefined) {
+        updateData.config.adsTxtEntry = adsTxtEntry
+      }
+
+      if (isVerified !== undefined) {
+        updateData.config.isVerified = isVerified
+        updateData.config.verifiedAt = isVerified ? new Date().toISOString() : null
+      }
+    }
+
     // Update the vendor
     const vendor = await prisma.adVendor.update({
       where: { id },
-      data: {
-        ...(name && { name }),
-        ...(type && { type }),
-        ...(description !== undefined && { description }),
-        ...(isActive !== undefined && { isActive }),
-        ...(config && { config }),
-        updatedAt: new Date()
-      }
+      data: updateData
     })
 
     return NextResponse.json({

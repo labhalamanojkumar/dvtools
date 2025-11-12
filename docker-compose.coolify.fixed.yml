@@ -1,6 +1,8 @@
 # Coolify Deployment Configuration for DvTools
 # Optimized for VPS deployment with proper resource management
 
+version: "3.8"
+
 services:
   dvtools:
     # Build from local Dockerfile (use image: ... for prebuilt images)

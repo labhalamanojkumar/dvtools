@@ -97,6 +97,7 @@ export default function RootLayout({
           href="/apple-touch-icon.png"
         />
         <link rel="manifest" href="/manifest.json" />
+        {/* Ad vendor verification meta tags will be inserted dynamically */}
       </head>
       <body className={inter.className}>
         <Providers>

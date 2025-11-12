@@ -1,0 +1,21 @@
+# ads.txt for dvtools.in
+# This file declares authorized digital sellers for ad inventory
+# Format: domain, publisher_id, relationship_type, certification_authority_id
+
+# Google AdSense
+# google.com, pub-XXXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+
+# Media.net
+# media.net, XXXXX, DIRECT
+
+# Monetag (formerly PropellerAds)
+# propellerads.com, XXXXX, DIRECT
+
+# Amazon Associates
+# amazon-adsystem.com, XXXXX, DIRECT
+
+# Add your publisher IDs above - remove the # to uncomment
+# Replace XXXXX with your actual publisher IDs from each ad network
+
+# Contact: admin@dvtools.in
+# Last Updated: 2025-11-12

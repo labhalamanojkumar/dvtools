@@ -171,7 +171,11 @@ export default function AdsAdmin() {
     apiKey: "",
     apiSecret: "",
     siteId: "",
-    publisherId: ""
+    publisherId: "",
+    verificationCode: "",
+    verificationFile: "",
+    adsTxtEntry: "",
+    isVerified: false
   });
 
   const [newCampaign, setNewCampaign] = useState({
@@ -219,6 +223,27 @@ export default function AdsAdmin() {
 
     loadData();
   }, [session, router]);
+
+  // Populate form when editing a vendor
+  useEffect(() => {
+    if (editingVendor) {
+      const config = editingVendor.config as any || {};
+      setNewVendor({
+        name: editingVendor.name,
+        type: editingVendor.type,
+        description: editingVendor.description || "",
+        isActive: editingVendor.isActive,
+        apiKey: config.apiKey || "",
+        apiSecret: config.apiSecret || "",
+        siteId: config.siteId || "",
+        publisherId: config.publisherId || "",
+        verificationCode: config.verificationCode || "",
+        verificationFile: config.verificationFile || "",
+        adsTxtEntry: config.adsTxtEntry || "",
+        isVerified: config.isVerified || false
+      });
+    }
+  }, [editingVendor]);
 
   const loadData = async () => {
     setLoading(true);
@@ -275,7 +300,11 @@ export default function AdsAdmin() {
             apiKey: newVendor.apiKey,
             apiSecret: newVendor.apiSecret,
             siteId: newVendor.siteId,
-            publisherId: newVendor.publisherId
+            publisherId: newVendor.publisherId,
+            verificationCode: newVendor.verificationCode,
+            verificationFile: newVendor.verificationFile,
+            adsTxtEntry: newVendor.adsTxtEntry,
+            isVerified: newVendor.isVerified
           }
         }),
       });
@@ -287,6 +316,7 @@ export default function AdsAdmin() {
         });
         setShowCreateVendor(false);
         resetVendorForm();
+        setEditingVendor(null);
         loadData();
       } else {
         const error = await response.json();
@@ -306,6 +336,92 @@ export default function AdsAdmin() {
     }
   };
 
+  const updateVendor = async () => {
+    if (!editingVendor) return;
+
+    try {
+      const response = await fetch(`/api/admin/ads/vendors?id=${editingVendor.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newVendor.name,
+          type: newVendor.type,
+          description: newVendor.description,
+          isActive: newVendor.isActive,
+          config: {
+            apiKey: newVendor.apiKey,
+            apiSecret: newVendor.apiSecret,
+            siteId: newVendor.siteId,
+            publisherId: newVendor.publisherId,
+            verificationCode: newVendor.verificationCode,
+            verificationFile: newVendor.verificationFile,
+            adsTxtEntry: newVendor.adsTxtEntry,
+            isVerified: newVendor.isVerified
+          }
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Ad vendor updated successfully",
+        });
+        setShowCreateVendor(false);
+        resetVendorForm();
+        setEditingVendor(null);
+        loadData();
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Error",
+          description: error.error || "Failed to update vendor",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error updating vendor:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update vendor",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteVendor = async (vendorId: string, vendorName: string) => {
+    if (!confirm(`Are you sure you want to delete "${vendorName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/ads/vendors?id=${vendorId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Ad vendor deleted successfully",
+        });
+        loadData();
+      } else {
+        const error = await response.json();
+        toast({
+          title: "Error",
+          description: error.error || "Failed to delete vendor",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting vendor:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete vendor",
+        variant: "destructive",
+      });
+    }
+  };
+
   const resetVendorForm = () => {
     setNewVendor({
       name: "",
@@ -315,7 +431,11 @@ export default function AdsAdmin() {
       apiKey: "",
       apiSecret: "",
       siteId: "",
-      publisherId: ""
+      publisherId: "",
+      verificationCode: "",
+      verificationFile: "",
+      adsTxtEntry: "",
+      isVerified: false
     });
   };
 
@@ -389,7 +509,11 @@ export default function AdsAdmin() {
             Add Campaign
           </Button>
           <Button
-            onClick={() => setShowCreateVendor(true)}
+            onClick={() => {
+              setEditingVendor(null);
+              resetVendorForm();
+              setShowCreateVendor(true);
+            }}
           >
             <Plus className="w-4 h-4 mr-2" />
             Add Vendor
@@ -640,7 +764,10 @@ export default function AdsAdmin() {
                                   <Settings className="w-4 h-4 mr-2" />
                                   {vendor.isActive ? "Deactivate" : "Activate"}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-600">
+                                <DropdownMenuItem 
+                                  className="text-red-600"
+                                  onClick={() => deleteVendor(vendor.id, vendor.name)}
+                                >
                                   <Trash2 className="w-4 h-4 mr-2" />
                                   Delete
                                 </DropdownMenuItem>
@@ -1130,6 +1257,78 @@ export default function AdsAdmin() {
               </div>
             </div>
 
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Shield className="w-5 h-5" />
+                Vendor Verification
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Add verification codes and settings to enable ad vendor verification on your site.
+              </p>
+
+              <div className="space-y-2">
+                <Label htmlFor="vendor-verification-code">
+                  Verification Code / Meta Tag
+                </Label>
+                <Input
+                  id="vendor-verification-code"
+                  value={newVendor.verificationCode}
+                  onChange={(e) =>
+                    setNewVendor({ ...newVendor, verificationCode: e.target.value })
+                  }
+                  placeholder="e.g., google-site-verification content value"
+                />
+                <p className="text-xs text-muted-foreground">
+                  For Google: Enter the content value from the meta tag (e.g., "abc123xyz...")
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="vendor-ads-txt">ads.txt Entry</Label>
+                <Textarea
+                  id="vendor-ads-txt"
+                  value={newVendor.adsTxtEntry}
+                  onChange={(e) =>
+                    setNewVendor({ ...newVendor, adsTxtEntry: e.target.value })
+                  }
+                  placeholder="google.com, pub-XXXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0"
+                  rows={2}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Format: domain, publisher_id, relationship_type, certification_authority_id
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="vendor-verification-file">
+                  Verification File (JSON)
+                </Label>
+                <Textarea
+                  id="vendor-verification-file"
+                  value={newVendor.verificationFile}
+                  onChange={(e) =>
+                    setNewVendor({ ...newVendor, verificationFile: e.target.value })
+                  }
+                  placeholder={'{"filename": "monetag-verify.html", "content": "<html>...</html>", "contentType": "text/html"}'}
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Optional: JSON object with filename, content, and contentType for verification files
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="vendor-verified"
+                  checked={newVendor.isVerified}
+                  onCheckedChange={(checked) =>
+                    setNewVendor({ ...newVendor, isVerified: checked })
+                  }
+                />
+                <Label htmlFor="vendor-verified">Mark as Verified</Label>
+              </div>
+            </div>
+
             <div className="flex items-center space-x-2">
               <Switch
                 id="vendor-active"
@@ -1153,7 +1352,7 @@ export default function AdsAdmin() {
                 Cancel
               </Button>
               <Button
-                onClick={createVendor}
+                onClick={editingVendor ? updateVendor : createVendor}
                 disabled={!newVendor.name}
               >
                 {editingVendor ? "Update Vendor" : "Create Vendor"}

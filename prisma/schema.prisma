@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -714,6 +714,11 @@ model AdVendor {
   apiSecret         String?      
   siteId            String?
   publisherId       String?
+  verificationCode  String?       // HTML meta tag verification code
+  verificationFile  String?       // Verification file content (for root directory files)
+  adsTxtEntry       String?       // Entry for ads.txt file
+  isVerified        Boolean       @default(false)
+  verifiedAt        DateTime?
   isActive          Boolean       @default(true)
   config            Json?         // Additional configuration
   createdAt         DateTime      @default(now())
@@ -725,6 +730,7 @@ model AdVendor {
   
   @@index([type])
   @@index([isActive])
+  @@index([isVerified])
   @@map("ad_vendors")
 }
 

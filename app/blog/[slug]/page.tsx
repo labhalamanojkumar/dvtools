@@ -499,6 +499,10 @@ export default async function BlogPostPage({ params }: Props) {
   // Get OG image - handle both database posts (ogImage) and tool blogs (seo.ogImage)
   const ogImageUrl = post.ogImage || post.seo?.ogImage || '';
 
+  // Detect whether post.content contains HTML tags. If true, we'll render
+  // it using `dangerouslySetInnerHTML` so <img> and other tags are processed
+  // correctly. Otherwise treat the content as Markdown.
+  const contentIsHtml = /<\/?[a-z][\s\S]*>/i.test(post.content || '');
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Structured Data for SEO */}
@@ -615,7 +619,21 @@ export default async function BlogPostPage({ params }: Props) {
         <div className="lg:col-span-3">
           {/* Article Content */}
           <article className="prose prose-lg max-w-none dark:prose-invert">
-            <MarkdownRenderer content={post.content} />
+            {/*
+              post.content can be either Markdown or pre-rendered HTML depending on
+              how the post was created (editor -> HTML or markdown). If the content
+              contains HTML tags (e.g. <img>), render it as HTML. Otherwise treat it
+              as Markdown and use the MarkdownRenderer.
+            */}
+            {typeof post.markdownContent === 'string' && post.markdownContent.trim().length > 0 ? (
+              <MarkdownRenderer content={post.markdownContent} />
+            ) : contentIsHtml ? (
+              // content appears to contain HTML tags; render as HTML
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+            ) : (
+              // fallback: treat as markdown
+              <MarkdownRenderer content={post.content || ''} />
+            )}
           </article>
 
           {/* Author Card */}
